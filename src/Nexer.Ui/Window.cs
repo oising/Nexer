@@ -296,6 +296,19 @@ public class Window : Widget
         base.OnSizeChanged();
     }
 
+    /// <inheritdoc/>
+    protected override void OnChildAdded(Widget child)
+    {
+        ArgumentNullException.ThrowIfNull(child);
+        // A Panel/SplitPane added without a size fills the client area (Jexer code sizes them explicitly).
+        if (ChildList.Count == 1 && child is IFillsWindow && child.Width == 0 && child.Height == 0)
+        {
+            child.SetDimensions(child.X, child.Y, Math.Max(0, Width - 2 * ChildOffset), Math.Max(0, Height - 2 * ChildOffset));
+        }
+
+        base.OnChildAdded(child);
+    }
+
     // ---- appearance ----
 
     /// <summary>Current border colour (Jexer <c>getBorder</c>, without its side effects).</summary>

@@ -10,7 +10,7 @@ Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAM
 | a-windowing (Window, Desktop, Application loop, z-order, modal) | done |
 | a-menus (MenuBar/Menu/MenuItem/SubMenu/StatusBar/accelerators) | done |
 | a-controls (Label, Button, CheckBox, RadioGroup/RadioButton, Field, PasswordField, Spinner, ProgressBar, Text, HScroller/VScroller) | done |
-| a-scrolling | pending |
+| a-scrolling (ScrollableWindow, Panel, SplitPane) | done |
 | a-lists | pending |
 | a-dialogs | pending |
 | a-translucence | pending |
@@ -64,6 +64,14 @@ All types are in XML namespace `https://nexer.dev/ui`.
   `Text`, so the string property is `Content`.)
 - `HScroller`/`VScroller` (`Minimum`, `Maximum`, `Value`, `SmallChange`, `BigChange`, `ValueChanged`) and the
   `ScrollableWidget` base (internal scrollers on the right/bottom edges). Scrollers are never focused.
+- `ScrollableWindow` (non-sealed window) — `HasVerticalScroller`/`HasHorizontalScroller` put scrollers on the
+  right/bottom border; `VerticalValue`, `HorizontalValue`, `ToHome`/`ToEnd`; override `ReflowData` to update
+  ranges on resize.
+- `Panel` — `Title`, `TitlePosition` (TopLeft/Top/TopRight/BottomLeft/Bottom/BottomRight), `BorderStyle`
+  (default None); fills its area with `tpanel.border`.
+- `SplitPane` — `Vertical` (default true), `Split`, `Left`/`Right` (= `Top`/`Bottom`), `FocusFollowsMouse`;
+  content = up to two panes. The divider is dragged with the mouse; nested split panes draw ┤ ├ ┬ ┴ ┼ junctions.
+  A Panel/SplitPane that is a window's only child fills the client area (also when added unsized).
 ### Nexer.Ui.Layout
 
 - `StretchLayout`, `BoxLayout` (`Orientation`), `AnchorLayout` with the attached property
@@ -117,10 +125,14 @@ All types are in XML namespace `https://nexer.dev/ui`.
   CLR events. Scrollers clamp page steps the same way but expose `ValueChanged`.
 - `RadioGroup.SelectionChanged` is new (Jexer has no group action).
 - Button shadows use a black foreground over the existing background (Jexer: RGB black).
+- `SplitPane` panes can be set through properties or as content, in any order; `Left`/`Top` and `Right`/`Bottom`
+  are the same two slots (Jexer throws for the wrong orientation). The split stays centred until `Split` is set
+  or the divider is dragged. `removeSplit`/`replaceWidget` are not ported (set the pane properties instead).
+- Size changes invalidate the screen, so property-driven resizes repaint without an explicit refresh.
 
 ## Known gaps
 
-- Scrolling containers, lists, dialogs and translucence milestones are pending (see Progress).
+- Lists, dialogs and translucence milestones are pending (see Progress).
 - `ComboBox` depends on the list widget and is delivered with a-lists.
 - Field clipboard commands (cut/copy/paste/clear) are not implemented (no clipboard abstraction yet);
   bracketed paste works.

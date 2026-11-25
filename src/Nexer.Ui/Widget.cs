@@ -264,6 +264,7 @@ public class Widget : ISupportInitialize, IResourceProvider
         }
 
         OnSizeChanged();
+        Invalidate();
     }
 
     /// <summary>
@@ -363,10 +364,16 @@ public class Widget : ISupportInitialize, IResourceProvider
         }
 
         ResetTabOrder();
+        OnChildRemoved(child);
     }
 
     /// <summary>Called after a child is added.</summary>
     protected virtual void OnChildAdded(Widget child)
+    {
+    }
+
+    /// <summary>Called after a child is removed.</summary>
+    protected virtual void OnChildRemoved(Widget child)
     {
     }
 
