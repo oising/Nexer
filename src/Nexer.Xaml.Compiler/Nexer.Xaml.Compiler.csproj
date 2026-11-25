@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- XamlX is compiled from source (Avalonia style). XAMLX_INTERNAL is not defined because the
+         XamlX.IL.Cecil sources are unconditionally public; this is a build-time-only assembly. -->
+    <XamlXSrc>$(MSBuildThisFileDirectory)..\..\external\XamlX\src\</XamlXSrc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(XamlXSrc)XamlX\**\*.cs" Exclude="$(XamlXSrc)XamlX\obj\**;$(XamlXSrc)XamlX\bin\**" Link="XamlX\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(XamlXSrc)XamlX.IL.Cecil\**\*.cs" Exclude="$(XamlXSrc)XamlX.IL.Cecil\obj\**;$(XamlXSrc)XamlX.IL.Cecil\bin\**" Link="XamlX.IL.Cecil\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Nexer.Xaml.Build" />
+    <InternalsVisibleTo Include="Nexer.Xaml.Loader" />
+    <InternalsVisibleTo Include="Nexer.Xaml.Tests" />
+  </ItemGroup>
+</Project>
+

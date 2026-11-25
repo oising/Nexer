@@ -2,9 +2,23 @@
   <Folder Name="/src/">
     <Project Path="src/Nexer.Core/Nexer.Core.csproj" />
     <Project Path="src/Nexer.Emulation/Nexer.Emulation.csproj" />
+    <Project Path="src/Nexer.Hosting/Nexer.Hosting.csproj" />
+    <Project Path="src/Nexer.Input/Nexer.Input.csproj" />
+    <Project Path="src/Nexer.Rendering/Nexer.Rendering.csproj" />
+    <Project Path="src/Nexer.Ui.Testing/Nexer.Ui.Testing.csproj" />
+    <Project Path="src/Nexer.Ui/Nexer.Ui.csproj" />
+    <Project Path="src/Nexer.Xaml.Build/Nexer.Xaml.Build.csproj" />
+    <Project Path="src/Nexer.Xaml.Compiler/Nexer.Xaml.Compiler.csproj" />
+    <Project Path="src/Nexer.Xaml.Generators/Nexer.Xaml.Generators.csproj" />
+    <Project Path="src/Nexer.Xaml.Loader/Nexer.Xaml.Loader.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Nexer.Core.Tests/Nexer.Core.Tests.csproj" />
     <Project Path="tests/Nexer.Emulation.Tests/Nexer.Emulation.Tests.csproj" />
+    <Project Path="tests/Nexer.Hosting.Tests/Nexer.Hosting.Tests.csproj" />
+    <Project Path="tests/Nexer.Input.Tests/Nexer.Input.Tests.csproj" />
+    <Project Path="tests/Nexer.Rendering.Tests/Nexer.Rendering.Tests.csproj" />
+    <Project Path="tests/Nexer.Ui.Tests/Nexer.Ui.Tests.csproj" />
+    <Project Path="tests/Nexer.Xaml.Tests/Nexer.Xaml.Tests.csproj" />
   </Folder>
 </Solution>
