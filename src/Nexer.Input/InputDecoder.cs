@@ -693,8 +693,13 @@ public sealed class InputDecoder
         MouseEventKind kind;
         if ((code & 64) != 0)
         {
-            if (low > 1) return; // horizontal wheel: not in the contract
-            kind = low == 0 ? MouseEventKind.WheelUp : MouseEventKind.WheelDown;
+            kind = low switch
+            {
+                0 => MouseEventKind.WheelUp,
+                1 => MouseEventKind.WheelDown,
+                2 => MouseEventKind.WheelLeft,
+                _ => MouseEventKind.WheelRight,
+            };
             button = MouseButton.None;
         }
         else if ((code & 32) != 0)
@@ -760,8 +765,21 @@ public sealed class InputDecoder
         int bits = parameter - 1;
         KeyModifiers modifiers = KeyModifiers.None;
         if ((bits & 1) != 0) modifiers |= KeyModifiers.Shift;
-        if ((bits & 2) != 0 || (bits & 8) != 0) modifiers |= KeyModifiers.Alt;
+        if ((bits & 2) != 0) modifiers |= KeyModifiers.Alt;
         if ((bits & 4) != 0) modifiers |= KeyModifiers.Ctrl;
+        if (bits < 16)
+        {
+            // xterm layout: 8 = Meta.
+            if ((bits & 8) != 0) modifiers |= KeyModifiers.Meta;
+        }
+        else
+        {
+            // Bits above 8 only exist in the kitty layout: 8 = Super, 16 = Hyper (no contract member),
+            // 32 = Meta, 64/128 = Caps/Num Lock (ignored).
+            if ((bits & 8) != 0) modifiers |= KeyModifiers.Super;
+            if ((bits & 32) != 0) modifiers |= KeyModifiers.Meta;
+        }
+
         return modifiers;
     }
 
