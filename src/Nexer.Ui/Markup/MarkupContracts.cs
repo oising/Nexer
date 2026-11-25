@@ -94,6 +94,15 @@ public interface IXmlNamespaceInfoProvider
     IReadOnlyDictionary<string, IReadOnlyList<XmlNamespaceInfo>> XmlNamespaces { get; }
 }
 
+/// <summary>
+/// Implemented by objects that hold named resources (Widget, Application). Markup extensions such as
+/// <c>{StaticResource}</c> walk <see cref="IParentStackProvider.Parents"/> and query each provider.
+/// </summary>
+public interface IResourceProvider
+{
+    bool TryGetResource(string key, out object? value);
+}
+
 /// <summary>Used for child elements when the parent has no content property.</summary>
 public interface IAddChild
 {
