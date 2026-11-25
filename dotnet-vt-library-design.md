@@ -3,6 +3,14 @@
 Status: proposed architecture and implementation plan; no implementation or
 performance claims. Working name: `VtKit` (package-name availability not checked).
 
+> **Implementation status.** This document is kept as the original design record. It is implemented in
+> this repository under the name **Nexer**: `VtKit.Core` → `Nexer.Core`, `VtKit.Emulation` → `Nexer.Emulation`,
+> `VtKit.Input` → `Nexer.Input`, `VtKit.Rendering` → `Nexer.Rendering` (`VtRenderer`), and `VtKit.Hosting` →
+> `Nexer.Hosting` (`ConsoleTerminalHost`). Phases 2B (TUI backend) and 3 (hosting) are implemented and
+covered by automated tests; Unix hosting has not yet been verified on a real Unix terminal. For the current API
+> see [`docs/backend.md`](docs/backend.md) and [`COMPATIBILITY.md`](COMPATIBILITY.md). The windowing
+> framework built on top of it (`Nexer.Ui`, XAML) is described in [`docs/architecture.md`](docs/architecture.md).
+
 ## 1. Decision and scope
 
 Build two independently usable features over a small shared foundation:

@@ -39,11 +39,17 @@ All types are in XML namespace `https://nexer.dev/ui`.
 - `DrawContext` — clip/offset drawing over a `CellSurface` (PutChar, PutString, HLine, VLine, Fill, DrawBox,
   DrawBoxShadow). Override `Widget.Draw(DrawContext)` for custom widgets.
 - `ColorTheme` — all Jexer default keys (generated from `bits/ColorTheme.java` by
-  `Themes/generate_theme_defaults.py`), `SetColor(key, "bold white on blue")`, `Load(TextReader)`. In XAML a theme takes `ThemeColor` children\r\n  (`<Window.OwnTheme><ColorTheme><ThemeColor Key="tlabel" Style="bold yellow on blue" /></ColorTheme></Window.OwnTheme>`;\r\n  `Style` is converted at compile time); a new `ColorTheme` starts from the defaults.
+  `Themes/generate_theme_defaults.py`), `SetColor(key, "bold white on blue")`, `Load(TextReader)`. In XAML a theme takes `ThemeColor` children
+  (`<Window.OwnTheme><ColorTheme><ThemeColor Key="tlabel" Style="bold yellow on blue" /></ColorTheme></Window.OwnTheme>`;
+  `Style` is converted at compile time); a new `ColorTheme` starts from the defaults.
 - Parse-able value types: `Rect` (`"x,y,w,h"`), `Thickness` (`"1"`, `"h,v"`, `"l,t,r,b"`), `KeyGesture`
   (`"Ctrl+Q"`, `"Alt+F"`, `"F10"`, `"Shift+Tab"`, `"Ctrl+Plus"`), `Command` (`"Exit"`, `"Tile"`, any name),
   `BorderStyle` (`"Single"`, `"Double"`, `"SingleVDoubleH"`, `"SingleHDoubleV"`, `"Round"`, `"None"`).
 - Mnemonics: `"&File"` underlines/accelerates `F`; write `&&` for a literal ampersand (`"Save && &Quit"`).
+  `MnemonicString` exposes the parsed result for custom widgets.
+- Mouse: widgets receive `UiMouseEvent` (`MouseAction`, button, local and absolute coordinates) already re-based
+  into their local coordinates; double-clicks are synthesized by the application.
+- Timers: `Application.AddTimer(interval, action, recurring)` returns a `UiTimer` (dispose to cancel).
 
 ### Nexer.Ui.Controls
 
@@ -71,7 +77,8 @@ All types are in XML namespace `https://nexer.dev/ui`.
   (default None); fills its area with `tpanel.border`.
 - `SplitPane` — `Vertical` (default true), `Split`, `Left`/`Right` (= `Top`/`Bottom`), `FocusFollowsMouse`;
   content = up to two panes. The divider is dragged with the mouse; nested split panes draw ┤ ├ ┬ ┴ ┼ junctions.
-  A Panel/SplitPane that is a window's only child fills the client area (also when added unsized); the border\r\n  scrollers of a `ScrollableWindow` do not count as children for this rule.
+  A Panel/SplitPane that is a window's only child fills the client area (also when added unsized); the border
+  scrollers of a `ScrollableWindow` do not count as children for this rule.
 - `List` — `[Content] Items` (strings; `ReplaceAll`), `SelectedIndex`, `SelectedItem`, events `SelectionChanged`,
   `ItemActivated` (Enter/double-click), `ItemClicked`.
 - `ComboBox` — `[Content] Items`, `Text`, `SelectedIndex`, `LimitToListValue` (default true), `MaxValuesHeight`,
@@ -113,7 +120,8 @@ All types are in XML namespace `https://nexer.dev/ui`.
   `EnqueueText`, `EnqueueClick`, `EnqueueDrag`, `EnqueuePaste`, `Resize`), captured `Frame` (`ScreenSnapshot`).
 - `UiDriver` — attaches an application and pumps until idle after each step (`Press("Alt+F")`, `Type`,
   `Click`, `Drag`, `Advance(TimeSpan)`, `Text()`, `Row(y)`, `Style(x, y)`).
-- `ScreenDump.Text` / `ScreenDump.Attributes`.
+- `ScreenDump.Text` / `ScreenDump.Attributes`; `ScreenSnapshot` cell accessors `GetText`, `GetStyle`, `GetRole`,
+  `GetRowText`.
 
 ## Design notes
 

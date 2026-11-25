@@ -104,7 +104,9 @@ public partial class MainWindow : Window
 
 The generated `InitializeComponent(IServiceProvider? services = null)` calls
 `XamlComponent.InitializeComponent<MainWindow>(this, services)` and then assigns each `x:Name` field from the
-root's `NameScope`. Fields are `internal` unless `x:FieldModifier` says otherwise.
+root's `NameScope`. Fields are `internal` unless `x:FieldModifier` says otherwise. No field is generated for an
+`x:Name` on the root element itself, or for named elements inside `[DeferredContent]` (they are created later,
+possibly many times).
 
 ## Runtime API
 

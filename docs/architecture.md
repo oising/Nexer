@@ -7,16 +7,22 @@ visual reference; Nexer.Core is the cell/Unicode foundation.
 
 ## Reference documents
 
+These live outside this repository (paths relative to the Jexer checkout that contains `nexer\`, and to a
+XamlX checkout):
+
 | Document | Use |
 |---|---|
-| `C:\dev\scratch\jexer\src\jexer-windowing-analysis.md` | Widget tree, coordinates, window chrome, event/draw order, z-order, layouts, translucence, Java defects (§9). |
-| `C:\dev\scratch\jexer\src\jexer-rendering-analysis.md` | Cell model, diff algorithm, SGR, input parsing, Windows console setup. |
-| `dotnet-vt-library-design.md` | Authoritative design for Rendering/Input/Hosting. Overrides Jexer where they differ. |
-| `README.md`, `COMPATIBILITY.md` | What Nexer.Core / Nexer.Emulation guarantee. |
-| `C:\dev\github\XamlX\docs\tui-framework-guide.md` | XamlX mapping contract, object-model rules, gotchas. |
-| Jexer sources: `C:\dev\scratch\jexer\src\jexer\**` | Behavioural reference for ports. |
+| `..\src\jexer-windowing-analysis.md` (Jexer checkout) | Widget tree, coordinates, window chrome, event/draw order, z-order, layouts, translucence, Java defects (§9). |
+| `..\src\jexer-rendering-analysis.md` (Jexer checkout) | Cell model, diff algorithm, SGR, input parsing, Windows console setup. |
+| [`dotnet-vt-library-design.md`](../dotnet-vt-library-design.md) | Authoritative design for Rendering/Input/Hosting. Overrides Jexer where they differ. |
+| [`README.md`](../README.md), [`COMPATIBILITY.md`](../COMPATIBILITY.md) | What Nexer.Core / Nexer.Emulation guarantee. |
+| `docs/tui-framework-guide.md` in a XamlX checkout (not in the `external\XamlX` submodule) | XamlX mapping contract, object-model rules, gotchas. |
+| Jexer sources: `..\src\jexer\**` (Jexer checkout) | Behavioural reference for ports. |
 
 ## Projects and ownership
+
+The *Owner* column and the editing rule below record how the code was originally built: three parallel agents
+plus a coordinator. They still describe each project's area of responsibility.
 
 ```
 Core  <-  Input, Rendering  <-  Hosting  <-  Ui  <-  Ui.Testing
@@ -82,7 +88,8 @@ Additive extensions (new members) are possible by request; renames/removals are 
 - One **UI thread** owns the entire widget tree and calls `ITerminalHost.Present`.
 - `Application.Run` installs a single-threaded `SynchronizationContext` and pumps: input from
   `ITerminalHost.Input`, posted continuations, timers (via `TimeProvider`), then draws if invalidated.
-- Hosts read input on a background task and write to a bounded `Channel<InputEvent>`.
+- `ConsoleTerminalHost` reads input on a background task into a bounded `Channel<InputEvent>`
+  (`InputCapacity`); the test `HeadlessHost` uses an unbounded channel fed by scripted input.
 - Modal UI is `Task<T> ShowModalAsync()`; awaiting continues on the UI context. No nested loops,
   no secondary UI threads (this replaces Jexer's `yield()`).
 - `Application.Invoke`/`InvokeAsync`/`Post` marshal work from other threads.
