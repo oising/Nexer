@@ -1,0 +1,21 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoTextWindow"
+        Title="Text Area" Width="50" Height="21" Centered="True">
+  <Window.Layout>
+    <AnchorLayout />
+  </Window.Layout>
+  <Window.StatusBar>
+    <StatusBar Text="Reflowable text window">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F3" Text="Open" Command="Open" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Button x:Name="LeftButton" Text="&amp;Left" X="1" Y="1" Click="OnLeft" />
+  <Button x:Name="CenterButton" Text="&amp;Center" X="10" Y="1" Click="OnCenter" />
+  <Button x:Name="RightButton" Text="&amp;Right" X="21" Y="1" Click="OnRight" />
+  <Button x:Name="FullButton" Text="&amp;Full" X="31" Y="1" Click="OnFull" />
+  <Text x:Name="Body" X="1" Y="4" Width="45" Height="14" Justification="Left" AnchorLayout.Anchor="All" />
+</Window>

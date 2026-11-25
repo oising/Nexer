@@ -1,0 +1,22 @@
+<Application xmlns="https://nexer.dev/ui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Nexer.Ui.Xaml.Tests.Views.CompiledApplication"
+             ConfirmExit="False">
+  <Application.Resources>
+    <x:String x:Key="appTitle">From application</x:String>
+  </Application.Resources>
+  <Application.Menus>
+    <Menu Title="&amp;File">
+      <MenuItem x:Name="OpenItem" Text="&amp;Open" Shortcut="Ctrl+O" Click="OnOpen" />
+      <MenuSeparator />
+      <SubMenu Text="&amp;Recent">
+        <MenuItem Text="&amp;One" Click="OnRecent" />
+      </SubMenu>
+      <MenuItem Text="E&amp;xit" Shortcut="Alt+X" Command="{x:Static Command.Exit}" />
+    </Menu>
+    <Menu Title="&amp;Window">
+      <MenuItem Text="&amp;Tile" Command="Tile" />
+      <MenuItem Text="&amp;Wrap" Checkable="True" Checked="True" />
+    </Menu>
+  </Application.Menus>
+</Application>

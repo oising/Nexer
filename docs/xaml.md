@@ -263,3 +263,33 @@ type systems and has no dependency on concrete controls). The compiler relies on
   references only).
 - The SRE loader keeps compiled documents (dynamic assemblies) alive for the process lifetime (non-collectible).
 - Hot reload is not wired up; use `XamlComponent.Fallback` + `XamlLoader` to experiment.
+
+## Real-control coverage
+
+`tests\Nexer.Ui.Xaml.Tests` compiles XAML in the real `https://nexer.dev/ui` namespace both at runtime (`XamlLoader`)
+and at build time (the test assembly itself imports `Nexer.Xaml.targets`), then renders it through `HeadlessHost`.
+`tests\Nexer.Xaml.Tests` keeps testing the toolchain against the fixture object model
+(`https://nexer.dev/ui/test-fixtures`).
+
+Idioms for the real controls:
+
+- Lists, combo boxes: `<List><x:String>One</x:String></List>`; trees: `<TreeView><TreeItem Text="Root">…</TreeItem></TreeView>`.
+- Menus live on the application: an `x:Class` root of type `Application` with `<Application.Menus><Menu Title="&amp;File">…`.
+- Status bars: `<Window.StatusBar><StatusBar Text="…"><StatusKey Key="F1" Text="Help" Command="Help" /></StatusBar></Window.StatusBar>`.
+- Colours: `<Window.OwnTheme><ColorTheme><ThemeColor Key="tlabel" Style="bold yellow on blue" /></ColorTheme></Window.OwnTheme>`.
+- Layout: `<Window.Layout><AnchorLayout /></Window.Layout>` and `AnchorLayout.Anchor="Right, Bottom"` on children.
+- A `{StaticResource}` used on the element that declares the resources is resolved before the property element is
+  processed; reference resources from descendants (or the application) instead.
+
+## Demo application notes
+
+`samples\Nexer.Demo` is the reference app for the Cecil path (`build\Nexer.Xaml.targets` + generator); every window
+is a `.xaml` + `.xaml.cs` pair and the build reports zero XAML diagnostics. Lessons from it:
+
+- Generated `x:Name` fields are `internal`; the demo exposes them to `tests\Nexer.Demo.Tests` with
+  `<InternalsVisibleTo Include="Nexer.Demo.Tests" />` rather than `x:FieldModifier="public"`.
+- `Command="Open"` creates `new Command("Open")`; commands compare by name, so a code-behind
+  `public static readonly Command Open = new("Open")` matches it in `Application.OnCommand`. Built-in commands use
+  `{x:Static Command.Exit}` (either form works).
+- Properties of derived roots work as property elements (`<Desktop.StatusBar>`, `<ScrollableWindow.StatusBar>`).
+- An MSBuild XML comment in the csproj must not contain `--` (it breaks project loading, not XAML).

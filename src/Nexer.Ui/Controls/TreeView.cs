@@ -226,7 +226,8 @@ public class TreeView : ScrollableWidget
         HorizontalScroller.ValueChanged += (_, _) => Invalidate();
     }
 
-    /// <summary>The root item.</summary>
+    /// <summary>The root item (content property).</summary>
+    [Content]
     public TreeItem? Root
     {
         get => root;

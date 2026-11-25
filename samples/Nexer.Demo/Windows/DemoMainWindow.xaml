@@ -1,0 +1,44 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoMainWindow"
+        Title="Demo Window" Width="64" Height="23" Centered="True">
+  <Window.StatusBar>
+    <StatusBar Text="Demo Main Window">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F3" Text="Open" Command="Open" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="Message Boxes" X="1" Y="1" />
+  <Button x:Name="MessageBoxesButton" Text="&amp;MessageBoxes" X="37" Y="1" Click="OnMessageBoxes" />
+
+  <Label Text="Open me as modal" X="1" Y="3" />
+  <Button x:Name="ModalButton" Text="M&amp;odal" X="37" Y="3" Click="OnModal" />
+
+  <Label Text="Text fields, spinner, progress" X="1" Y="5" />
+  <Button x:Name="FieldsButton" Text="Field&amp;s" X="37" Y="5" Click="OnFields" />
+
+  <Label Text="Radio buttons◎, checkbox√, combobox↓" X="1" Y="7" />
+  <Button x:Name="CheckBoxesButton" Text="&amp;CheckBoxes" X="37" Y="7" Click="OnCheckBoxes" />
+
+  <Label Text="Text areas" X="1" Y="9" />
+  <Button x:Name="TextButton" Text="&amp;3 Text" X="37" Y="9" Click="OnText" />
+
+  <Label Text="Tree views, lists, directories" X="1" Y="11" />
+  <Button x:Name="TreeViewButton" Text="Tree&amp;View" X="37" Y="11" Click="OnTreeView" />
+
+  <Label Text="Scrollable window" X="1" Y="13" />
+  <Button x:Name="ScrollableButton" Text="Sc&amp;roll" X="37" Y="13" Click="OnScrollable" />
+
+  <Label Text="Split panes" X="1" Y="15" />
+  <Button x:Name="SplitButton" Text="S&amp;plit" X="37" Y="15" Click="OnSplitPane" />
+
+  <Label Text="File open box" X="1" Y="17" />
+  <Button x:Name="OpenFileButton" Text="Ope&amp;n" X="37" Y="17" Click="OnOpenFile" />
+
+  <ProgressBar x:Name="Progress1" X="50" Y="15" Width="12" />
+  <Label x:Name="TimerLabel" Text="Timer" X="50" Y="16" />
+  <ProgressBar x:Name="Progress2" X="50" Y="17" Width="12"
+               LeftBorderChar="╞" RightBorderChar="╡" CompletedChar="▒" RemainingChar="═" />
+</Window>

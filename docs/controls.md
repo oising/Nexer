@@ -39,7 +39,7 @@ All types are in XML namespace `https://nexer.dev/ui`.
 - `DrawContext` — clip/offset drawing over a `CellSurface` (PutChar, PutString, HLine, VLine, Fill, DrawBox,
   DrawBoxShadow). Override `Widget.Draw(DrawContext)` for custom widgets.
 - `ColorTheme` — all Jexer default keys (generated from `bits/ColorTheme.java` by
-  `Themes/generate_theme_defaults.py`), `SetColor(key, "bold white on blue")`, `Load(TextReader)`.
+  `Themes/generate_theme_defaults.py`), `SetColor(key, "bold white on blue")`, `Load(TextReader)`. In XAML a theme takes `ThemeColor` children\r\n  (`<Window.OwnTheme><ColorTheme><ThemeColor Key="tlabel" Style="bold yellow on blue" /></ColorTheme></Window.OwnTheme>`;\r\n  `Style` is converted at compile time); a new `ColorTheme` starts from the defaults.
 - Parse-able value types: `Rect` (`"x,y,w,h"`), `Thickness` (`"1"`, `"h,v"`, `"l,t,r,b"`), `KeyGesture`
   (`"Ctrl+Q"`, `"Alt+F"`, `"F10"`, `"Shift+Tab"`, `"Ctrl+Plus"`), `Command` (`"Exit"`, `"Tile"`, any name),
   `BorderStyle` (`"Single"`, `"Double"`, `"SingleVDoubleH"`, `"SingleHDoubleV"`, `"Round"`, `"None"`).
@@ -71,12 +71,12 @@ All types are in XML namespace `https://nexer.dev/ui`.
   (default None); fills its area with `tpanel.border`.
 - `SplitPane` — `Vertical` (default true), `Split`, `Left`/`Right` (= `Top`/`Bottom`), `FocusFollowsMouse`;
   content = up to two panes. The divider is dragged with the mouse; nested split panes draw ┤ ├ ┬ ┴ ┼ junctions.
-  A Panel/SplitPane that is a window's only child fills the client area (also when added unsized).
+  A Panel/SplitPane that is a window's only child fills the client area (also when added unsized); the border\r\n  scrollers of a `ScrollableWindow` do not count as children for this rule.
 - `List` — `[Content] Items` (strings; `ReplaceAll`), `SelectedIndex`, `SelectedItem`, events `SelectionChanged`,
   `ItemActivated` (Enter/double-click), `ItemClicked`.
-- `ComboBox` — `Items`, `Text`, `SelectedIndex`, `LimitToListValue` (default true), `MaxValuesHeight`,
+- `ComboBox` — `[Content] Items`, `Text`, `SelectedIndex`, `LimitToListValue` (default true), `MaxValuesHeight`,
   `ShowList`/`HideList`, `Changed` event. Alt+Down or a click on the arrow opens the list.
-- `TreeView` — `Root` (a `TreeItem`), `SelectedItem`, `Select(item, center)`, `VisibleItems`, events
+- `TreeView` — `[Content] Root` (a `TreeItem`), `SelectedItem`, `Select(item, center)`, `VisibleItems`, events
   `SelectionChanged`/`ItemActivated`. `TreeItem` is a model object (not a widget): `Text`, `[Content] Items`,
   `IsExpanded`, `IsExpandable`, `IsSelectable`, `Tag`, virtual `OnExpand` for lazy loading.
 - `DirectoryTreeItem` (`Path`; static `OpenPath(view, path)`) and `DirectoryList` (`Path`, `Filter` = regexes
@@ -169,3 +169,29 @@ All types are in XML namespace `https://nexer.dev/ui`.
 - Field clipboard commands (cut/copy/paste/clear) are not implemented (no clipboard abstraction yet);
   bracketed paste works.
 - Buttons are square style only (Jexer's round/diamond/arrow styles need pixel images).
+
+## XAML integration fixes
+
+Found while compiling XAML against the real controls (`tests\Nexer.Ui.Xaml.Tests`):
+
+- `List.Items`, `ComboBox.Items` and `TreeView.Root` are now `[Content]` properties (before, items written as content
+  were routed to the inherited `Widget.Children` and failed to compile).
+- `ColorTheme` implements `IAddChild<ThemeColor>` so themes (and therefore `CellStyle` values) can be authored in XAML.
+- The "only child fills the window" rule ignores a `ScrollableWindow`'s border scrollers, and also applies when a
+  scrollable window is resized.
+- `Application` works as an `x:Class` XAML root (menus in `<Application.Menus>`, `<Application.Resources>`).
+
+## Notes from the demo (integration)
+
+- Key routing: the active window's shortcut keys (button mnemonics, `Alt+letter`) win over menu accelerators and
+  `Alt+letter` menu mnemonics. Pick button mnemonics that do not clash with the menu bar titles (the demo's main
+  window uses "Ope&n" because Alt+E opens the Edit menu). Menu accelerators are ignored while a modal window is active.
+- Framework hooks are `protected internal virtual` (`Draw`, `OnKeypress`, `OnClosed`, `OnAddedToApplication`,
+  `OnCommand`); app assemblies override them as `protected override`. `Application.OnCommand` is `protected virtual`.
+- Windows that own timers should create them in `OnAddedToApplication` and dispose them in `OnClosed`
+  (see `DemoMainWindow`).
+- A `ScrollableWindow` with a virtual canvas overrides `Draw` (offsetting by `HorizontalValue`/`VerticalValue`),
+  `ReflowData` (setting the scrollers' maximums) and `OnKeypress` (see `DemoScrollableWindow`).
+- `TileWindows` follows Jexer's integer arithmetic: two windows on a 23-row desktop are 11 rows each, leaving one row
+  uncovered.
+- `PasswordField` draws `Width - 2` stars when inactive regardless of the text length (Jexer behaviour).

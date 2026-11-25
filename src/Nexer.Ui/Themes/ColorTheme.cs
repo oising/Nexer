@@ -1,13 +1,16 @@
 // Ported from Jexer bits/ColorTheme.java (MIT, © Autumn Lamonte).
 using System.Diagnostics.CodeAnalysis;
 using Nexer.Core;
+using Nexer.Ui.Markup;
 
 namespace Nexer.Ui;
 
 /// <summary>
 /// Named colours keyed by Jexer's theme keys (e.g. <c>"twindow.border"</c>). A new theme holds Jexer's defaults.
+/// In XAML, <see cref="ThemeColor"/> children override entries:
+/// <c>&lt;ColorTheme&gt;&lt;ThemeColor Key="tbutton.active" Style="bold yellow on red" /&gt;&lt;/ColorTheme&gt;</c>.
 /// </summary>
-public partial class ColorTheme
+public partial class ColorTheme : IAddChild<ThemeColor>
 {
     private readonly Dictionary<string, CellStyle> colors = new(StringComparer.Ordinal);
 
@@ -74,6 +77,15 @@ public partial class ColorTheme
         }
     }
 
+    /// <summary>Sets the colour described by <paramref name="child"/> (XAML content).</summary>
+    public void AddChild(ThemeColor child)
+    {
+        ArgumentNullException.ThrowIfNull(child);
+        SetColor(child.Key ?? throw new ArgumentException("ThemeColor.Key is required.", nameof(child)), child.Style);
+    }
+
+    void IAddChild.AddChild(object child) => AddChild(child as ThemeColor ?? throw new ArgumentException("Only ThemeColor elements can be added to a ColorTheme.", nameof(child)));
+
     /// <summary>Returns a copy of this theme.</summary>
     public ColorTheme Clone()
     {
@@ -82,4 +94,14 @@ public partial class ColorTheme
         foreach (var (k, v) in colors) copy.colors[k] = v;
         return copy;
     }
+}
+
+/// <summary>One theme entry authored in XAML as content of a <see cref="ColorTheme"/>.</summary>
+public sealed class ThemeColor
+{
+    /// <summary>The theme key, e.g. <c>"twindow.background"</c>.</summary>
+    public string? Key { get; set; }
+
+    /// <summary>The colour (<see cref="StyleSyntax"/> in XAML, converted at compile time).</summary>
+    public CellStyle Style { get; set; }
 }

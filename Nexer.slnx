@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/samples/">
     <Project Path="samples/Nexer.Backend.Sample/Nexer.Backend.Sample.csproj" />
+    <Project Path="samples/Nexer.Demo/Nexer.Demo.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Nexer.Core/Nexer.Core.csproj" />
@@ -17,11 +18,13 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Nexer.Core.Tests/Nexer.Core.Tests.csproj" />
+    <Project Path="tests/Nexer.Demo.Tests/Nexer.Demo.Tests.csproj" />
     <Project Path="tests/Nexer.Emulation.Tests/Nexer.Emulation.Tests.csproj" />
     <Project Path="tests/Nexer.Hosting.Tests/Nexer.Hosting.Tests.csproj" />
     <Project Path="tests/Nexer.Input.Tests/Nexer.Input.Tests.csproj" />
     <Project Path="tests/Nexer.Rendering.Tests/Nexer.Rendering.Tests.csproj" />
     <Project Path="tests/Nexer.Ui.Tests/Nexer.Ui.Tests.csproj" />
+    <Project Path="tests/Nexer.Ui.Xaml.Tests/Nexer.Ui.Xaml.Tests.csproj" />
     <Project Path="tests/Nexer.Xaml.Fixtures/Nexer.Xaml.Fixtures.csproj" />
     <Project Path="tests/Nexer.Xaml.TestApp/Nexer.Xaml.TestApp.csproj" />
     <Project Path="tests/Nexer.Xaml.Tests/Nexer.Xaml.Tests.csproj" />

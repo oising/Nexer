@@ -1,0 +1,42 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoTextFieldWindow"
+        Title="Text Fields" Width="60" Height="20" Centered="True">
+  <Window.Resources>
+    <x:String x:Key="fieldText">-- Field text --</x:String>
+  </Window.Resources>
+  <Window.StatusBar>
+    <StatusBar Text="Text fields">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F3" Text="Open" Command="Open" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="Variable-width text field:" X="1" Y="1" />
+  <Field x:Name="Field1" Text="{StaticResource fieldText}" X="35" Y="1" Width="15" />
+  <Label Text="Fixed-width text field:" X="1" Y="3" />
+  <Field x:Name="Field2" X="35" Y="3" Width="15" Fixed="True" />
+  <Label Text="Variable-width password:" X="1" Y="5" />
+  <PasswordField x:Name="Password1" X="35" Y="5" Width="15" />
+  <Label Text="Fixed-width password:" X="1" Y="7" />
+  <PasswordField x:Name="Password2" Text="hunter2" X="35" Y="7" Width="15" Fixed="True" />
+  <Label Text="Very long text field:" X="1" Y="9" />
+  <Field x:Name="LongField" Text="Very very long field text that should be outside the window" X="35" Y="9" Width="40" />
+
+  <Label Text="Day of week:" X="1" Y="11" />
+  <ComboBox x:Name="DayCombo" X="35" Y="11" Width="13" LimitToListValue="True" Changed="OnDayChanged">
+    <x:String>Sunday</x:String>
+    <x:String>Monday</x:String>
+    <x:String>Tuesday</x:String>
+    <x:String>Wednesday</x:String>
+    <x:String>Thursday</x:String>
+    <x:String>Friday</x:String>
+    <x:String>Saturday</x:String>
+  </ComboBox>
+  <Spinner x:Name="DaySpinner" X="48" Y="11" SpinUp="OnSpinUp" SpinDown="OnSpinDown" />
+  <Label Text="Week progress:" X="1" Y="13" />
+  <ProgressBar x:Name="WeekProgress" X="35" Y="13" Width="15" />
+
+  <Button x:Name="CloseButton" Text="&amp;Close Window" X="20" Y="15" Click="OnClose" />
+</Window>
