@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Port of Jexer's demo. Every window is authored as .xaml + .xaml.cs code-behind and compiled into this assembly by
+    the Nexer XAML build step (Cecil path, see docs\xaml.md). Run it with dotnet run (see README.md)
+    (pass the smoke switch, see Program.cs, to construct and render every demo window headlessly and exit).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Nexer.Demo</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Ui.Testing\Nexer.Ui.Testing.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Hosting\Nexer.Hosting.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj" ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\Nexer.Xaml.targets" />
+</Project>

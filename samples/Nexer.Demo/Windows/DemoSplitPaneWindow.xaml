@@ -1,0 +1,28 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoSplitPaneWindow"
+        Title="Split Panes" Width="60" Height="18" Centered="True">
+  <Window.StatusBar>
+    <StatusBar Text="Split panes: drag the dividers with the mouse">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <SplitPane x:Name="Outer" Vertical="True">
+    <List x:Name="Planets" SelectionChanged="OnPlanetChanged">
+      <x:String>Mercury</x:String>
+      <x:String>Venus</x:String>
+      <x:String>Earth</x:String>
+      <x:String>Mars</x:String>
+      <x:String>Jupiter</x:String>
+      <x:String>Saturn</x:String>
+      <x:String>Uranus</x:String>
+      <x:String>Neptune</x:String>
+    </List>
+    <SplitPane x:Name="Inner" Vertical="False">
+      <Text x:Name="Details" Content="Choose a planet on the left." />
+      <Text x:Name="Notes" Content="The left and right panes are split vertically; this side is split horizontally." />
+    </SplitPane>
+  </SplitPane>
+</Window>

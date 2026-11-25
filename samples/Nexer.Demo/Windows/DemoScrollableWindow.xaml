@@ -1,0 +1,12 @@
+<ScrollableWindow xmlns="https://nexer.dev/ui"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  x:Class="Nexer.Demo.DemoScrollableWindow"
+                  Title="Scrollable Window" Width="50" Height="16" Centered="True"
+                  HasVerticalScroller="True" HasHorizontalScroller="True">
+  <ScrollableWindow.StatusBar>
+    <StatusBar Text="Scrollable window: arrows, PgUp/PgDn, Home/End or the scroll bars">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </ScrollableWindow.StatusBar>
+</ScrollableWindow>

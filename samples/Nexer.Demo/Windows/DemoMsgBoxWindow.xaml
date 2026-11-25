@@ -1,0 +1,34 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoMsgBoxWindow"
+        Title="Message Boxes" Width="64" Height="18" Centered="True">
+  <Window.StatusBar>
+    <StatusBar Text="Message boxes">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F3" Text="Open" Command="Open" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="Default OK message box" X="1" Y="1" />
+  <Button x:Name="OkButton" Text="Open O&amp;K MB" X="35" Y="1" Click="OnOk" />
+
+  <Label Text="OK/Cancel message box" X="1" Y="3" />
+  <Button x:Name="OkCancelButton" Text="O&amp;pen OKC MB" X="35" Y="3" Click="OnOkCancel" />
+
+  <Label Text="Yes/No message box" X="1" Y="5" />
+  <Button x:Name="YesNoButton" Text="Open &amp;YN MB" X="35" Y="5" Click="OnYesNo" />
+
+  <Label Text="Yes/No/Cancel message box" X="1" Y="7" />
+  <Button x:Name="YesNoCancelButton" Text="Ope&amp;n YNC MB" X="35" Y="7" Click="OnYesNoCancel" />
+
+  <Label Text="Input box 1" X="1" Y="9" />
+  <Button x:Name="InputButton" Text="Open &amp;input box" X="35" Y="9" Click="OnInput" />
+
+  <Label Text="Input box 2" X="1" Y="11" />
+  <Button x:Name="CancellableInputButton" Text="Cance&amp;llable input box" X="35" Y="11" Click="OnCancellableInput" />
+
+  <Label x:Name="LastResult" Text="" X="1" Y="13" Width="60" />
+
+  <Button x:Name="CloseButton" Text="&amp;Close Window" X="24" Y="14" Click="OnClose" />
+</Window>

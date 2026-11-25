@@ -1,0 +1,71 @@
+<Application xmlns="https://nexer.dev/ui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Nexer.Demo.DemoApplication">
+  <Application.Resources>
+    <x:String x:Key="aboutTitle">About</x:String>
+  </Application.Resources>
+  <Application.Menus>
+    <Menu Title="&amp;File">
+      <MenuItem Text="&amp;Open..." Shortcut="Ctrl+O" Command="Open" />
+      <MenuSeparator />
+      <MenuItem Text="E&amp;xit" Shortcut="Alt+X" Command="{x:Static Command.Exit}" />
+    </Menu>
+    <Menu Title="&amp;Edit">
+      <MenuItem Text="&amp;Undo" Shortcut="Ctrl+Z" Enabled="False" />
+      <MenuItem Text="&amp;Redo" Shortcut="Ctrl+Y" Enabled="False" />
+      <MenuSeparator />
+      <MenuItem Text="Cu&amp;t" Shortcut="Ctrl+X" Enabled="False" />
+      <MenuItem Text="&amp;Copy" Shortcut="Ctrl+C" Enabled="False" />
+      <MenuItem Text="&amp;Paste" Shortcut="Ctrl+V" Enabled="False" />
+      <MenuItem Text="C&amp;lear" Enabled="False" />
+    </Menu>
+    <Menu Title="&amp;Demo">
+      <MenuItem Text="N&amp;ew Main Window..." Click="OnNewMainWindow" />
+      <MenuSeparator />
+      <MenuItem x:Name="TranslucenceItem" Text="&amp;Translucent windows" Checkable="True" Click="OnTranslucence" />
+      <MenuItem x:Name="StatusBarItem" Text="Hide &amp;status bar" Checkable="True" Click="OnHideStatusBar" />
+      <MenuSeparator />
+      <MenuItem Text="&amp;Checkable" Checkable="True" />
+      <MenuItem Text="Disabled" Enabled="False" />
+      <MenuItem Text="&amp;Normal" Click="OnNormal" />
+      <SubMenu Text="Sub-&amp;Menu">
+        <MenuItem Text="&amp;Checkable (sub)" Checkable="True" />
+        <MenuItem Text="Disabled (sub)" Enabled="False" />
+        <MenuItem Text="&amp;Normal (sub)" Click="OnNormal" />
+        <SubMenu Text="Sub-&amp;Menu">
+          <MenuItem Text="&amp;Checkable (sub)" Checkable="True" />
+          <MenuItem Text="Disabled (sub)" Enabled="False" />
+          <MenuItem Text="&amp;Normal (sub)" Click="OnNormal" />
+        </SubMenu>
+      </SubMenu>
+    </Menu>
+    <Menu Title="&amp;Window">
+      <MenuItem Text="&amp;Tile" Command="Tile" />
+      <MenuItem Text="C&amp;ascade" Command="Cascade" />
+      <MenuItem Text="Cl&amp;ose All" Command="CloseAll" />
+      <MenuSeparator />
+      <MenuItem Text="&amp;Size/Move" Shortcut="Ctrl+F5" Command="WindowMove" />
+      <MenuItem Text="&amp;Zoom" Shortcut="F5" Command="WindowZoom" />
+      <MenuItem Text="&amp;Next" Shortcut="F6" Command="WindowNext" />
+      <MenuItem Text="&amp;Previous" Shortcut="Shift+F6" Command="WindowPrevious" />
+      <MenuItem Text="&amp;Close" Shortcut="Ctrl+W" Command="WindowClose" />
+    </Menu>
+    <Menu Title="&amp;Help">
+      <MenuItem Text="&amp;Contents" Shortcut="F1" Command="Help" />
+      <MenuSeparator />
+      <MenuItem Text="&amp;About..." Click="OnAbout" />
+    </Menu>
+  </Application.Menus>
+  <Application.Desktop>
+    <Desktop>
+      <Desktop.StatusBar>
+        <StatusBar Text="Nexer demo">
+          <StatusKey Key="F1" Text="Help" Command="Help" />
+          <StatusKey Key="F3" Text="Open" Command="Open" />
+          <StatusKey Key="F10" Text="Menu" Command="Menu" />
+          <StatusKey Key="Alt+X" Text="Exit" Command="Exit" />
+        </StatusBar>
+      </Desktop.StatusBar>
+    </Desktop>
+  </Application.Desktop>
+</Application>

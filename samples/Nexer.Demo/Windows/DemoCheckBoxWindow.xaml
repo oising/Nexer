@@ -1,0 +1,40 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoCheckBoxWindow"
+        Title="Radiobuttons, CheckBoxes, and ComboBox" Width="60" Height="17" Centered="True">
+  <Window.StatusBar>
+    <StatusBar Text="Radiobuttons and checkboxes">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F3" Text="Open" Command="Open" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="Check box example 1" X="1" Y="1" />
+  <CheckBox x:Name="CheckBox1" Text="CheckBox &amp;1" X="33" Y="1" />
+  <Label Text="Check box example 2" X="1" Y="2" />
+  <CheckBox x:Name="CheckBox2" Text="CheckBox &amp;2" X="33" Y="2" Checked="True" />
+
+  <RadioGroup x:Name="Group" Text="Group 1" X="1" Y="4" Width="22" RequiresSelection="True">
+    <RadioButton Text="Radio option &amp;1" />
+    <RadioButton Text="Radio option &amp;2" />
+    <RadioButton Text="Radio option &amp;3" />
+  </RadioGroup>
+
+  <Label Text="Combo box" X="33" Y="4" />
+  <ComboBox x:Name="Combo" X="33" Y="5" Width="12" MaxValuesHeight="6" Changed="OnComboChanged">
+    <x:String>String 0</x:String>
+    <x:String>String 1</x:String>
+    <x:String>String 2</x:String>
+    <x:String>String 3</x:String>
+    <x:String>String 4</x:String>
+    <x:String>String 5</x:String>
+    <x:String>String 6</x:String>
+    <x:String>String 7</x:String>
+    <x:String>String 8</x:String>
+    <x:String>String 9</x:String>
+    <x:String>String 10</x:String>
+  </ComboBox>
+
+  <Button x:Name="CloseButton" Text="&amp;Close Window" X="20" Y="12" Click="OnClose" />
+</Window>

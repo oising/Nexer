@@ -1,0 +1,52 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Demo.DemoTreeViewWindow"
+        Title="Tree View" Width="76" Height="20" Centered="True">
+  <Window.Layout>
+    <AnchorLayout />
+  </Window.Layout>
+  <Window.StatusBar>
+    <StatusBar Text="Treeview demonstration">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F3" Text="Open" Command="Open" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="Tree" X="1" Y="0" />
+  <TreeView x:Name="Tree" X="1" Y="1" Width="22" Height="12" AnchorLayout.Anchor="Left, Top, Bottom"
+            ItemActivated="OnTreeActivated">
+    <TreeItem Text="Nexer" IsExpanded="True">
+      <TreeItem Text="Core" />
+      <TreeItem Text="Input" />
+      <TreeItem Text="Rendering" />
+      <TreeItem Text="Ui" IsExpanded="True">
+        <TreeItem Text="Controls" />
+        <TreeItem Text="Menus" />
+        <TreeItem Text="Markup" />
+      </TreeItem>
+      <TreeItem Text="Xaml">
+        <TreeItem Text="Compiler" />
+        <TreeItem Text="Loader" />
+      </TreeItem>
+    </TreeItem>
+  </TreeView>
+
+  <Label Text="Directories" X="24" Y="0" />
+  <TreeView x:Name="DirectoryTree" X="24" Y="1" Width="24" Height="12" AnchorLayout.Anchor="All"
+            SelectionChanged="OnDirectoryChanged" />
+
+  <Label Text="Files" X="49" Y="0" AnchorLayout.Anchor="Right, Top" />
+  <DirectoryList x:Name="Files" X="49" Y="1" Width="24" Height="12" AnchorLayout.Anchor="Right, Top, Bottom" />
+
+  <Label Text="List" X="1" Y="13" AnchorLayout.Anchor="Left, Bottom" />
+  <List x:Name="Fruit" X="1" Y="14" Width="22" Height="3" AnchorLayout.Anchor="Left, Bottom"
+        SelectionChanged="OnFruitChanged">
+    <x:String>Apple</x:String>
+    <x:String>Banana</x:String>
+    <x:String>Cherry</x:String>
+    <x:String>Damson</x:String>
+    <x:String>Elderberry</x:String>
+  </List>
+  <Label x:Name="Selection" Text="" X="24" Y="14" Width="49" AnchorLayout.Anchor="Left, Right, Bottom" />
+</Window>
