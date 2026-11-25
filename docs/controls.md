@@ -11,7 +11,7 @@ Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAM
 | a-menus (MenuBar/Menu/MenuItem/SubMenu/StatusBar/accelerators) | done |
 | a-controls (Label, Button, CheckBox, RadioGroup/RadioButton, Field, PasswordField, Spinner, ProgressBar, Text, HScroller/VScroller) | done |
 | a-scrolling (ScrollableWindow, Panel, SplitPane) | done |
-| a-lists | pending |
+| a-lists (List, ComboBox, TreeView, DirectoryList) | done |
 | a-dialogs | pending |
 | a-translucence | pending |
 
@@ -72,6 +72,16 @@ All types are in XML namespace `https://nexer.dev/ui`.
 - `SplitPane` — `Vertical` (default true), `Split`, `Left`/`Right` (= `Top`/`Bottom`), `FocusFollowsMouse`;
   content = up to two panes. The divider is dragged with the mouse; nested split panes draw ┤ ├ ┬ ┴ ┼ junctions.
   A Panel/SplitPane that is a window's only child fills the client area (also when added unsized).
+- `List` — `[Content] Items` (strings; `ReplaceAll`), `SelectedIndex`, `SelectedItem`, events `SelectionChanged`,
+  `ItemActivated` (Enter/double-click), `ItemClicked`.
+- `ComboBox` — `Items`, `Text`, `SelectedIndex`, `LimitToListValue` (default true), `MaxValuesHeight`,
+  `ShowList`/`HideList`, `Changed` event. Alt+Down or a click on the arrow opens the list.
+- `TreeView` — `Root` (a `TreeItem`), `SelectedItem`, `Select(item, center)`, `VisibleItems`, events
+  `SelectionChanged`/`ItemActivated`. `TreeItem` is a model object (not a widget): `Text`, `[Content] Items`,
+  `IsExpanded`, `IsExpandable`, `IsSelectable`, `Tag`, virtual `OnExpand` for lazy loading.
+- `DirectoryTreeItem` (`Path`; static `OpenPath(view, path)`) and `DirectoryList` (`Path`, `Filter` = regexes
+  separated by ';', `Filters`, `Files`, `SelectedFile`, `Refresh`).
+
 ### Nexer.Ui.Layout
 
 - `StretchLayout`, `BoxLayout` (`Orientation`), `AnchorLayout` with the attached property
@@ -129,11 +139,15 @@ All types are in XML namespace `https://nexer.dev/ui`.
   are the same two slots (Jexer throws for the wrong orientation). The split stays centred until `Split` is set
   or the divider is dragged. `removeSplit`/`replaceWidget` are not ported (set the pane properties instead).
 - Size changes invalidate the screen, so property-driven resizes repaint without an explicit refresh.
+- `List.SelectionChanged` also fires for clicks and programmatic changes; a `SelectedIndex` set while the list
+  is empty is applied when items arrive.
+- `ComboBox` keeps its text when `Items` change (Jexer clears it).
+- Tree items are model objects rather than widgets; Up/Down select the first row when nothing is selected
+  (Jexer ignores them). Directory and file names are sorted ordinally (Jexer: unsorted file listing).
 
 ## Known gaps
 
-- Lists, dialogs and translucence milestones are pending (see Progress).
-- `ComboBox` depends on the list widget and is delivered with a-lists.
+- Dialogs and translucence milestones are pending (see Progress).
 - Field clipboard commands (cut/copy/paste/clear) are not implemented (no clipboard abstraction yet);
   bracketed paste works.
 - Buttons are square style only (Jexer's round/diamond/arrow styles need pixel images).

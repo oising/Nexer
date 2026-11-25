@@ -63,6 +63,26 @@ public static class TextMetrics
         return sb.ToString();
     }
 
+    /// <summary>Drops leading clusters until at least <paramref name="columns"/> columns have been skipped.</summary>
+    public static string SkipColumns(string? text, int columns)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        if (columns <= 0) return text;
+        var sb = new StringBuilder();
+        int width = 0;
+        foreach (var (cluster, w) in Clusters(text))
+        {
+            if (width >= columns)
+            {
+                foreach (var r in cluster) sb.Append(r.ToString());
+            }
+
+            width += w;
+        }
+
+        return sb.ToString();
+    }
+
     /// <summary>Splits text into runes (scalars).</summary>
     public static List<Rune> ToRunes(string? text)
     {
