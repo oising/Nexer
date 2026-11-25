@@ -4,7 +4,8 @@ using System.Globalization;
 using Nexer.Core;
 using Nexer.Ui.Markup;
 
-[assembly: XmlnsDefinition(XamlNamespaces.Ui, "Nexer.Xaml.Fixtures")]
+// Distinct from XamlNamespaces.Ui so fixtures never collide with the real Nexer.Ui controls.
+[assembly: XmlnsDefinition("https://nexer.dev/ui/test-fixtures", "Nexer.Xaml.Fixtures")]
 
 namespace Nexer.Xaml.Fixtures;
 

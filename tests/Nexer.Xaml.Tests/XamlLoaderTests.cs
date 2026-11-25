@@ -7,7 +7,7 @@ namespace Nexer.Xaml.Tests;
 
 public class XamlLoaderTests
 {
-    private const string Ns = "xmlns='https://nexer.dev/ui' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'";
+    private const string Ns = "xmlns='https://nexer.dev/ui/test-fixtures' xmlns:n='https://nexer.dev/ui' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'";
 
     [Fact]
     public void BuildsObjectTreeWithPropertiesAndContent()
@@ -116,7 +116,7 @@ public class XamlLoaderTests
                 <Label x:Key='quit' Text='Quit' />
               </Window.Resources>
               <Widget>
-                <Button Text='{"{StaticResource title}"}' Tag='{"{StaticResource ResourceKey=quit}"}' />
+                <Button Text='{"{n:StaticResource title}"}' Tag='{"{n:StaticResource ResourceKey=quit}"}' />
               </Widget>
             </Window>
             """);
@@ -131,7 +131,7 @@ public class XamlLoaderTests
     {
         var app = new Application();
         app.Resources["accent"] = "Accent";
-        var button = XamlLoader.Load<Button>($"<Button {Ns} Text='{{StaticResource accent}}' />", services: new Services(app));
+        var button = XamlLoader.Load<Button>($"<Button {Ns} Text='{{n:StaticResource accent}}' />", services: new Services(app));
 
         Assert.Equal("Accent", button.Text);
     }
@@ -140,7 +140,7 @@ public class XamlLoaderTests
     public void MissingStaticResourceThrowsClearError()
     {
         var error = Assert.Throws<KeyNotFoundException>(() =>
-            XamlLoader.Load<Button>($"<Button {Ns} Text='{{StaticResource missing}}' />"));
+            XamlLoader.Load<Button>($"<Button {Ns} Text='{{n:StaticResource missing}}' />"));
 
         Assert.Contains("'missing'", error.Message);
         Assert.Contains("Text", error.Message);

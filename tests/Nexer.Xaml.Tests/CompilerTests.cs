@@ -5,7 +5,7 @@ namespace Nexer.Xaml.Tests;
 
 public class CompilerTests
 {
-    private const string Ns = "xmlns='https://nexer.dev/ui' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'";
+    private const string Ns = "xmlns='https://nexer.dev/ui/test-fixtures' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'";
 
     private static NexerXamlCompiler CreateCompiler()
     {

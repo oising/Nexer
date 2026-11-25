@@ -1,4 +1,4 @@
-<Window xmlns="https://nexer.dev/ui"
+<Window xmlns="https://nexer.dev/ui/test-fixtures"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Nexer.Xaml.TestApp.Dialogs.ConfirmDialog"
         Title="Confirm">

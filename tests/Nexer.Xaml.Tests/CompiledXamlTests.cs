@@ -138,7 +138,7 @@ public class CompiledXamlTests
         var dir = Path.Combine(Path.GetDirectoryName(typeof(CompiledXamlTests).Assembly.Location)!, "cecil-errors");
         Directory.CreateDirectory(dir);
         var xaml = Path.Combine(dir, "Broken.xaml");
-        File.WriteAllText(xaml, "<Window xmlns='https://nexer.dev/ui'>\n  <Button Style='bold on nowhere' />\n</Window>");
+        File.WriteAllText(xaml, "<Window xmlns='https://nexer.dev/ui/test-fixtures'>\n  <Button Style='bold on nowhere' />\n</Window>");
         var refs = PlatformAssemblies()
             .Append(typeof(XamlComponent).Assembly.Location)
             .Append(typeof(Nexer.Core.CellStyle).Assembly.Location);
