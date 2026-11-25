@@ -13,7 +13,7 @@ Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAM
 | a-scrolling (ScrollableWindow, Panel, SplitPane) | done |
 | a-lists (List, ComboBox, TreeView, DirectoryList) | done |
 | a-dialogs (MessageBox, InputBox, FileOpenBox, exit confirmation) | done |
-| a-translucence | pending |
+| a-translucence (window/menu alpha blending, blended shadows) | done |
 
 ## Public API overview (for XAML authors)
 
@@ -128,6 +128,12 @@ All types are in XML namespace `https://nexer.dev/ui`.
   are no nested loops.
 - Mnemonic passes for Alt+key inside windows: buttons, then labels, then radio buttons, then check boxes.
 
+- Translucence (`Application.Translucence`, `Window.Alpha` 0–255, default 242 = 95%): each window/menu is drawn
+  opaquely, then blended per channel over what was underneath (blank overlay cells let underlying glyphs show
+  through, except hatch characters and glyphs that would be invisible), followed by a black shadow blended at
+  30% of the alpha. Palette colours are resolved with Jexer's default VGA palette (bold brightens colours 0–7);
+  blended cells are emitted as RGB. With translucence off, windows draw Jexer's classic opaque box shadow.
+
 ## Deviations from Jexer
 
 - Initial focus: the first enabled tab stop added keeps the focus (Jexer activates the last added child).
@@ -156,10 +162,10 @@ All types are in XML namespace `https://nexer.dev/ui`.
   (Jexer ignores them). Directory and file names are sorted ordinally (Jexer: unsorted file listing).
 - Dialogs are awaited (`ShowAsync`) instead of blocking in a nested loop. `FileOpenBox` lays out its content in code
   instead of using an anchored layout manager; the tree view's selection (not only Enter) updates the file list.
+- `Application.Translucence` is off by default (Jexer: on) because blended cells need a true-colour terminal.
 
 ## Known gaps
 
-- The translucence milestone is pending (see Progress).
 - Field clipboard commands (cut/copy/paste/clear) are not implemented (no clipboard abstraction yet);
   bracketed paste works.
 - Buttons are square style only (Jexer's round/diamond/arrow styles need pixel images).

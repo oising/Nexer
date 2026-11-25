@@ -114,8 +114,21 @@ public class Application : IResourceProvider
     /// <summary>Whether moving the mouse over a window activates it.</summary>
     public bool FocusFollowsMouse { get; set; }
 
-    /// <summary>Whether windows are alpha-blended over what is behind them (instead of drawing shadows).</summary>
-    public bool Translucence { get; set; }
+    /// <summary>
+    /// Whether windows and menus are alpha-blended (<see cref="Window.Alpha"/>) over what is behind them, with a
+    /// blended drop shadow (Jexer translucence). Blended cells use RGB colours, so this is off by default (Jexer: on).
+    /// </summary>
+    public bool Translucence
+    {
+        get => translucence;
+        set
+        {
+            translucence = value;
+            invalidated = true;
+        }
+    }
+
+    private bool translucence;
 
     /// <summary>Maximum delay between two presses at the same cell for a double click (default 250 ms).</summary>
     public TimeSpan DoubleClickTime { get; set; } = TimeSpan.FromMilliseconds(250);
@@ -1214,9 +1227,15 @@ public class Application : IResourceProvider
         s.Clear();
         var screen = new Rect(0, 0, ScreenWidth, ScreenHeight);
         desktop?.DrawTree(s, screen);
+        void DrawWindow(Window window)
+        {
+            if (Translucence) Ui.Translucence.DrawWindow(s, window, screen);
+            else window.DrawTree(s, screen);
+        }
+
         for (int i = windows.Count - 1; i >= 0; i--)
         {
-            if (windows[i].IsShown) windows[i].DrawTree(s, screen);
+            if (windows[i].IsShown) DrawWindow(windows[i]);
         }
 
         var root = new DrawContext(s);
@@ -1255,7 +1274,7 @@ public class Application : IResourceProvider
                 }
             }
 
-            if (menu.IsOpen) menu.DrawTree(s, screen);
+            if (menu.IsOpen) DrawWindow(menu);
             x += titleWidth + 2;
         }
 
@@ -1263,10 +1282,10 @@ public class Application : IResourceProvider
         {
             menuIsActive = true;
             topLevel = context;
-            context.DrawTree(s, screen);
+            DrawWindow(context);
         }
 
-        foreach (var sub in subMenus) sub.DrawTree(s, screen);
+        foreach (var sub in subMenus) DrawWindow(sub);
 
         if (!hideStatusBar && DesktopBottom >= 0 && DesktopBottom < ScreenHeight)
         {

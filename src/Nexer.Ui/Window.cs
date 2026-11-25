@@ -101,6 +101,22 @@ public class Window : Widget
     /// <summary>Per-window colour theme override; null uses the application theme.</summary>
     public ColorTheme? OwnTheme { get; set; }
 
+    /// <summary>
+    /// Opacity used when <see cref="Ui.Application.Translucence"/> is on: 0 (transparent) to 255 (opaque). Default
+    /// 242 (Jexer's 95% <c>jexer.TWindow.opacity</c>).
+    /// </summary>
+    public int Alpha
+    {
+        get => alpha;
+        set
+        {
+            alpha = Math.Clamp(value, 0, 255);
+            Invalidate();
+        }
+    }
+
+    private int alpha = 95 * 255 / 100;
+
     /// <summary>True while the window is hidden.</summary>
     public bool IsHidden { get; internal set; }
 
