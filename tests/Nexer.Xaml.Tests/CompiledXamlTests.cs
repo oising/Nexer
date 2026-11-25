@@ -5,6 +5,7 @@ using Nexer.Ui.Markup;
 using Nexer.Xaml.Compiler;
 using Nexer.Xaml.Fixtures;
 using Nexer.Xaml.TestApp;
+using Nexer.Xaml.TestApp.Dialogs;
 
 namespace Nexer.Xaml.Tests;
 
@@ -69,9 +70,9 @@ public class CompiledXamlTests
     {
         var documents = XamlComponent.GetDocuments(s_app);
 
-        Assert.Equal(["MainWindow.xaml", "Views/About.xaml"], documents.Select(d => d.LogicalName));
+        Assert.Equal(["Dialogs/ConfirmDialog.xaml", "MainWindow.xaml", "Views/About.xaml"], documents.Select(d => d.LogicalName));
         Assert.True(XamlComponent.IsRegistered(typeof(MainWindow)));
-        Assert.Equal(typeof(MainWindow), documents[0].ComponentType);
+        Assert.Equal(typeof(MainWindow), documents[1].ComponentType);
     }
 
     [Fact]
@@ -90,6 +91,20 @@ public class CompiledXamlTests
         var window = Assert.IsType<MainWindow>(XamlComponent.Build(s_app, "MainWindow.xaml"));
 
         Assert.Equal(2, window.Children.Count);
+    }
+
+    [Fact]
+    public void GeneratedInitializeComponentAssignsTypedFields()
+    {
+        var dialog = new ConfirmDialog();
+
+        Assert.Equal("Confirm", dialog.Title);
+        Assert.Equal("Are you sure?", dialog.MessageLabel.Text);
+        Assert.Equal("&No", dialog.NoButtonField.Text);
+        Button yes = dialog.YesButton;
+        yes.PerformClick();
+        Assert.True(dialog.Confirmed);
+        Assert.Same(dialog.Children[1].Children[0], yes);
     }
 
     [Fact]

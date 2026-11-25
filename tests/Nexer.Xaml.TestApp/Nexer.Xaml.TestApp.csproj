@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Nexer.Xaml.Fixtures\Nexer.Xaml.Fixtures.csproj" />
     <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj" ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <Import Project="..\..\build\Nexer.Xaml.targets" />
