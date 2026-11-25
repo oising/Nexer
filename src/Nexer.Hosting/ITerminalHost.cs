@@ -25,7 +25,10 @@ public interface ITerminalHost : IAsyncDisposable
     /// <summary>Current size. Changes are also delivered as <see cref="ResizeEvent"/> on <see cref="Input"/>.</summary>
     TerminalSize Size { get; }
 
-    /// <summary>Decoded input. Completes when the host input ends (EOF, disposal, or fault).</summary>
+    /// <summary>
+    /// Decoded input. Completes when the host input ends (EOF or disposal). A host fault, including a failed
+    /// frame write, completes it with that exception (observed via <see cref="ChannelReader{T}.Completion"/>).
+    /// </summary>
     ChannelReader<InputEvent> Input { get; }
 
     /// <summary>Clock used for event timestamps, ESC disambiguation and frame scheduling.</summary>

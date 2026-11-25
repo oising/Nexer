@@ -36,6 +36,8 @@ public enum KeyModifiers : byte
     Shift = 1,
     Alt = 2,
     Ctrl = 4,
+    Super = 8,
+    Meta = 16,
 }
 
 public enum MouseButton : byte
@@ -58,6 +60,8 @@ public enum MouseEventKind : byte
     Drag,
     WheelUp,
     WheelDown,
+    WheelLeft,
+    WheelRight,
 }
 
 /// <summary>Base for all host input. Events are immutable; re-base coordinates with <c>with</c>.</summary>
@@ -87,5 +91,6 @@ public sealed record ResizeEvent(int Columns, int Rows) : InputEvent;
 /// <summary>The host terminal window gained or lost focus (mode 1004).</summary>
 public sealed record FocusEvent(bool Focused) : InputEvent;
 
-/// <summary>A complete bracketed paste (mode 2004). Never interpreted as keys.</summary>
+/// <summary>Bracketed paste text (mode 2004). Never interpreted as keys.</summary>
+/// <remarks>A large paste may arrive as several consecutive events; concatenate them in order.</remarks>
 public sealed record PasteEvent(string Text) : InputEvent;
