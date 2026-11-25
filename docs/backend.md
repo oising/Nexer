@@ -71,7 +71,8 @@ processing. If startup fails part-way, the terminal is restored before the excep
   `min(100 ms, decoder.TimeUntilTimeout)`, feeds the decoder, resolves lone-ESC timeouts, polls the
   terminal size (also triggered by SIGWINCH on Unix) and posts `ResizeEvent`s. Events go into a
   bounded channel; when it is full the reader waits (backpressure; nothing is dropped).
-- A frame write failure completes `Input` with an `IOException`; EOF on stdin completes it normally.
+- A frame write failure completes `Input` with an `IOException` (the fault exception, per the
+  `ITerminalHost.Input` contract); EOF on stdin completes it normally.
 
 ## Terminal state and restore
 
@@ -93,9 +94,17 @@ and then restores the exact original console modes / code pages / termios bytes.
 - **Control bytes**: 0x0d → Enter, 0x0a → Ctrl+J, 0x09 → Tab, 0x7f → Backspace, 0x08 → Ctrl+Backspace
   (configurable to Ctrl+H), 0x00 → Ctrl+Space, 0x1c–0x1f → Ctrl+`\ ] ^ _`.
 - **Paste** is never surfaced as keys. Very large pastes are delivered as several consecutive
-  `PasteEvent`s of at most `MaxPasteChunkBytes` each (split on UTF-8 boundaries).
-- **Mouse**: SGR 1006, legacy X10 and urxvt 1015 are decoded; coordinates are zero-based. Horizontal
-  wheel and extended buttons 8–11 are dropped because the contract has no kinds for them.
+  `PasteEvent`s of at most `MaxPasteChunkBytes` each (split on UTF-8 boundaries), as the contract
+  allows; consumers concatenate consecutive chunks.
+- **Mouse**: SGR 1006, legacy X10 and urxvt 1015 are decoded; coordinates are zero-based. Wheel
+  buttons 64–67 (X10 bytes `` ` `` `a` `b` `c`) map to `WheelUp`/`WheelDown`/`WheelLeft`/`WheelRight`.
+  Extended buttons 8–11 (codes ≥ 128) are dropped. Mouse modifier bit 8 is reported as `Alt`
+  (terminals send it for Alt; Meta is not distinguishable in mouse reports).
+- **Key modifiers**: the CSI parameter is `1 + bits`. When `bits < 16` the xterm layout is used:
+  1 Shift, 2 Alt, 4 Ctrl, 8 `Meta`. When any bit ≥ 16 is present only the kitty layout can produce
+  it, so 8 is `Super` and 32 is `Meta`; Hyper (16) and Caps/Num Lock (64/128) are ignored. Kitty's
+  Super without another high bit (e.g. `CSI 1;9A`) is indistinguishable from xterm Meta and decodes
+  as `Meta`. The host never enables the kitty keyboard protocol.
 - **Windows input** uses `ReadConsoleInputW` (not `ReadFile`) so the wait can time out for the ESC
   resolver; key-down characters (honoring repeat counts) are re-encoded to UTF-8 and fed to the
   same decoder as Unix. Size comes from the window rectangle (`srWindow`), polled on every read tick.
@@ -112,7 +121,7 @@ and then restores the exact original console modes / code pages / termios bytes.
 - No capability probing (DA/XTVERSION/DECRQM); options decide which modes are enabled.
   Synchronized output is harmless on terminals that ignore it.
 - Mouse motion without buttons (1003) is off by default.
-- `PasteEvent` chunking, horizontal wheel, and Super/Meta modifiers are limited by the contract.
+- Hyper and Caps/Num Lock key modifiers have no contract members and are dropped.
 - The sample cannot be driven interactively in CI; `--smoke` renders one frame and exits.
 
 ## Sample
