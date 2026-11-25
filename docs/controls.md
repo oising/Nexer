@@ -9,7 +9,7 @@ Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAM
 | a-core (Widget, WidgetCollection, DrawContext, Rect/Thickness/KeyGesture/Command, ColorTheme, HeadlessHost) | done |
 | a-windowing (Window, Desktop, Application loop, z-order, modal) | done |
 | a-menus (MenuBar/Menu/MenuItem/SubMenu/StatusBar/accelerators) | done |
-| a-controls | pending |
+| a-controls (Label, Button, CheckBox, RadioGroup/RadioButton, Field, PasswordField, Spinner, ProgressBar, Text, HScroller/VScroller) | done |
 | a-scrolling | pending |
 | a-lists | pending |
 | a-dialogs | pending |
@@ -45,6 +45,25 @@ All types are in XML namespace `https://nexer.dev/ui`.
   `BorderStyle` (`"Single"`, `"Double"`, `"SingleVDoubleH"`, `"SingleHDoubleV"`, `"Round"`, `"None"`).
 - Mnemonics: `"&File"` underlines/accelerates `F`; write `&&` for a literal ampersand (`"Save && &Quit"`).
 
+### Nexer.Ui.Controls
+
+- `Label` — `Text` (mnemonic; sets width), `ColorKey`, `MatchWindowBackground`, `Command`, `Click` (raised by
+  Alt+mnemonic). Never focused.
+- `Button` — `Text` (mnemonic; width = label + 3, height 2 incl. shadow), `ShowShadow`, `Command`, `Click`.
+  Mouse release, Enter, Space or Alt+mnemonic.
+- `CheckBox` — `Text`, `Checked`, `MatchWindowBackground`, `Command`, `Changed`.
+- `RadioGroup` — `Text` (caption), content = `RadioButton`s (placed automatically, ids 1..n), `Selected`
+  (id, 0 = none), `SelectedButton`, `RequiresSelection`, `SelectionChanged`. `RadioButton` — `Text`,
+  `IsSelected` (settable before adding), `Id`.
+- `Field` — `Text`, `Fixed`, `InsertMode`, `BackgroundChar`, `ActiveColorKey`/`InactiveColorKey`, `Changed`
+  (every edit), `Submitted` (Enter). Bracketed paste is inserted as typed text. `PasswordField` shows `*` when
+  unfocused.
+- `Spinner` — `SpinUp`/`SpinDown` events. `ProgressBar` — `Minimum`, `Maximum`, `Value`, glyph properties.
+- `Text` — read-only word-wrapped scrolling text: `Content` (paragraphs separated by a blank line),
+  `Justification` (None/Left/Center/Right/Full), `LineSpacing`, `ColorKey`, `AddLine`. (The class is named
+  `Text`, so the string property is `Content`.)
+- `HScroller`/`VScroller` (`Minimum`, `Maximum`, `Value`, `SmallChange`, `BigChange`, `ValueChanged`) and the
+  `ScrollableWidget` base (internal scrollers on the right/bottom edges). Scrollers are never focused.
 ### Nexer.Ui.Layout
 
 - `StretchLayout`, `BoxLayout` (`Orientation`), `AnchorLayout` with the attached property
@@ -94,8 +113,16 @@ All types are in XML namespace `https://nexer.dev/ui`.
 - Paste events go to the focused widget's `OnPaste` (Jexer sends them as keystrokes).
 - A click that also moved the mouse still records the click time for double-click detection.
 - Pressed close/zoom glyphs are drawn while the button is held (state cleared on release anywhere).
+- `Field` is rune-aware (Jexer mixes UTF-16 indices and code points); `Spinner`/`Field`/`CheckBox` actions are
+  CLR events. Scrollers clamp page steps the same way but expose `ValueChanged`.
+- `RadioGroup.SelectionChanged` is new (Jexer has no group action).
+- Button shadows use a black foreground over the existing background (Jexer: RGB black).
 
 ## Known gaps
 
-- Controls, scrolling, lists, dialogs and translucence milestones are pending (see Progress).
+- Scrolling containers, lists, dialogs and translucence milestones are pending (see Progress).
+- `ComboBox` depends on the list widget and is delivered with a-lists.
+- Field clipboard commands (cut/copy/paste/clear) are not implemented (no clipboard abstraction yet);
+  bracketed paste works.
+- Buttons are square style only (Jexer's round/diamond/arrow styles need pixel images).
 - Exit confirmation always succeeds until the MessageBox milestone.

@@ -291,6 +291,9 @@ public class Widget : ISupportInitialize, IResourceProvider
     /// <summary>Looks up a theme colour.</summary>
     protected Nexer.Core.CellStyle GetColor(string key) => Theme.GetColor(key);
 
+    /// <summary>Requests a redraw on the next loop iteration (no-op when not attached to an application).</summary>
+    protected void Invalidate() => Application?.Invalidate();
+
     /// <summary>Finds a descendant (or self) by <see cref="Name"/>.</summary>
     public Widget? FindByName(string name)
     {

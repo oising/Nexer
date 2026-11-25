@@ -128,6 +128,65 @@ public sealed class DrawContext
         RestyleAbsolute(x + OffsetX, y + OffsetY, _ => style);
     }
 
+    /// <summary>
+    /// Returns <paramref name="style"/> with the background of the cell already at local (x, y) (Jexer's
+    /// "foreground" drawing, used by controls that match the window background).
+    /// </summary>
+    public CellStyle MatchBackground(int x, int y, CellStyle style)
+    {
+        if (!IsVisible(x, y)) return style;
+        return style with { Background = surface.GetRow(y + OffsetY)[x + OffsetX].Style.Background };
+    }
+
+    /// <summary>Writes a character keeping the existing background (Jexer putForegroundCharXY).</summary>
+    public void PutForegroundChar(int x, int y, Rune ch, CellStyle style) => PutChar(x, y, ch, MatchBackground(x, y, style));
+
+    /// <summary>Writes a character keeping the existing background.</summary>
+    public void PutForegroundChar(int x, int y, char ch, CellStyle style) => PutForegroundChar(x, y, new Rune(ch), style);
+
+    /// <summary>Writes a string keeping the existing background (Jexer putForegroundStringXY).</summary>
+    public int PutForegroundString(int x, int y, string? text, CellStyle style)
+    {
+        int col = x;
+        foreach (var (cluster, w) in TextMetrics.Clusters(text))
+        {
+            if (w == 0) continue;
+            int width = Math.Min(w, 2);
+            PutCluster(col, y, cluster, width, MatchBackground(col, y, style));
+            col += width;
+        }
+
+        return col - x;
+    }
+
+    /// <summary>Horizontal line keeping the existing background.</summary>
+    public void HForegroundLine(int x, int y, int n, char ch, CellStyle style)
+    {
+        for (int i = 0; i < n; i++) PutForegroundChar(x + i, y, ch, style);
+    }
+
+    /// <summary>Draws a box border keeping the existing background (Jexer drawForegroundBox, no fill).</summary>
+    public void DrawForegroundBox(int left, int top, int right, int bottom, CellStyle border, BorderStyle borderStyle)
+    {
+        ArgumentNullException.ThrowIfNull(borderStyle);
+        int w = right - left, h = bottom - top;
+        PutForegroundChar(left, top, borderStyle.TopLeft, border);
+        PutForegroundChar(left + w - 1, top, borderStyle.TopRight, border);
+        PutForegroundChar(left, top + h - 1, borderStyle.BottomLeft, border);
+        PutForegroundChar(left + w - 1, top + h - 1, borderStyle.BottomRight, border);
+        for (int i = 1; i < w - 1; i++)
+        {
+            PutForegroundChar(left + i, top, borderStyle.Horizontal, border);
+            PutForegroundChar(left + i, top + h - 1, borderStyle.Horizontal, border);
+        }
+
+        for (int i = 1; i < h - 1; i++)
+        {
+            PutForegroundChar(left, top + i, borderStyle.Vertical, border);
+            PutForegroundChar(left + w - 1, top + i, borderStyle.Vertical, border);
+        }
+    }
+
     /// <summary>Horizontal line of <paramref name="n"/> copies of <paramref name="ch"/>.</summary>
     public void HLine(int x, int y, int n, Rune ch, CellStyle style)
     {

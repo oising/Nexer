@@ -104,4 +104,55 @@ public static class TextMetrics
 
         return result;
     }
+
+    /// <summary>Word-wraps and right-justifies (Jexer StringUtils.right).</summary>
+    public static List<string> WrapRight(string text, int width) =>
+        WrapLeft(text, width).ConvertAll(line => new string(' ', Math.Max(0, width - Width(line))) + line);
+
+    /// <summary>Word-wraps and centres (Jexer StringUtils.center).</summary>
+    public static List<string> WrapCenter(string text, int width) =>
+        WrapLeft(text, width).ConvertAll(line =>
+        {
+            int l = Math.Max(0, (width - Width(line)) / 2);
+            int r = Math.Max(0, width - Width(line) - l);
+            return new string(' ', l) + line + new string(' ', r);
+        });
+
+    /// <summary>Word-wraps and fully justifies all but the last line (Jexer StringUtils.full).</summary>
+    public static List<string> WrapFull(string text, int width)
+    {
+        var lines = WrapLeft(text, width);
+        var result = new List<string>(lines.Count);
+        for (int i = 0; i < lines.Count - 1; i++)
+        {
+            var words = lines[i].Split(' ');
+            if (words.Length <= 1)
+            {
+                result.Add(lines[i]);
+                continue;
+            }
+
+            int charCount = 0;
+            foreach (var w in words) charCount += Width(w);
+            int spaceCount = Math.Max(0, width - charCount);
+            int q = spaceCount / (words.Length - 1);
+            int r = spaceCount % (words.Length - 1);
+            var sb = new StringBuilder();
+            for (int j = 0; j < words.Length - 1; j++)
+            {
+                sb.Append(words[j]).Append(' ', q);
+                if (r > 0)
+                {
+                    sb.Append(' ');
+                    r--;
+                }
+            }
+
+            sb.Append(words[^1]);
+            result.Add(sb.ToString());
+        }
+
+        if (lines.Count > 0) result.Add(lines[^1]);
+        return result;
+    }
 }
