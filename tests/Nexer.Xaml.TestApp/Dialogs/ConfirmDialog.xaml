@@ -1,0 +1,13 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Xaml.TestApp.Dialogs.ConfirmDialog"
+        Title="Confirm">
+  <Label x:Name="Message" Text="Are you sure?" />
+  <Widget>
+    <Button x:Name="YesButton" x:FieldModifier="public" Text="&amp;Yes" Click="OnYes" />
+    <Button Name="NoButton" Text="&amp;No" />
+  </Widget>
+  <Window.Template>
+    <Label x:Name="TemplatedLabel" />
+  </Window.Template>
+</Window>

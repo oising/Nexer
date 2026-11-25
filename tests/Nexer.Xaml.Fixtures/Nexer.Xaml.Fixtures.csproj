@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Minimal stand-in for Agent A's controls, following the XAML object-model rules in docs\architecture.md.
+       Used by the XAML tests until the real Nexer.Ui controls are available. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
+  </ItemGroup>
+</Project>
