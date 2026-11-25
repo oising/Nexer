@@ -1,6 +1,7 @@
 // Ported from Jexer TList.java (MIT, © Autumn Lamonte).
 using System.Collections.ObjectModel;
 using Nexer.Input;
+using Nexer.Ui.Markup;
 
 namespace Nexer.Ui.Controls;
 
@@ -98,7 +99,8 @@ public class List : ScrollableWidget
         Children.Add(VerticalScroller);
     }
 
-    /// <summary>The items. In markup: <c>&lt;List.Items&gt;&lt;x:String&gt;One&lt;/x:String&gt;&lt;/List.Items&gt;</c>.</summary>
+    /// <summary>The items (content property). In markup: <c>&lt;List&gt;&lt;x:String&gt;One&lt;/x:String&gt;&lt;/List&gt;</c>.</summary>
+    [Content]
     public ListItemCollection Items { get; }
 
     /// <summary>

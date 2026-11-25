@@ -118,6 +118,7 @@ public class ScrollableWindow : Window
     protected internal override void OnSizeChanged()
     {
         // Jexer does not run the layout manager for scrollable windows.
+        ResizeFillingChild();
         ReflowData();
         PlaceScrollbars();
     }

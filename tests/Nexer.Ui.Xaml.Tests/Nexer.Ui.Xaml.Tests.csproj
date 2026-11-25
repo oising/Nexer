@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    XAML against the real Nexer.Ui controls. The .xaml files in this project are compiled into the test assembly by the
+    Nexer XAML build step (Cecil path); the loader tests compile inline XAML at runtime (SRE path).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Ui.Testing\Nexer.Ui.Testing.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Loader\Nexer.Xaml.Loader.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj" ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\Nexer.Xaml.targets" />
+</Project>

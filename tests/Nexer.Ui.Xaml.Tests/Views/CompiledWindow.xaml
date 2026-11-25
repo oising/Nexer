@@ -1,0 +1,54 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Ui.Xaml.Tests.Views.CompiledWindow"
+        Title="Compiled Window" Bounds="2,1,74,21">
+  <Window.Resources>
+    <x:String x:Key="okText">&amp;OK</x:String>
+  </Window.Resources>
+  <Window.Layout>
+    <AnchorLayout />
+  </Window.Layout>
+  <Window.OwnTheme>
+    <ColorTheme>
+      <ThemeColor Key="tlabel" Style="bold yellow on blue" />
+    </ColorTheme>
+  </Window.OwnTheme>
+  <Window.StatusBar>
+    <StatusBar Text="Compiled status">
+      <StatusKey Key="F2" Text="Save" />
+    </StatusBar>
+  </Window.StatusBar>
+  <Label x:Name="Caption" Text="&amp;Name:" X="1" Y="0" />
+  <Field x:Name="NameField" Text="Nexer" X="8" Y="0" Width="15" Changed="OnNameChanged" />
+  <PasswordField x:Name="Secret" Text="hunter2" X="8" Y="1" Width="15" />
+  <Button x:Name="OkButton" Text="{StaticResource okText}" X="1" Y="3" Click="OnOk" />
+  <Button x:Name="CancelButton" Text="&amp;Cancel" X="10" Y="3" Click="OnCancel" AnchorLayout.Anchor="Right, Bottom" />
+  <CheckBox x:Name="Check" Text="C&amp;heck me" X="1" Y="6" Changed="OnCheckChanged" />
+  <RadioGroup x:Name="Radios" Text="Choose" X="30" Y="0" Width="20" SelectionChanged="OnRadioChanged">
+    <RadioButton Text="&amp;Alpha" />
+    <RadioButton Text="&amp;Beta" />
+  </RadioGroup>
+  <ComboBox x:Name="Combo" X="1" Y="8" Width="15">
+    <x:String>one</x:String>
+    <x:String>two</x:String>
+  </ComboBox>
+  <Spinner x:Name="Spin" X="17" Y="8" SpinUp="OnSpinUp" />
+  <ProgressBar x:Name="Progress" X="1" Y="10" Width="20" Value="25" />
+  <List x:Name="Fruit" X="30" Y="6" Width="15" Height="4" ItemActivated="OnFruitActivated">
+    <x:String>Apple</x:String>
+    <x:String>Banana</x:String>
+  </List>
+  <TreeView x:Name="Tree" X="46" Y="6" Width="20" Height="5">
+    <TreeItem Text="Root" IsExpanded="True">
+      <TreeItem Text="Leaf 1" />
+      <TreeItem Text="Leaf 2" />
+    </TreeItem>
+  </TreeView>
+  <Text x:Name="Body" X="1" Y="12" Width="40" Height="3" Content="Compiled text body." />
+  <Panel x:Name="Box" Title="Panel" BorderStyle="Single" X="46" Y="12" Width="20" Height="5">
+    <SplitPane Vertical="False" Width="18" Height="3">
+      <Label Text="Top" />
+      <Label Text="Bottom" />
+    </SplitPane>
+  </Panel>
+</Window>

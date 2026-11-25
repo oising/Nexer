@@ -1,5 +1,6 @@
 // Ported from Jexer TComboBox.java (MIT, © Autumn Lamonte).
 using Nexer.Input;
+using Nexer.Ui.Markup;
 
 namespace Nexer.Ui.Controls;
 
@@ -33,7 +34,8 @@ public class ComboBox : Widget
         Height = 1;
     }
 
-    /// <summary>The values offered in the drop-down list.</summary>
+    /// <summary>The values offered in the drop-down list (content property).</summary>
+    [Content]
     public ListItemCollection Items => list.Items;
 
     /// <summary>The current text. Setting it selects the matching list item (case-sensitive), if any.</summary>

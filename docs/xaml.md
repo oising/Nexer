@@ -263,3 +263,20 @@ type systems and has no dependency on concrete controls). The compiler relies on
   references only).
 - The SRE loader keeps compiled documents (dynamic assemblies) alive for the process lifetime (non-collectible).
 - Hot reload is not wired up; use `XamlComponent.Fallback` + `XamlLoader` to experiment.
+
+## Real-control coverage
+
+`tests\Nexer.Ui.Xaml.Tests` compiles XAML in the real `https://nexer.dev/ui` namespace both at runtime (`XamlLoader`)
+and at build time (the test assembly itself imports `Nexer.Xaml.targets`), then renders it through `HeadlessHost`.
+`tests\Nexer.Xaml.Tests` keeps testing the toolchain against the fixture object model
+(`https://nexer.dev/ui/test-fixtures`).
+
+Idioms for the real controls:
+
+- Lists, combo boxes: `<List><x:String>One</x:String></List>`; trees: `<TreeView><TreeItem Text="Root">…</TreeItem></TreeView>`.
+- Menus live on the application: an `x:Class` root of type `Application` with `<Application.Menus><Menu Title="&amp;File">…`.
+- Status bars: `<Window.StatusBar><StatusBar Text="…"><StatusKey Key="F1" Text="Help" Command="Help" /></StatusBar></Window.StatusBar>`.
+- Colours: `<Window.OwnTheme><ColorTheme><ThemeColor Key="tlabel" Style="bold yellow on blue" /></ColorTheme></Window.OwnTheme>`.
+- Layout: `<Window.Layout><AnchorLayout /></Window.Layout>` and `AnchorLayout.Anchor="Right, Bottom"` on children.
+- A `{StaticResource}` used on the element that declares the resources is resolved before the property element is
+  processed; reference resources from descendants (or the application) instead.

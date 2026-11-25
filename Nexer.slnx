@@ -22,6 +22,7 @@
     <Project Path="tests/Nexer.Input.Tests/Nexer.Input.Tests.csproj" />
     <Project Path="tests/Nexer.Rendering.Tests/Nexer.Rendering.Tests.csproj" />
     <Project Path="tests/Nexer.Ui.Tests/Nexer.Ui.Tests.csproj" />
+    <Project Path="tests/Nexer.Ui.Xaml.Tests/Nexer.Ui.Xaml.Tests.csproj" />
     <Project Path="tests/Nexer.Xaml.Fixtures/Nexer.Xaml.Fixtures.csproj" />
     <Project Path="tests/Nexer.Xaml.TestApp/Nexer.Xaml.TestApp.csproj" />
     <Project Path="tests/Nexer.Xaml.Tests/Nexer.Xaml.Tests.csproj" />

@@ -309,15 +309,36 @@ public class Window : Widget
     /// <inheritdoc/>
     protected internal override void OnSizeChanged()
     {
-        var children = ChildList;
-        if (children.Count == 1 && children[0] is IFillsWindow)
-        {
-            var child = children[0];
-            child.SetDimensions(child.X, child.Y, Math.Max(0, Width - 2 * ChildOffset), Math.Max(0, Height - 2 * ChildOffset));
-            return;
-        }
-
+        if (ResizeFillingChild()) return;
         base.OnSizeChanged();
+    }
+
+    /// <summary>
+    /// The Panel/SplitPane that is the window's only content child (border scrollers of a
+    /// <see cref="Controls.ScrollableWindow"/> do not count), or null.
+    /// </summary>
+    private Widget? FillingChild
+    {
+        get
+        {
+            Widget? found = null;
+            foreach (var child in ChildList)
+            {
+                if (child is Controls.ScrollerBase) continue;
+                if (found != null) return null;
+                found = child;
+            }
+
+            return found is IFillsWindow ? found : null;
+        }
+    }
+
+    /// <summary>Sizes the <see cref="FillingChild"/> to the client area; returns false when there is none.</summary>
+    private protected bool ResizeFillingChild()
+    {
+        if (FillingChild is not { } child) return false;
+        child.SetDimensions(child.X, child.Y, Math.Max(0, Width - 2 * ChildOffset), Math.Max(0, Height - 2 * ChildOffset));
+        return true;
     }
 
     /// <inheritdoc/>
@@ -325,11 +346,7 @@ public class Window : Widget
     {
         ArgumentNullException.ThrowIfNull(child);
         // A Panel/SplitPane added without a size fills the client area (Jexer code sizes them explicitly).
-        if (ChildList.Count == 1 && child is IFillsWindow && child.Width == 0 && child.Height == 0)
-        {
-            child.SetDimensions(child.X, child.Y, Math.Max(0, Width - 2 * ChildOffset), Math.Max(0, Height - 2 * ChildOffset));
-        }
-
+        if (child == FillingChild && child.Width == 0 && child.Height == 0) ResizeFillingChild();
         base.OnChildAdded(child);
     }
 
