@@ -1,0 +1,15 @@
+Unicode data and conformance fixtures
+=====================================
+
+src\Nexer.Core\Text\UnicodeData.g.cs is generated from Unicode 17.0.0:
+  auxiliary/GraphemeBreakProperty.txt
+  DerivedCoreProperties.txt (Indic_Conjunct_Break)
+  EastAsianWidth.txt
+  emoji/emoji-data.txt
+
+tests\Nexer.Core.Tests\TestData\GraphemeBreakTest-17.0.0.txt is an
+unmodified Unicode 17.0.0 conformance fixture (UTF-8 BOM/newlines normalized).
+
+Source: https://www.unicode.org/Public/17.0.0/ucd/
+License and copyright: see LICENSE-Unicode.txt.
+Regenerate with: python .\tools\generate_unicode.py

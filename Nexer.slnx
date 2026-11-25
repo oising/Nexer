@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Nexer.Core/Nexer.Core.csproj" />
+    <Project Path="src/Nexer.Emulation/Nexer.Emulation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Nexer.Core.Tests/Nexer.Core.Tests.csproj" />
+    <Project Path="tests/Nexer.Emulation.Tests/Nexer.Emulation.Tests.csproj" />
+  </Folder>
+</Solution>
