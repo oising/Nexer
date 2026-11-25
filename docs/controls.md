@@ -12,7 +12,7 @@ Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAM
 | a-controls (Label, Button, CheckBox, RadioGroup/RadioButton, Field, PasswordField, Spinner, ProgressBar, Text, HScroller/VScroller) | done |
 | a-scrolling (ScrollableWindow, Panel, SplitPane) | done |
 | a-lists (List, ComboBox, TreeView, DirectoryList) | done |
-| a-dialogs | pending |
+| a-dialogs (MessageBox, InputBox, FileOpenBox, exit confirmation) | done |
 | a-translucence | pending |
 
 ## Public API overview (for XAML authors)
@@ -81,6 +81,16 @@ All types are in XML namespace `https://nexer.dev/ui`.
   `IsExpanded`, `IsExpandable`, `IsSelectable`, `Tag`, virtual `OnExpand` for lazy loading.
 - `DirectoryTreeItem` (`Path`; static `OpenPath(view, path)`) and `DirectoryList` (`Path`, `Filter` = regexes
   separated by ';', `Filters`, `Files`, `SelectedFile`, `Refresh`).
+- Dialogs (modal, centred; all results via `Task`):
+  - `MessageBox` — `Title`, `Message` (lines split on `\n`), `Buttons` (`MessageBoxButtons` Ok/OkCancel/YesNo/
+    YesNoCancel), `Result` (`MessageBoxResult`); `await box.ShowAsync()` or
+    `MessageBox.ShowAsync(app, title, message, buttons)`. Letters o/c/y/n (plain or Alt) pick a button.
+  - `InputBox : MessageBox` — `Text`; `InputBox.ShowAsync(app, title, message, text, buttons)` returns the text,
+    or null for Cancel/No. Enter in the field chooses OK/Yes.
+  - `FileOpenBox` — `Path`, `Type` (`FileOpenBoxType` Open/Save/Select), `Filter`, `FileName`;
+    `FileOpenBox.ShowAsync(app, path, type, filter)` returns the file name or null (Esc/Cancel).
+  - `Command.Exit` with `Application.ConfirmExit` (default true) asks "Exit application?" (Yes/No).
+  - Dialog windows build their content in `Window.OnAddedToApplication` (so they can fit the screen).
 
 ### Nexer.Ui.Layout
 
@@ -144,11 +154,12 @@ All types are in XML namespace `https://nexer.dev/ui`.
 - `ComboBox` keeps its text when `Items` change (Jexer clears it).
 - Tree items are model objects rather than widgets; Up/Down select the first row when nothing is selected
   (Jexer ignores them). Directory and file names are sorted ordinally (Jexer: unsorted file listing).
+- Dialogs are awaited (`ShowAsync`) instead of blocking in a nested loop. `FileOpenBox` lays out its content in code
+  instead of using an anchored layout manager; the tree view's selection (not only Enter) updates the file list.
 
 ## Known gaps
 
-- Dialogs and translucence milestones are pending (see Progress).
+- The translucence milestone is pending (see Progress).
 - Field clipboard commands (cut/copy/paste/clear) are not implemented (no clipboard abstraction yet);
   bracketed paste works.
 - Buttons are square style only (Jexer's round/diamond/arrow styles need pixel images).
-- Exit confirmation always succeeds until the MessageBox milestone.

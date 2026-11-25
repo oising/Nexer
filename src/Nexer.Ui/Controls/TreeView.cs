@@ -110,7 +110,7 @@ public class TreeItem
     /// <summary>Whether the children are shown (default true; the root is always expanded).</summary>
     public bool IsExpanded
     {
-        get => Level == 0 || expanded;
+        get => expanded || IsViewRoot;
         set
         {
             expanded = value;
@@ -121,7 +121,7 @@ public class TreeItem
     /// <summary>Whether an expander (<c>[+]</c>/<c>[-]</c>) is drawn. True when set or when the item has children.</summary>
     public bool IsExpandable
     {
-        get => Level == 0 || expandable || Items.Count > 0;
+        get => expandable || Items.Count > 0 || IsViewRoot;
         set
         {
             expandable = value;
@@ -164,6 +164,8 @@ public class TreeItem
     }
 
     internal TreeView? TreeViewOwner { get; set; }
+
+    private bool IsViewRoot => Parent == null && TreeViewOwner != null;
 
     internal string Prefix { get; set; } = "";
 

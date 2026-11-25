@@ -41,6 +41,25 @@ public class DirectoryTreeItem : TreeItem
     protected internal override void OnExpand()
     {
         if (directory == null) return;
+        IsExpandable = true;
+        if (!IsExpanded)
+        {
+            // Only probe readability (cheap) until the item is expanded.
+            try
+            {
+                using var probe = directory.EnumerateDirectories().GetEnumerator();
+                probe.MoveNext();
+                IsSelectable = true;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+            {
+                IsSelectable = false;
+            }
+
+            if (Items.Count > 0) Items.ReplaceAll([]);
+            return;
+        }
+
         DirectoryInfo[] subdirectories;
         try
         {
@@ -51,13 +70,6 @@ public class DirectoryTreeItem : TreeItem
         {
             subdirectories = [];
             IsSelectable = false;
-        }
-
-        IsExpandable = true;
-        if (!IsExpanded)
-        {
-            Items.ReplaceAll([]);
-            return;
         }
 
         // Jexer sorts tree items by text (String.compareTo, i.e. ordinal).

@@ -151,6 +151,14 @@ public class Window : Widget
 
     internal void SetApplication(Application? app) => application = app;
 
+    /// <summary>
+    /// Called when the window is added to an application, before it is placed; dialogs build their content here
+    /// (for example to fit the screen size).
+    /// </summary>
+    protected internal virtual void OnAddedToApplication()
+    {
+    }
+
     /// <summary>Stops any mouse/keyboard move or resize in progress.</summary>
     public void StopMovements()
     {

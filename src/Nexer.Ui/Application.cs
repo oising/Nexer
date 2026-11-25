@@ -831,6 +831,7 @@ public class Application : IResourceProvider
         if (windows.Contains(window)) throw new ArgumentException("The window is already in the window list.", nameof(window));
         if (window.Application != null && window.Application != this) throw new ArgumentException("The window belongs to another application.", nameof(window));
         window.SetApplication(this);
+        window.OnAddedToApplication();
         foreach (var w in windows) w.StopMovements();
         if (IsModalActive)
         {
