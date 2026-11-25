@@ -15,7 +15,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Nexer.Ui is read by metadata only; the colour syntax parser is shared as source so styles are parsed at compile time. -->
+    <Compile Include="..\Nexer.Ui\StyleSyntax.cs" Link="Shared\StyleSyntax.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.11.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nexer.Core\Nexer.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
