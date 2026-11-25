@@ -1,0 +1,95 @@
+<Project>
+  <!--
+    Nexer XAML build integration. Import this file from a project that contains .xaml files (see docs\xaml.md).
+    After CoreCompile it rewrites the intermediate assembly with Nexer.Xaml.Build, compiling every NexerXaml item
+    into IL and registering it with Nexer.Ui.Markup.XamlComponent from a module initializer.
+
+    Properties:
+      NexerXamlEnabled               'false' disables the build step (XAML can still be loaded at runtime by XamlLoader).
+      EnableDefaultNexerXamlItems    'false' disables the default **\*.xaml glob.
+      NexerXamlBuildToolPath         Path to Nexer.Xaml.Build.dll. Alternatively add a ProjectReference to
+                                     Nexer.Xaml.Build.csproj with ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool".
+    Items:
+      NexerXaml                      XAML files; optional LogicalName metadata (defaults to Link, else the project-relative path).
+  -->
+  <PropertyGroup>
+    <NexerXamlEnabled Condition="'$(NexerXamlEnabled)' == ''">true</NexerXamlEnabled>
+    <NexerXamlDotnetHost Condition="'$(NexerXamlDotnetHost)' == '' and '$(DOTNET_HOST_PATH)' != ''">$(DOTNET_HOST_PATH)</NexerXamlDotnetHost>
+    <NexerXamlDotnetHost Condition="'$(NexerXamlDotnetHost)' == ''">dotnet</NexerXamlDotnetHost>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableDefaultNexerXamlItems)' != 'false'">
+    <NexerXaml Include="**\*.xaml" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);@(NexerXaml)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Visible to the Nexer.Xaml.Generators source generator (typed x:Name fields and InitializeComponent). -->
+    <AdditionalFiles Include="@(NexerXaml)" Exclude="@(AdditionalFiles)" />
+    <!-- A XAML change recompiles the assembly, so the build step always rewrites a fresh (unprocessed) assembly. -->
+    <CustomAdditionalCompileInputs Include="@(NexerXaml)" />
+  </ItemGroup>
+
+  <Target Name="_NexerXamlPrepare" Condition="'$(NexerXamlEnabled)' == 'true' and '@(NexerXaml)' != ''">
+    <PropertyGroup>
+      <!-- IntermediateOutputPath is only defined after the SDK targets, so this is computed here, not at evaluation. -->
+      <NexerXamlIntermediateDir Condition="'$(NexerXamlIntermediateDir)' == ''">$(IntermediateOutputPath)nexerxaml\</NexerXamlIntermediateDir>
+      <_NexerXamlTool>$(NexerXamlBuildToolPath)</_NexerXamlTool>
+      <_NexerXamlTool Condition="'$(_NexerXamlTool)' == ''">@(NexerXamlBuildTool->'%(FullPath)')</_NexerXamlTool>
+      <_NexerXamlRefsFile>$(NexerXamlIntermediateDir)$(TargetName).refs</_NexerXamlRefsFile>
+      <_NexerXamlItemsFile>$(NexerXamlIntermediateDir)$(TargetName).items</_NexerXamlItemsFile>
+      <_NexerXamlOutput>$(NexerXamlIntermediateDir)$(TargetFileName)</_NexerXamlOutput>
+      <_NexerXamlOutputPdb>$(NexerXamlIntermediateDir)$(TargetName).pdb</_NexerXamlOutputPdb>
+      <_NexerXamlStamp>$(NexerXamlIntermediateDir)$(TargetName).stamp</_NexerXamlStamp>
+    </PropertyGroup>
+
+    <Error Condition="'$(_NexerXamlTool)' == '' or !Exists('$(_NexerXamlTool)')"
+           Code="NXAML0007"
+           Text="Nexer.Xaml.Build was not found ('$(_NexerXamlTool)'). Set NexerXamlBuildToolPath or add a ProjectReference to Nexer.Xaml.Build with OutputItemType=&quot;NexerXamlBuildTool&quot;." />
+
+    <ItemGroup>
+      <_NexerXamlItem Include="@(NexerXaml)" />
+      <_NexerXamlItem Condition="'%(_NexerXamlItem.LogicalName)' == '' and '%(_NexerXamlItem.Link)' != ''">
+        <LogicalName>%(_NexerXamlItem.Link)</LogicalName>
+      </_NexerXamlItem>
+      <_NexerXamlItem Condition="'%(_NexerXamlItem.LogicalName)' == ''">
+        <LogicalName>%(_NexerXamlItem.Identity)</LogicalName>
+      </_NexerXamlItem>
+      <_NexerXamlItemLine Include="@(_NexerXamlItem->'%(FullPath)|%(LogicalName)')" />
+    </ItemGroup>
+
+    <MakeDir Directories="$(NexerXamlIntermediateDir)" />
+    <WriteLinesToFile File="$(_NexerXamlRefsFile)" Lines="@(ReferencePath->'%(FullPath)')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <WriteLinesToFile File="$(_NexerXamlItemsFile)" Lines="@(_NexerXamlItemLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <Target Name="NexerXamlCompile"
+          AfterTargets="CoreCompile"
+          BeforeTargets="CopyFilesToOutputDirectory"
+          DependsOnTargets="_NexerXamlPrepare"
+          Condition="'$(NexerXamlEnabled)' == 'true' and '@(NexerXaml)' != ''"
+          Inputs="@(IntermediateAssembly);@(NexerXaml);$(_NexerXamlRefsFile);$(_NexerXamlItemsFile);$(_NexerXamlTool)"
+          Outputs="$(_NexerXamlStamp)">
+    <!-- Diagnostics are printed as "file(line,col): error NXAML0001: ..." which Exec reports as MSBuild errors. -->
+    <Exec Command="&quot;$(NexerXamlDotnetHost)&quot; exec &quot;$(_NexerXamlTool)&quot; &quot;@(IntermediateAssembly->'%(FullPath)')&quot; &quot;$(_NexerXamlRefsFile)&quot; &quot;$(_NexerXamlItemsFile)&quot; &quot;$(_NexerXamlOutput)&quot;"
+          EchoOff="true"
+          StandardOutputImportance="low"
+          ConsoleToMSBuild="true"
+          IgnoreExitCode="true">
+      <Output TaskParameter="ExitCode" PropertyName="_NexerXamlExitCode" />
+      <Output TaskParameter="ConsoleOutput" PropertyName="_NexerXamlConsoleOutput" />
+    </Exec>
+    <!-- Diagnostics printed by the tool are already logged as errors (and fail the build); this covers silent failures. -->
+    <Error Condition="'$(_NexerXamlExitCode)' != '0' and !$(_NexerXamlConsoleOutput.Contains(': error '))"
+           Code="NXAML0007" Text="Nexer.Xaml.Build failed with exit code $(_NexerXamlExitCode)." />
+
+    <Copy SourceFiles="$(_NexerXamlOutput)" DestinationFiles="@(IntermediateAssembly)" Condition="'$(_NexerXamlExitCode)' == '0'" />
+    <Copy SourceFiles="$(_NexerXamlOutputPdb)"
+          DestinationFiles="@(_DebugSymbolsIntermediatePath)"
+          Condition="'$(_NexerXamlExitCode)' == '0' and '@(_DebugSymbolsIntermediatePath)' != '' and Exists('$(_NexerXamlOutputPdb)')" />
+    <Touch Files="$(_NexerXamlStamp)" AlwaysCreate="true" Condition="'$(_NexerXamlExitCode)' == '0'" />
+
+    <ItemGroup>
+      <FileWrites Include="$(_NexerXamlOutput);$(_NexerXamlOutputPdb);$(_NexerXamlStamp);$(_NexerXamlRefsFile);$(_NexerXamlItemsFile)" />
+    </ItemGroup>
+  </Target>
+</Project>

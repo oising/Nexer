@@ -1,0 +1,13 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Nexer.Xaml.TestApp.MainWindow"
+        Title="Compiled" Bounds="0,0,80,25" Style="white on blue" CloseGesture="Ctrl+Q">
+  <Window.Resources>
+    <Label x:Key="shared" Text="Shared" />
+  </Window.Resources>
+  <Button x:Name="OkButton" Text="&amp;OK" Click="OnOk" Margin="1" Dock.Edge="Bottom" Tag="{StaticResource shared}" />
+  <Button x:Name="QuitButton" Text="Quit" Command="{x:Static Command.Quit}" Click="OnQuit" />
+  <Window.Template>
+    <Label Text="Templated" />
+  </Window.Template>
+</Window>

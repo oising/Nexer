@@ -89,6 +89,10 @@ public sealed class NexerXamlCompiler
     /// <summary>Clears the diagnostics.</summary>
     public void ClearDiagnostics() => _sink.Clear();
 
+    /// <summary>Reports an error that is not tied to a position in a document.</summary>
+    public void ReportError(string code, string message, string? filePath) =>
+        _sink.Add(new NexerXamlDiagnostic(code, NexerXamlSeverity.Error, message, filePath, 0, 0));
+
     /// <summary>Creates the XamlX runtime context type (one per assembly is enough).</summary>
     public IXamlType CreateContextType(IXamlTypeBuilder<IXamlILEmitter> builder) => CreateILCompiler(null, null).CreateContextType(builder);
 

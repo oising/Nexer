@@ -8,6 +8,7 @@
     <ProjectReference Include="..\..\src\Nexer.Xaml.Compiler\Nexer.Xaml.Compiler.csproj" />
     <ProjectReference Include="..\..\src\Nexer.Xaml.Loader\Nexer.Xaml.Loader.csproj" />
     <ProjectReference Include="..\Nexer.Xaml.Fixtures\Nexer.Xaml.Fixtures.csproj" />
+    <ProjectReference Include="..\Nexer.Xaml.TestApp\Nexer.Xaml.TestApp.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <IsPackable>false</IsPackable>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Fixture app compiled with the Nexer XAML build step (Cecil path); exercised by Nexer.Xaml.Tests. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nexer.Xaml.Fixtures\Nexer.Xaml.Fixtures.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj" ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\Nexer.Xaml.targets" />
+</Project>

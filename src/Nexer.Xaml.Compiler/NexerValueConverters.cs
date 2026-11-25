@@ -196,5 +196,5 @@ public static class NexerValueConverters
 
     private static NexerXamlException Invalid(IXamlLineInfo line, IXamlType type, string detail) =>
         new(NexerXamlDiagnosticCodes.InvalidValue,
-            $"Invalid {type.Name} value '{(line as XamlAstTextNode)?.Text}': {detail}.", line);
+            $"Invalid {type.Name} value '{(line as XamlAstTextNode)?.Text}': {detail.TrimEnd('.')}.", line);
 }
