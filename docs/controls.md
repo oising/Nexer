@@ -180,3 +180,18 @@ Found while compiling XAML against the real controls (`tests\Nexer.Ui.Xaml.Tests
 - The "only child fills the window" rule ignores a `ScrollableWindow`'s border scrollers, and also applies when a
   scrollable window is resized.
 - `Application` works as an `x:Class` XAML root (menus in `<Application.Menus>`, `<Application.Resources>`).
+
+## Notes from the demo (integration)
+
+- Key routing: the active window's shortcut keys (button mnemonics, `Alt+letter`) win over menu accelerators and
+  `Alt+letter` menu mnemonics. Pick button mnemonics that do not clash with the menu bar titles (the demo's main
+  window uses "Ope&n" because Alt+E opens the Edit menu). Menu accelerators are ignored while a modal window is active.
+- Framework hooks are `protected internal virtual` (`Draw`, `OnKeypress`, `OnClosed`, `OnAddedToApplication`,
+  `OnCommand`); app assemblies override them as `protected override`. `Application.OnCommand` is `protected virtual`.
+- Windows that own timers should create them in `OnAddedToApplication` and dispose them in `OnClosed`
+  (see `DemoMainWindow`).
+- A `ScrollableWindow` with a virtual canvas overrides `Draw` (offsetting by `HorizontalValue`/`VerticalValue`),
+  `ReflowData` (setting the scrollers' maximums) and `OnKeypress` (see `DemoScrollableWindow`).
+- `TileWindows` follows Jexer's integer arithmetic: two windows on a 23-row desktop are 11 rows each, leaving one row
+  uncovered.
+- `PasswordField` draws `Width - 2` stars when inactive regardless of the text length (Jexer behaviour).

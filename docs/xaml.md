@@ -280,3 +280,16 @@ Idioms for the real controls:
 - Layout: `<Window.Layout><AnchorLayout /></Window.Layout>` and `AnchorLayout.Anchor="Right, Bottom"` on children.
 - A `{StaticResource}` used on the element that declares the resources is resolved before the property element is
   processed; reference resources from descendants (or the application) instead.
+
+## Demo application notes
+
+`samples\Nexer.Demo` is the reference app for the Cecil path (`build\Nexer.Xaml.targets` + generator); every window
+is a `.xaml` + `.xaml.cs` pair and the build reports zero XAML diagnostics. Lessons from it:
+
+- Generated `x:Name` fields are `internal`; the demo exposes them to `tests\Nexer.Demo.Tests` with
+  `<InternalsVisibleTo Include="Nexer.Demo.Tests" />` rather than `x:FieldModifier="public"`.
+- `Command="Open"` creates `new Command("Open")`; commands compare by name, so a code-behind
+  `public static readonly Command Open = new("Open")` matches it in `Application.OnCommand`. Built-in commands use
+  `{x:Static Command.Exit}` (either form works).
+- Properties of derived roots work as property elements (`<Desktop.StatusBar>`, `<ScrollableWindow.StatusBar>`).
+- An MSBuild XML comment in the csproj must not contain `--` (it breaks project loading, not XAML).
