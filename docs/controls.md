@@ -1,4 +1,4 @@
-# Nexer.Ui controls (Agent A)
+# Nexer.Ui controls
 
 Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAML-first API.
 
