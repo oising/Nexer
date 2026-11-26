@@ -281,4 +281,40 @@ public class DemoEndToEndTests
         Assert.Equal("Mars", window.Planets.SelectedItem);
         Assert.Contains("Olympus", d.Text(), StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void DataBindingWindowEditsTheViewModelAndRunsCommands()
+    {
+        var (app, d) = Start(openMainWindow: false);
+
+        d.Press("Alt+D");
+        d.Press("d");
+        var window = Assert.IsType<DemoBindingWindow>(app.ActiveWindow);
+        var vm = window.ViewModel;
+        Assert.Contains("Grace (36) is not subscribed.", d.Text(), StringComparison.Ordinal);
+        Assert.Contains("(nobody)", d.Text(), StringComparison.Ordinal);
+        Assert.False(window.RemoveButton.IsEffectivelyEnabled);
+
+        // Two-way: typing in the Name field updates the view model and every binding that depends on it.
+        Assert.Same(window.NameField, window.ActiveChild);
+        d.Press("End");
+        d.Type("!");
+        Assert.Equal("Grace!", vm.Name);
+        Assert.Contains("Grace! (36) is not subscribed.", d.Text(), StringComparison.Ordinal);
+        Assert.Contains("Echo:      Grace!", d.Text(), StringComparison.Ordinal);
+
+        // The Add command appends to the ObservableCollection, which the list shows.
+        d.Press("Alt+A");
+        Assert.Equal(4, vm.People.Count);
+        Assert.Equal("Grace!", vm.People[3].Name);
+        Find(d, "Grace!  ");
+
+        // Selecting enables Remove (CanExecute) and updates the selection label; removing clears it.
+        vm.Selected = vm.People[0];
+        d.Pump();
+        Assert.Contains("Ada, 36", d.Text(), StringComparison.Ordinal);
+        Assert.True(window.RemoveButton.IsEffectivelyEnabled);
+        d.Press("Alt+R");
+        Assert.DoesNotContain(vm.People, p => p.Name == "Ada");
+    }
 }
