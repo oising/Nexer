@@ -245,8 +245,9 @@ public class WindowingTests
         Assert.Contains(dialog, app.Windows);
         Assert.True(dialog.Modal);
         d.Press("Ctrl+W");
-        Assert.True(task.IsCompleted);
-        Assert.Null(await task);
+        Assert.DoesNotContain(dialog, app.Windows);
+        // The generic overload's continuation runs asynchronously, so await rather than checking IsCompleted.
+        Assert.Null(await task.WaitAsync(TimeSpan.FromSeconds(5)));
     }
 
     [Fact]

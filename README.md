@@ -1,5 +1,7 @@
 # Nexer
 
+[![CI](https://github.com/oising/Nexer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/oising/Nexer/actions/workflows/ci.yml)
+
 Nexer is a .NET 10 text-mode windowing framework for VT terminals in the spirit of Turbo Vision and
 [Jexer](https://gitlab.com/AutumnMeowMeow/jexer): overlapping windows, menus, dialogs, a status bar and a
 widget set, with the UI authored in XAML that is compiled at build time by [XamlX](https://github.com/kekekeks/XamlX).
@@ -133,6 +135,11 @@ dotnet build .\Nexer.slnx
 dotnet test .\Nexer.slnx
 dotnet format .\Nexer.slnx --verify-no-changes --exclude external
 ```
+
+Clone with `--recurse-submodules` (XamlX lives in `external/XamlX`). Pull requests are gated by
+`.github/workflows/ci.yml`, which runs build, tests and the demo `--smoke` run on Windows and Ubuntu plus the format
+check. To make these checks required, enable branch protection on `main` and add the `Build & test (windows-latest)`,
+`Build & test (ubuntu-latest)` and `Format check` status checks.
 
 The libraries have no third-party runtime dependencies besides XamlX/Mono.Cecil in the XAML build tooling. Tests use
 xUnit. Generated Unicode data and the official fixture ship with the Unicode license and attribution; see
