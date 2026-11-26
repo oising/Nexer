@@ -132,7 +132,12 @@ public class DialogTests
             Assert.Contains("Open File...", d.Row(box.Y, box.X, box.Width), StringComparison.Ordinal);
             Assert.Equal("│", d.Cell(box.X + 33, box.Y + 4));
             Assert.Contains("a.txt", d.Row(box.Y + 4, box.X + 36, 26), StringComparison.Ordinal);
-            Assert.Contains("sub", d.Text(box.X + 2, box.Y + 4, 30, 18), StringComparison.Ordinal);
+            // The tree scrolls only to show the selected directory, so its children may be off-screen on deep paths
+            // (e.g. CI runners); check the model instead of the rendered text.
+            var tree = Assert.Single(box.Children.OfType<TreeView>());
+            var selected = Assert.IsType<DirectoryTreeItem>(tree.SelectedItem);
+            Assert.Equal(Path.GetFullPath(dir), Path.GetFullPath(selected.Path!));
+            Assert.Contains(selected.Items, i => i.Text == "sub");
             Assert.Equal(Path.Combine(dir, "a.txt"), box.StatusBar!.Text);
 
             d.Key(Nexer.Input.Key.Down);
