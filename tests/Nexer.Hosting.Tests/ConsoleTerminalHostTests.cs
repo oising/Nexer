@@ -219,7 +219,7 @@ public class ConsoleTerminalHostTests
     public async Task WriteFailureFaultsInputAndDisposeStillRestores()
     {
         var platform = new FakePlatform();
-        ConsoleTerminalHost host = Start(platform);
+        await using ConsoleTerminalHost host = Start(platform);
         platform.FailWrites = true;
         var surface = new CellSurface(20, 5);
         Write(surface, 0, 0, "x");
