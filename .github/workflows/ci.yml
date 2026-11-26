@@ -51,6 +51,18 @@ jobs:
       - name: Demo smoke run
         run: dotnet run --project samples/Nexer.Demo --configuration Release --no-build -- --smoke
 
+      - name: Pack
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet pack Nexer.slnx --configuration Release --no-build --output artifacts/pkg
+
+      - name: Upload packages
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v7
+        with:
+          name: packages
+          path: artifacts/pkg/*
+          if-no-files-found: error
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7

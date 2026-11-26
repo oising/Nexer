@@ -3,3 +3,6 @@
 TestResults/
 *.DotSettings.user
 .vs/
+
+# dotnet pack output
+artifacts/

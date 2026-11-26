@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <Description>Nexer widget toolkit for terminal applications: windows, controls, menus, dialogs, layouts, XAML runtime types and compiled data binding.</Description>
   </PropertyGroup>
 
   <ItemGroup>
