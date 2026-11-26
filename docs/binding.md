@@ -99,40 +99,64 @@ BindingOperations.Bind(label, "Text",
 
 ## Runtime semantics (runtime-engine agent)
 
-- **Source resolution**: `DataContext` → `Target.DataContext`; `Self` → `Target`; `ElementName` → walk the target's
-  ancestors, `NameScope.GetNameScope(w)?.Find(name)` (resolved once attached; re-resolve on re-parenting);
-  `FindAncestor` → the `AncestorLevel`-th ancestor assignable to `AncestorType` (parents, then the window).
-- **Lifecycle**: `Bind` registers the expression (replacing an existing one for the same property) and evaluates
-  once if a source is available. Subscriptions (`INotifyPropertyChanged` on every `Notifies` node,
-  `INotifyDataErrorInfo.ErrorsChanged`, the target's `PropertyChanged` for TwoWay/OneWayToSource,
-  `DataContextChanged`) exist **only while `Target.IsAttachedToTree`**; detaching unsubscribes from sources so a
-  long-lived view model never keeps a closed window alive. Re-attach re-evaluates. `DataContextChanged` always
-  re-evaluates (it is raised on the widget itself, no leak).
-- **Path walk**: node *i* is read from the value of node *i−1*; a `null` intermediate or `UnsetValue` = unresolved →
-  `FallbackValue` (if set) else the target type's default (`null`/`default(T)`, which for `string` is `null`).
-  Re-subscribe from the changed node downwards when an intermediate changes (`PropertyChanged` with that node's
-  name, `null` or empty = all).
-- **Source → target**: value (`null` → `TargetNullValue` if set) → `Converter.Convert(value, targetType, parameter,
-  CultureInfo.CurrentCulture)` → if `targetType == string` and `StringFormat` set: `string.Format(culture, fmt, v)`
-  (a format without `{` is treated as `{0:fmt}`) → conversion (below) → `targetSetter`. `OneTime` evaluates on
-  attach/DataContext change only, without subscriptions.
+Implemented in `src\Nexer.Ui\Data\BindingExpression.cs`; tests in `tests\Nexer.Ui.Tests\Data\`.
+
+- **Source resolution** (repeated on every attach, `DataContextChanged` and `UpdateTarget()`): `DataContext` →
+  `Target.DataContext`; `Self` → `Target`; `ElementName` → walk the target and its ancestors, first
+  `NameScope.GetNameScope(w)?.Find(name)` hit (a name registered after `Bind` — compiled XAML registers names at the
+  end of the document — is found on attach); `FindAncestor` → the `AncestorLevel`-th ancestor (starting at
+  `Target.Parent`, up to and including the window) that is an instance of `AncestorType`. Re-parenting is seen
+  through the detach/attach pair (or `DataContextChanged`).
+- **Lifecycle**: `Bind` registers the expression (replacing an existing one for the same property). On an attached
+  target it activates immediately; otherwise it evaluates once **only if a source resolves** (so a widget bound
+  before it is added to its parent is not reset to the default). Subscriptions (`INotifyPropertyChanged` on every
+  node owner that implements it at runtime, `INotifyDataErrorInfo.ErrorsChanged` on the leaf owner, the target's
+  `PropertyChanged` for TwoWay/OneWayToSource) exist **only while `Target.IsAttachedToTree`**: `AttachedToTree`
+  subscribes and re-evaluates, `DetachedFromTree` unsubscribes, so a long-lived view model never keeps a closed
+  window alive. `DataContextChanged`, `AttachedToTree` and `DetachedFromTree` are raised by the target itself and
+  stay subscribed until `Dispose`; `DataContextChanged` always re-evaluates (without subscribing while detached).
+  An owner shared by several nodes is subscribed once.
+- **Path walk**: node *i* is read from the value of node *i−1*; a `null` intermediate, `UnsetValue` (wrong owner
+  type, e.g. a DataContext of another type) or an exception from a getter = unresolved → `FallbackValue` (if set,
+  converted to the target type) else the target type's default (`null`/`default(T)`, which for `string` is `null`).
+  A `null` leaf is resolved (→ `TargetNullValue`). When a node owner raises `PropertyChanged` with that node's name
+  (`null`/empty = all), the path is re-walked from that node down (old downstream owners are unsubscribed).
+- **Source → target**: unresolved → fallback; `null` with `TargetNullValue` set → `TargetNullValue` (the converter
+  is **not** called, as in WPF/Avalonia); otherwise `Converter.Convert(value, targetType, parameter,
+  CultureInfo.CurrentCulture)` (`UnsetValue` → fallback, `DoNothing` → target untouched) → if `targetType == string`
+  and `StringFormat` set: `string.Format(culture, fmt, v)` (a format without `{` is treated as `{0:fmt}`) →
+  conversion (below) → `targetSetter`. Any exception in this pipeline → fallback (never thrown to the source).
+- **Modes**: `Default` = `OneWay`. `OneTime` evaluates without subscriptions, and only when the resolved source
+  object differs from the one it last evaluated (first activation, DataContext change); `UpdateTarget()` always
+  evaluates. `OneWayToSource` pushes the target value to the source when it activates / the source is (re)resolved,
+  then on target changes; source changes never touch the target.
 - **Target → source** (TwoWay, OneWayToSource): on the target's `PropertyChanged(TargetProperty)` when
-  `UpdateSourceTrigger` is `Default`/`PropertyChanged`; `LostFocus` only on `Field` (on focus loss); `Explicit` only
-  via `UpdateSource()`. Value via `targetGetter` → `ConvertBack` (or conversion to the leaf's `ValueType`) → leaf
-  `Set`. A re-entrancy guard suppresses the echo in both directions.
-- **Conversion rules**: `null` → `null` for reference/nullable targets, `default` otherwise; assignable → as is;
-  `string` target → `IFormattable.ToString(null, culture)`/`ToString()`; from `string` to numeric/`bool`/enum/`char`
-  (and their nullables) via `Parse` with the current culture (empty string → `null` for nullables); other primitive
-  pairs via `Convert.ChangeType`. Failure source→target → fallback; failure target→source → validation error,
-  source unchanged.
+  `UpdateSourceTrigger` is `Default`/`PropertyChanged`; `Explicit` only via `UpdateSource()`; `LostFocus` when the
+  target implements the internal `ILostFocusSource` (`Field`), otherwise like `PropertyChanged`. Requires a resolved
+  leaf owner and a leaf `Set`. Value via `targetGetter` → `ConvertBack(value, leaf.ValueType, …)` (`DoNothing`/
+  `UnsetValue` → source untouched) → conversion to the leaf's `ValueType` → leaf `Set`. Echo suppression: source
+  notifications are ignored while the expression writes the source (the target is not re-read/re-formatted while the
+  user types; a source that coerces the value is not reflected until its next change), and target notifications are
+  ignored while it writes the target, so there is no ping-pong.
+- **Conversion rules** (both directions, always `CultureInfo.CurrentCulture`): `null` → `null` for reference/nullable
+  targets, `default` otherwise; assignable → as is; `string` target → `IFormattable.ToString(null, culture)`/
+  `ToString()`; from `string`: empty/whitespace → `null` for nullables, enums via `Enum.Parse` (ignore case), `bool`,
+  `char` (exactly one character), `Guid`, `TimeSpan`, `DateTimeOffset`, numerics/`DateTime` via
+  `Convert.ChangeType` (culture-aware parse); numbers → enums via `Enum.ToObject`; other `IConvertible` pairs via
+  `Convert.ChangeType`; anything else fails (`InvalidCastException`). Failure source→target → fallback; failure
+  target→source → validation error, source unchanged.
 - **Validation**: when `ValidatesOnExceptions`, exceptions from `ConvertBack`, conversion or the source setter become
-  `ValidationError(ex.Message, ex, expr)`; a successful update clears them. When `ValidatesOnNotifyDataErrors` and the
-  leaf owner implements `INotifyDataErrorInfo`, its errors for the leaf property name are mirrored (subscribe while
-  attached). Use `Validation.SetErrors(expr, …)` so errors from one expression replace only its own.
-- **Threading**: source notifications raised off the UI thread are marshalled with `Application.Post` (when the
-  target's application is known; otherwise applied inline). The widget tree is touched only on the UI thread.
-- `ClearBinding`/`Dispose` detach and leave the property value as is. Exceptions in converters during
-  source→target are swallowed (fallback) and do not crash the app.
+  `ValidationError(ex.Message, ex, expr)` (otherwise they are swallowed and the source is untouched); a successful
+  source update, or a later source → target transfer, clears it. When `ValidatesOnNotifyDataErrors` and the leaf owner
+  implements `INotifyDataErrorInfo`, `GetErrors(leafName)` is mirrored as `ValidationError(error, null, expr)` after
+  every walk and on `ErrorsChanged` for that name (or all); this applies to every mode, not only two-way. The
+  expression publishes its errors with `Validation.SetErrors(expr, …)` (the exception error first), which raises the
+  errors-changed handlers and invalidates the application only when its set actually changes. `Dispose` clears them.
+- **Threading**: a source `PropertyChanged`/`ErrorsChanged` raised where `(Target.Application ??
+  Application.Current).CheckAccess()` is false is marshalled with `Application.Post`; notifications arriving before
+  the posted work runs are collapsed into one full re-walk. With no application (or no running loop) updates apply
+  inline. The widget tree is touched only on the UI thread.
+- `ClearBinding`/`Dispose` unsubscribe everything and leave the property value as is.
 
 ## Controls contract (controls agent)
 
@@ -182,8 +206,8 @@ Obsolete warning). Errors unless noted.
 | `src\Nexer.Xaml.*` (`Transformers\BindingTransformers.cs`: indexers, NXAML0105, `[DeferredContent]` reset, item-type inference, loader access targets for view-model assemblies) | compiler agent |
 | Integration, demo MVVM window, docs | coordinator |
 
-The current `BindingExpression` is a spike implementation (OneWay/OneTime for `Self`/`DataContext`, no
-subscriptions); the runtime-engine agent replaces its body keeping the public members above.
+`BindingExpression` implements the runtime semantics above (it replaced the spike's OneWay/OneTime-only body; the
+public members are unchanged).
 
 ## Out of scope (v1)
 
