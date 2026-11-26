@@ -9,6 +9,11 @@ public class CompilerTests
 
     private static NexerXamlCompiler CreateCompiler()
     {
+        // SreTypeSystem only sees loaded assemblies; don't rely on the test host having loaded these (mirrors XamlLoader).
+        _ = typeof(Uri).Assembly;
+        _ = typeof(System.ComponentModel.ISupportInitialize).Assembly;
+        _ = typeof(System.ComponentModel.TypeConverterAttribute).Assembly;
+        _ = typeof(System.Collections.ObjectModel.Collection<>).Assembly;
         _ = typeof(Fixtures.Widget).Assembly;
         _ = typeof(Ui.Markup.NameScope).Assembly;
         var ts = new SreTypeSystem();
