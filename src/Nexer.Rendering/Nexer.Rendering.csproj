@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <Description>Nexer VT renderer: diffs cell surfaces into minimal VT output (true colour, 256 and 16 colours).</Description>
   </PropertyGroup>
 
   <ItemGroup>

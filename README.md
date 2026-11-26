@@ -30,6 +30,22 @@ terminal emulator and a console host) that can be used on their own.
 Design documents: [architecture](docs/architecture.md), [controls](docs/controls.md), [XAML](docs/xaml.md),
 [data binding](docs/binding.md), [backend](docs/backend.md), [compatibility](COMPATIBILITY.md).
 
+## NuGet packages
+
+Each runtime assembly ships as its own package; dependencies between them flow automatically.
+
+| Package | Use it for |
+|---------|------------|
+| `Nexer.Core` | Cells, colours, styles, `CellSurface`, Unicode width, `VtScanner`. |
+| `Nexer.Input` | Decoding VT input. |
+| `Nexer.Rendering` | Rendering cell surfaces to VT output. |
+| `Nexer.Hosting` | Running in a real console (`ConsoleTerminalHost`). |
+| `Nexer.Emulation` | The headless terminal emulator. |
+| `Nexer.Ui` | The widget toolkit (brings in Core, Input and Hosting). |
+| `Nexer.Ui.Testing` | Driving an application headlessly in tests. |
+| `Nexer.Xaml` | Build-time XAML: compiles `.xaml` into the assembly and generates code-behind members (development dependency). |
+| `Nexer.Xaml.Loader` | Loading XAML text at runtime. |
+
 ## Running the demo
 
 ```powershell
@@ -47,7 +63,7 @@ and exits 0 (add `--dump` to print the frames).
 
 ## Building an app with XAML
 
-Reference the toolkit, the build step and (optionally) the generator, and import the targets:
+Reference the toolkit and the build-time XAML package:
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -56,15 +72,25 @@ Reference the toolkit, the build step and (optionally) the generator, and import
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
-    <ProjectReference Include="..\..\src\Nexer.Hosting\Nexer.Hosting.csproj" />
-    <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj"
-                      ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
-    <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj"
-                      ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <PackageReference Include="Nexer.Ui" Version="1.0.0-preview.1" />
+    <PackageReference Include="Nexer.Xaml" Version="1.0.0-preview.1" />
   </ItemGroup>
-  <Import Project="..\..\build\Nexer.Xaml.targets" />
 </Project>
+```
+
+When building against this repository's sources instead, reference the build step and the generator as projects and
+import the targets (see [docs/xaml.md](docs/xaml.md)):
+
+```xml
+<ItemGroup>
+  <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
+  <ProjectReference Include="..\..\src\Nexer.Hosting\Nexer.Hosting.csproj" />
+  <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj"
+                    ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
+  <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj"
+                    ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+</ItemGroup>
+<Import Project="..\..\build\Nexer.Xaml.targets" />
 ```
 
 Every `*.xaml` file is compiled into the assembly. Pair it with a partial code-behind class:
@@ -140,6 +166,11 @@ Clone with `--recurse-submodules` (XamlX lives in `external/XamlX`). Pull reques
 `.github/workflows/ci.yml`, which runs build, tests and the demo `--smoke` run on Windows and Ubuntu plus the format
 check. To make these checks required, enable branch protection on `main` and add the `Build & test (windows-latest)`,
 `Build & test (ubuntu-latest)` and `Format check` status checks.
+
+`dotnet pack .\Nexer.slnx -c Release -o artifacts\pkg` produces the NuGet packages (CI uploads them as the `packages`
+artifact). Pushing a `v*` tag (for example `v1.0.0-preview.1`) runs `.github/workflows/release.yml`, which packs with
+that version and publishes to nuget.org using the `NUGET_API_KEY` repository secret. The default version is set in
+`Directory.Build.props`.
 
 The libraries have no third-party runtime dependencies besides XamlX/Mono.Cecil in the XAML build tooling. Tests use
 xUnit. Generated Unicode data and the official fixture ship with the Unicode license and attribution; see

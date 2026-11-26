@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>true</IsPackable>
+    <Description>Nexer console terminal host: raw mode, alternate screen, input and resize pumps, and terminal restore on exit.</Description>
   </PropertyGroup>
 
   <ItemGroup>

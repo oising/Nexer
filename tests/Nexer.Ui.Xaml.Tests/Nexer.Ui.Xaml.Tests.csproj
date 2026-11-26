@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
     <ProjectReference Include="..\..\src\Nexer.Ui.Testing\Nexer.Ui.Testing.csproj" />
     <ProjectReference Include="..\..\src\Nexer.Xaml.Loader\Nexer.Xaml.Loader.csproj" />
+    <ProjectReference Include="..\..\src\Nexer.Xaml.Compiler\Nexer.Xaml.Compiler.csproj" />
     <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj" ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
     <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>

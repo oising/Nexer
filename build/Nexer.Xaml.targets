@@ -1,13 +1,14 @@
 <Project>
   <!--
-    Nexer XAML build integration. Import this file from a project that contains .xaml files (see docs\xaml.md).
+    Nexer XAML build integration. Imported automatically by the Nexer.Xaml NuGet package; when building from source,
+    import this file from a project that contains .xaml files (see docs\xaml.md).
     After CoreCompile it rewrites the intermediate assembly with Nexer.Xaml.Build, compiling every NexerXaml item
     into IL and registering it with Nexer.Ui.Markup.XamlComponent from a module initializer.
 
     Properties:
       NexerXamlEnabled               'false' disables the build step (XAML can still be loaded at runtime by XamlLoader).
       EnableDefaultNexerXamlItems    'false' disables the default **\*.xaml glob.
-      NexerXamlBuildToolPath         Path to Nexer.Xaml.Build.dll. Alternatively add a ProjectReference to
+      NexerXamlBuildToolPath         Path to Nexer.Xaml.Build.dll (defaults to the copy in the Nexer.Xaml package). Alternatively add a ProjectReference to
                                      Nexer.Xaml.Build.csproj with ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool".
     Items:
       NexerXaml                      XAML files; optional LogicalName metadata (defaults to Link, else the project-relative path).
@@ -35,6 +36,8 @@
       <NexerXamlIntermediateDir Condition="'$(NexerXamlIntermediateDir)' == ''">$(IntermediateOutputPath)nexerxaml\</NexerXamlIntermediateDir>
       <_NexerXamlTool>$(NexerXamlBuildToolPath)</_NexerXamlTool>
       <_NexerXamlTool Condition="'$(_NexerXamlTool)' == ''">@(NexerXamlBuildTool->'%(FullPath)')</_NexerXamlTool>
+      <!-- Nexer.Xaml NuGet package layout: build\Nexer.Xaml.targets next to tools\net10.0\Nexer.Xaml.Build.dll. -->
+      <_NexerXamlTool Condition="'$(_NexerXamlTool)' == '' and Exists('$(MSBuildThisFileDirectory)..\tools\net10.0\Nexer.Xaml.Build.dll')">$([MSBuild]::NormalizePath('$(MSBuildThisFileDirectory)..\tools\net10.0\Nexer.Xaml.Build.dll'))</_NexerXamlTool>
       <_NexerXamlRefsFile>$(NexerXamlIntermediateDir)$(TargetName).refs</_NexerXamlRefsFile>
       <_NexerXamlItemsFile>$(NexerXamlIntermediateDir)$(TargetName).items</_NexerXamlItemsFile>
       <_NexerXamlOutput>$(NexerXamlIntermediateDir)$(TargetFileName)</_NexerXamlOutput>

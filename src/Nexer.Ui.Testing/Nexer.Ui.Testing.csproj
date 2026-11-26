@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <Description>Headless host and UI driver for testing Nexer applications without a terminal.</Description>
   </PropertyGroup>
 
   <ItemGroup>

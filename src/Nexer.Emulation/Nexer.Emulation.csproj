@@ -8,6 +8,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <Description>Headless terminal emulator for Nexer that interprets VT output into a screen model.</Description>
   </PropertyGroup>
 
 </Project>

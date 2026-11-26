@@ -4,11 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <Description>Nexer core primitives: cells, colours, styles, CellSurface, Unicode grapheme segmentation and width, and the VT scanner.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\LICENSE-Unicode.txt" Pack="true" PackagePath="" />
-    <None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

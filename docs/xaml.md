@@ -14,6 +14,16 @@ code-behind classes. All three are optional with respect to each other: code-beh
 
 ## Using XAML in an app project
 
+From NuGet, reference `Nexer.Ui` and `Nexer.Xaml`. `Nexer.Xaml` is a development dependency that contains the build
+step, the source generator and `Nexer.Xaml.targets`, which NuGet imports automatically:
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Nexer.Ui" Version="1.0.0-preview.1" />
+  <PackageReference Include="Nexer.Xaml" Version="1.0.0-preview.1" />
+</ItemGroup>
+```
+
 In this repository (project references):
 
 ```xml
@@ -38,7 +48,8 @@ In this repository (project references):
 ```
 
 `tests\Nexer.Xaml.TestApp` is a working example. Instead of the `Nexer.Xaml.Build` project reference you can set
-`NexerXamlBuildToolPath` to a built `Nexer.Xaml.Build.dll` (e.g. from a future NuGet package's `tools` folder).
+`NexerXamlBuildToolPath` to a built `Nexer.Xaml.Build.dll`; when the targets are imported from the `Nexer.Xaml`
+package it defaults to the copy in the package's `tools` folder.
 
 Add `Nexer.Xaml.Loader` as a reference only if the app loads XAML text at runtime.
 
@@ -49,7 +60,7 @@ Add `Nexer.Xaml.Loader` as a reference only if the app loads XAML text at runtim
 | `NexerXaml` item | XAML files to compile. Defaults to `**\*.xaml` (minus the SDK's default excludes). Optional `LogicalName` metadata; defaults to `Link`, otherwise the project-relative path. Logical names use `/`. |
 | `EnableDefaultNexerXamlItems` | `false` disables the default glob. |
 | `NexerXamlEnabled` | `false` skips the build step. |
-| `NexerXamlBuildToolPath` | Path to `Nexer.Xaml.Build.dll` (alternative to the `NexerXamlBuildTool` project reference). |
+| `NexerXamlBuildToolPath` | Path to `Nexer.Xaml.Build.dll` (alternative to the `NexerXamlBuildTool` project reference; defaults to the `Nexer.Xaml` package's copy). |
 | `NexerXamlDotnetHost` | Host used for `dotnet exec` (defaults to `$(DOTNET_HOST_PATH)`, else `dotnet`). |
 
 `NexerXaml` items are also added as `AdditionalFiles` (for the generator) and `CustomAdditionalCompileInputs`, so
