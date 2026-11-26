@@ -128,7 +128,7 @@ All types are in XML namespace `https://nexer.dev/ui`.
 
 ## Data binding support (controls side)
 
-See `docs/binding.md` for the binding contract; this is what the controls provide.
+See [binding.md](binding.md) for the binding feature as a whole; this is what the controls provide.
 
 - **Change notification**: `Widget` implements `INotifyPropertyChanged`. Authorable properties of all widgets
   raise `PropertyChanged` when their value changes (setters use `SetProperty`), including changes made by the
@@ -165,8 +165,9 @@ See `docs/binding.md` for the binding contract; this is what the controls provid
   is applied when they do). `TreeView` shows the source items as the top level (no root row); `ChildrenBinding`
   gives each item's children, read when the item is first expanded (the expander shows when the collection is
   non-empty, or for non-`ICollection` children), observed while attached; generated items are reused by identity
-  so expansion survives changes. Items render as text only (no templates); per-item property changes are not
-  observed (raise a Reset/Replace to refresh).
+  so expansion survives changes. Items render as text only (no templates). While attached, `List` and `TreeView`
+  re-read an item's text when the item raises `PropertyChanged` for the first segment of `DisplayMemberBinding`
+  (`ComboBox` and deeper segments are not observed: raise a Reset/Replace to refresh).
 - **Validation visuals**: Nexer extension theme keys (`ColorTheme.ExtensionColorSpecs`, applied after the
   generated Jexer defaults; not in Jexer): `tfield.error` (also `PasswordField` and a `ComboBox`'s field),
   `tcheckbox.error`, `tcombobox.error` (the arrow), `tlist.error` (unselected rows) and `tstatusbar.error`. Controls

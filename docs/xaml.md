@@ -172,7 +172,7 @@ var diagnostics = XamlLoader.Validate(xamlText);               // compile only, 
   `{x:Type Button}`, `{x:Static Command.Quit}` (static fields, properties and constants), `{Binding}` /
   `{RelativeSource}` (compiled, see below), and any type with a `ProvideValue(IServiceProvider)` method.
 - `x:DataType="prefix:Type"` on any element: the DataContext type for `{Binding}`s on that element and its
-  descendants.
+  descendants (see [binding.md](binding.md)).
 
 ### `{StaticResource}`
 
@@ -198,6 +198,7 @@ Attribute text is converted at **compile time** where possible (no parsing at ru
 | `Rect` (namespace `Nexer*`) | `x,y,w,h` | `new Rect(int,int,int,int)` if that constructor exists, else `Rect.Parse` |
 | `Thickness` (namespace `Nexer*`) | `1`, `1,2` (h,v), `l,t,r,b` | `new Thickness(l,t,r,b)` if that constructor exists, else `Thickness.Parse` |
 | `KeyGesture` (namespace `Nexer*`) | `Ctrl+Q`, `Alt+Shift+F10`, `Ctrl++` | syntax validated at compile time, `KeyGesture.Parse` at runtime |
+| `System.Windows.Input.ICommand` (e.g. `Button.Command`) | `Exit`, `Open` | `Nexer.Ui.Command.Parse(text)` at runtime (well-known instances such as `Command.Exit`, else a named `Command`) |
 | any other type with `static T Parse(string)` | — | `T.Parse(text)` at runtime (e.g. `Command`) |
 
 Mnemonic text such as `&amp;File` is plain string content (`&` must be escaped in XML).
@@ -221,7 +222,8 @@ Mnemonic text such as `&amp;File` is plain string content (`&` must be escaped i
   `OneWayToSource`), `Converter` (usually `{StaticResource}`), `ConverterParameter`, `StringFormat`,
   `FallbackValue`, `TargetNullValue` (strings or markup extensions), `UpdateSourceTrigger`, `ValidatesOnExceptions`,
   `ValidatesOnNotifyDataErrors`, `ElementName`, `RelativeSource` (`{RelativeSource Self}`,
-  `{RelativeSource FindAncestor, AncestorType=T, AncestorLevel=n}`), `DataType` (overrides `x:DataType`).
+  `{RelativeSource FindAncestor, AncestorType=T, AncestorLevel=n}`; `AncestorType` alone implies `FindAncestor`),
+  `DataType` (overrides `x:DataType`).
 - **Source type**: DataContext → the nearest `x:DataType` on the element or an ancestor (a `[DeferredContent]`
   property starts a new scope: templates need their own `x:DataType`), or `DataType=`; `Self` → the target element's
   type; `ElementName` → the named element's type (any `x:Name`/`Name` in the document, forward references allowed);
@@ -245,6 +247,8 @@ Mnemonic text such as `&amp;File` is plain string content (`&` must be escaped i
   is `DataType=` or inferred from an `ItemsSource="{Binding …}"` on the same element (`IEnumerable<T>` → `T`).
 - **Access**: view models may be internal to the assembly containing the XAML (build step) or to any assembly (SRE
   loader); the bound members must be public.
+- **Commands**: `Command="{Binding SaveCommand}"` binds any `ICommand`; a literal `Command="Exit"` is parsed into a
+  named `Command` (see *Value conversion*).
 
 ## Diagnostics
 

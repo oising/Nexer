@@ -1,230 +1,283 @@
-# Data binding (contract)
+# Data binding
 
-Status: **contract frozen; implementation in progress.** This document is the agreement between the runtime-engine,
-controls and compiler agents. The public surface lives in `src\Nexer.Ui\Data\*.cs` (files marked `// CONTRACT:`) plus
-the `Widget`/`Application` members listed below. Changes to that surface go through the coordinator (additive only).
-Spike findings and compiler internals: [binding-design-notes.md](binding-design-notes.md).
+Nexer supports WPF-style MVVM: every widget has an inherited `DataContext`, and XAML `{Binding}`s keep widget
+properties in sync with view-model properties. Bindings are **compiled only**: paths are resolved at compile time
+against an `x:DataType` (by the Cecil build step and the SRE loader alike, with the same transformers), and the
+compiler emits strongly typed accessor delegates. There is no runtime reflection over paths, so typos are build errors
+and bindings are trim/AOT friendly.
 
-## Overview
+Contents: [Quick start](#quick-start) · [XAML syntax](#xaml-syntax) · [Runtime behaviour](#runtime-behaviour) ·
+[Controls](#controls) · [Threading and lifetime](#threading-and-lifetime) · [API reference](#api-reference) ·
+[Diagnostics](#diagnostics) · [Limitations](#limitations) ·
+[Compiler implementation notes](#compiler-implementation-notes)
 
-Nexer supports WPF-style MVVM with **compiled bindings only**: every `{Binding}` whose source is the DataContext needs
-an `x:DataType` in scope, paths are resolved at compile time (Cecil build step and the SRE loader use the same
-transformers) and the compiler emits strongly typed accessor delegates. There is no runtime reflection over paths.
+The demo (`dotnet run --project samples\Nexer.Demo`, menu **Demo → Data binding (MVVM)...**) shows a complete form:
+`samples\Nexer.Demo\Windows\DemoBindingWindow.xaml(.cs)`.
+
+## Quick start
+
+```csharp
+public sealed class PersonViewModel : INotifyPropertyChanged
+{
+    private string name = "";
+    private int age;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string Name { get => name; set { name = value; Raise(); } }
+    public int Age { get => age; set { age = value; Raise(); } }      // non-numeric input → validation error
+    public ObservableCollection<Person> People { get; } = [];
+    public Person? Selected { get; set; }                              // raise PropertyChanged in real code
+    public ICommand SaveCommand { get; }                               // any ICommand (e.g. a RelayCommand)
+
+    private void Raise([CallerMemberName] string? p = null) => PropertyChanged?.Invoke(this, new(p));
+}
+```
 
 ```xml
 <Window xmlns="https://nexer.dev/ui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:MyApp" x:DataType="local:PersonViewModel">
-  <Label Text="{Binding Name}"/>
-  <Field Text="{Binding Age, StringFormat='{}{0}'}"/>            <!-- TwoWay by default ([BindsTwoWayByDefault]) -->
-  <Label Text="{Binding Address.City, FallbackValue=?}"/>
-  <Label Text="{Binding Text, ElementName=NameField}"/>
-  <Label Text="{Binding X, RelativeSource={RelativeSource Self}}"/>
-  <Label Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
-  <Button Text="Save" Command="{Binding SaveCommand}"/>
-  <List ItemsSource="{Binding People}" DisplayMemberBinding="{Binding Name, DataType=local:Person}"/>
+        xmlns:local="clr-namespace:MyApp" x:Class="MyApp.PersonWindow"
+        x:DataType="local:PersonViewModel" Title="Person" Width="50" Height="16">
+  <Field x:Name="NameField" Text="{Binding Name}" Width="20"/>      <!-- TwoWay by default -->
+  <Field Text="{Binding Age}" Y="1" Width="6"/>
+  <Label Text="{Binding Text, ElementName=NameField}" Y="2"/>
+  <List Y="3" Height="6" ItemsSource="{Binding People}"
+        DisplayMemberBinding="{Binding Name}" SelectedItem="{Binding Selected}"/>
+  <Button Y="10" Text="&amp;Save" Command="{Binding SaveCommand}" CommandParameter="{Binding Selected}"/>
 </Window>
 ```
 
-## Public API (namespace `Nexer.Ui.Data`, xmlns `https://nexer.dev/ui`)
+```csharp
+var window = new PersonWindow { DataContext = new PersonViewModel() };   // or Application.DataContext = vm
+```
+
+## XAML syntax
+
+`{Binding}` (also `{Binding Path}` / `{Binding Path=…}`) is the `BindingExtension` markup syntax; the compiler
+rewrites it into a `CompiledBinding` plus a `BindingOperations.Bind` call. Properties:
+
+| Property | Meaning |
+|---|---|
+| `Path` (positional) | The path (grammar below). Empty or `.` = the source itself. |
+| `Mode` | `OneWay`, `TwoWay`, `OneTime`, `OneWayToSource`, `Default` (see *Modes*). |
+| `Converter`, `ConverterParameter` | An `IValueConverter` (usually `{StaticResource …}`) and its parameter. |
+| `StringFormat` | Used when the target is `string`: `string.Format(culture, fmt, value)`; a format without `{` means `{0:fmt}` (`StringFormat=N2`). In XAML write a leading `{}` for a format starting with `{`: `StringFormat='{}{0} items'`. |
+| `FallbackValue` | Used when the path cannot be resolved (or conversion fails). Converted to the target type. |
+| `TargetNullValue` | Used when the resolved value is `null` (the converter is not called). |
+| `UpdateSourceTrigger` | `Default`/`PropertyChanged` (every change), `LostFocus` (`Field` only, see below), `Explicit` (`BindingExpression.UpdateSource()`). |
+| `ValidatesOnExceptions`, `ValidatesOnNotifyDataErrors` | Both default to `true` (see *Validation*). |
+| `ElementName` | Source = the named element in the same document. |
+| `RelativeSource` | `{RelativeSource Self}` or `{RelativeSource FindAncestor, AncestorType=local:T, AncestorLevel=n}`. Giving only `AncestorType` implies `FindAncestor` (as in Avalonia). |
+| `DataType` | Overrides the `x:DataType` in scope for this binding (`DataType=local:Person` or `{x:Type local:Person}`). |
+
+**Sources.** Without `ElementName`/`RelativeSource` the source is the target's `DataContext`, typed by the nearest
+`x:DataType` on the element or an ancestor element (or `DataType=` on the binding); `x:DataType` is inherited down
+the XAML tree and can be overridden on any element, and it is reset inside `[DeferredContent]`. `Self` uses the
+target's type, `ElementName` the named element's type (names are document-wide, including deferred content),
+`FindAncestor` the `AncestorType` (which must derive from `Widget`).
+
+**Path grammar.**
+
+- Dotted properties: `Address.City`. Members must be public instance properties.
+- Indexers: `Items[0]`, `Map[key]`, `Map['key with spaces']`. An `int` indexer is preferred, then `string`; arrays use
+  `IList<T>`. To refresh an indexer binding, raise `PropertyChanged("Item[]")` (or `null`/empty for all).
+- Attached properties: `(prefix:Type.Prop)`, read through the static `GetProp(owner)` (read-only, no notifications).
+- Casts: `((prefix:Type)Path)` or `((prefix:Type)Path).Member`, e.g. to reach a derived member.
+
+**Modes.** If `Mode` is omitted and the target property is marked `[BindsTwoWayByDefault]` the binding is `TwoWay`,
+otherwise `OneWay`. `OneTime` sets the target once per source object (first activation and each DataContext change).
+`OneWayToSource` pushes the target value to the source. `TwoWay`/`OneWayToSource` need a settable path (NXAML0104)
+and a target property with a public getter (NXAML0106).
+
+**Per-item bindings.** Properties typed `IBinding` (`DisplayMemberBinding` on `List`/`ComboBox`/`TreeView`,
+`TreeView.ChildrenBinding`) receive the `CompiledBinding` itself and evaluate it against each item. The item type is
+inferred from a sibling `ItemsSource="{Binding …}"` whose type implements `IEnumerable<T>` (or is `T[]`), in either
+attribute order; otherwise give `DataType=`. Per-item bindings cannot use `ElementName`/`RelativeSource`.
+
+**Commands.** `Command` on `Button`, `CheckBox`, `Label`, `MenuItem` and `StatusKey` is an
+`System.Windows.Input.ICommand?`, so it can be bound (`Command="{Binding SaveCommand}"`) together with
+`CommandParameter`. A literal such as `Command="Exit"` or `Command="Open"` still compiles, into `Command.Parse(text)`
+(the well-known instances like `Command.Exit`, otherwise a new named `Command`), and dispatches through
+`Application.ExecuteCommand`/`OnCommand` as before. `Command` implements `ICommand` with `CanExecute` always `true`.
+
+## Runtime behaviour
+
+Implemented by `BindingExpression` (`src\Nexer.Ui\Data\BindingExpression.cs`).
+
+- **Source resolution** (on every attach, `DataContextChanged` and `UpdateTarget()`): `DataContext` →
+  `Target.DataContext`; `Self` → the target; `ElementName` → the first `NameScope` hit walking up from the target (a
+  name registered later is found when the target is attached); `FindAncestor` → the `AncestorLevel`-th ancestor,
+  starting at `Target.Parent`, up to and including the window, that is an `AncestorType`.
+- **DataContext inheritance**: effective value = the widget's own value ?? `Parent.DataContext` ?? (for a window)
+  `Application.DataContext`. Setting `null` reverts to the inherited value. `DataContextChanged` is raised on the
+  widget and every inheriting descendant when the effective value changes (local set, ancestor set, application set,
+  re-parenting).
+- **Path walk**: node *i* reads the value of node *i−1*. A `null` intermediate, an owner of the wrong type (e.g. an
+  inner widget seeing an outer DataContext) or **an exception thrown by a getter** (e.g. an out-of-range indexer)
+  means *unresolved* → `FallbackValue` if set, else the target type's default. Unresolved paths are not validation
+  errors. A `null` leaf is resolved → `TargetNullValue` if set. When an owner raises `PropertyChanged` for its node
+  (`null`/empty = all) the path is re-walked from that node.
+- **Source → target**: `TargetNullValue` (for `null`, skips the converter) → `Converter.Convert` (`UnsetValue` →
+  fallback, `DoNothing` → target unchanged) → `StringFormat` (string targets) → conversion → setter. Any exception →
+  fallback; nothing is thrown at the source.
+- **Target → source** (`TwoWay`, `OneWayToSource`): on the target's `PropertyChanged` (trigger
+  `Default`/`PropertyChanged`), when the `Field` loses focus (`LostFocus`; other widgets treat it as
+  `PropertyChanged`) or on `UpdateSource()` (`Explicit`). Value → `ConvertBack` (`UnsetValue`/`DoNothing` → source
+  untouched) → conversion to the leaf type → leaf setter. Echo is suppressed in both directions, so a `Field` is not
+  re-formatted while the user types.
+- **Conversion** (both directions, `CultureInfo.CurrentCulture`): `null` → `null`/`default`; assignable values as
+  is; to `string` via `IFormattable.ToString(null, culture)`/`ToString()`; from `string`: blank → `null` for
+  nullables, enums (`Enum.Parse`, ignore case), `bool`, `char` (one character), `Guid`, `TimeSpan`,
+  `DateTimeOffset`, numerics/`DateTime` (culture-aware); numbers → enums; other `IConvertible` pairs via
+  `Convert.ChangeType`. A failure source → target uses the fallback; target → source is a validation error and the
+  source keeps its value.
+- **Validation**: with `ValidatesOnExceptions`, exceptions from `ConvertBack`, conversion or the source setter
+  become `ValidationError(ex.Message, ex, expression)`; a later successful update clears it. With
+  `ValidatesOnNotifyDataErrors`, a leaf owner implementing `INotifyDataErrorInfo` has `GetErrors(leaf)` mirrored
+  (every mode). Errors are read with `Validation.GetErrors/GetHasErrors` and observed with
+  `Validation.AddErrorsChangedHandler`.
+- `ClearBinding`/`Dispose` unsubscribe and leave the property value as it is. Binding the same property again
+  replaces the previous expression.
+
+## Controls
+
+- Every authorable property raises `PropertyChanged` when it changes, including through user input, so any widget
+  property can be a binding target and two-way bindings see user edits.
+- `[BindsTwoWayByDefault]`: `Field.Text`, `CheckBox.Checked`, `RadioGroup.Selected`, `List.SelectedIndex`,
+  `List.SelectedItem`, `ComboBox.Text`, `ComboBox.SelectedIndex`, `ComboBox.SelectedItem`, `TreeView.SelectedItem`,
+  `SplitPane.Split` and the scroller values (`Value`, `VerticalValue`, `HorizontalValue`, also on
+  `ScrollableWidget`/`ScrollableWindow`). `ProgressBar.Value` is one-way.
+- **Items**: `List`, `ComboBox` and `TreeView` have `IEnumerable? ItemsSource` (incremental updates for
+  `INotifyCollectionChanged`, `Reset` rebuilds) and `IBinding? DisplayMemberBinding` (else `ToString()`);
+  `TreeView.ChildrenBinding` gives each item's children (evaluated lazily on expansion). `Items` and `ItemsSource`
+  are mutually exclusive (`InvalidOperationException`). With `ItemsSource`, `SelectedItem` (`object?`) is the source
+  item; `List.SelectedText` and `TreeView.SelectedTreeItem` give the displayed text / tree node. While attached,
+  `List` and `TreeView` also refresh an item's text when the item raises `PropertyChanged` for the first segment of
+  `DisplayMemberBinding` (e.g. renaming a person updates the list).
+- **Commands**: while attached, a control subscribes to `CanExecuteChanged`; its effective enabled state is
+  `Enabled && CanExecute(CommandParameter)` (re-queried when `CommandParameter` changes), so a disabled button is
+  drawn disabled and ignores Enter, clicks and its mnemonic.
+- **Validation visuals**: a widget with errors draws with `tfield.error`, `tcheckbox.error`, `tcombobox.error` or
+  `tlist.error` (Nexer extensions to the Jexer theme), and the window status bar shows the focused widget's first
+  error with `tstatusbar.error`.
+
+## Threading and lifetime
+
+- A `PropertyChanged`/`ErrorsChanged`/`CanExecuteChanged`/`CollectionChanged` raised off the UI thread (where
+  `Application.CheckAccess()` is false) is marshalled with `Application.Post`; bursts collapse into one re-walk. The
+  widget tree is only touched on the UI thread. Without a running application updates apply inline.
+- Subscriptions to view-model events (`PropertyChanged`, `ErrorsChanged`, `CollectionChanged`, `CanExecuteChanged`,
+  item `PropertyChanged`) exist **only while the widget is attached** to an application's tree
+  (`Widget.IsAttachedToTree`, `AttachedToTree`/`DetachedFromTree`): closing a window releases them, so a long-lived
+  view model never keeps a closed window alive. Re-attaching re-subscribes and re-evaluates.
+- Bindings are created while the widget is being built (before it has a parent): a binding evaluates immediately only
+  if its source resolves, so a property's XAML default is not overwritten before the DataContext arrives.
+
+## API reference
+
+Namespace `Nexer.Ui.Data` (XAML: `https://nexer.dev/ui`, no prefix needed).
 
 | Type | Members |
 |---|---|
 | `IBinding` | `BindingMode Mode { get; }` |
 | `BindingMode` | `Default, OneWay, TwoWay, OneTime, OneWayToSource` |
 | `UpdateSourceTrigger` | `Default, PropertyChanged, LostFocus, Explicit` |
-| `IValueConverter` | `object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)`; `object? ConvertBack(…)` (same shape). Return `BindingOperations.UnsetValue` → fallback / no source update; `DoNothing` → skip. |
+| `IValueConverter` | `object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)`; `ConvertBack` (same shape). Return `BindingOperations.UnsetValue` → fallback / no source update; `DoNothing` → skip. |
 | `BindsTwoWayByDefaultAttribute` | `[AttributeUsage(Property)]`; read by the compiler. |
-| `BindingSourceKind` | `DataContext = 0, Self = 1, ElementName = 2, FindAncestor = 3` |
+| `BindingSourceKind` | `DataContext, Self, ElementName, FindAncestor` |
 | `RelativeSourceMode` | `Self, FindAncestor` |
-| `PathNode` | ctor `(string name, Type valueType, Func<object, object?> get, Action<object, object?>? set, bool notifies)`; `Name`, `ValueType`, `Get`, `Set`, `Notifies` (owner type implements `INotifyPropertyChanged`). `Get` returns `UnsetValue` if the owner is not of the compile-time type; `Set` is then a no-op. |
-| `CompiledBindingPath` | ctor `(BindingSourceKind source, string? elementName, Type? ancestorType, int ancestorLevel, PathNode[] nodes)`, ctor `(params PathNode[] nodes)` (DataContext); `Source`, `ElementName`, `AncestorType`, `AncestorLevel`, `Nodes`, `ValueType`, `IsWritable`. Zero nodes = the source itself (`{Binding}`). |
-| `CompiledBinding : IBinding` | ctors `()`, `(CompiledBindingPath)`; `Path`, `Mode`, `Converter`, `ConverterParameter`, `StringFormat`, `FallbackValue` (default `UnsetValue`), `TargetNullValue` (default `UnsetValue`), `UpdateSourceTrigger`, `ValidatesOnExceptions = true`, `ValidatesOnNotifyDataErrors = true`. |
-| `BindingExtension` | XAML syntax only (no `ProvideValue`; the compiler rewrites it into `CompiledBinding`). ctors `()`, `(string path)`; `Path`, `Mode`, `Converter`, `ConverterParameter`, `StringFormat`, `FallbackValue`, `TargetNullValue`, `UpdateSourceTrigger`, `ValidatesOnExceptions`, `ValidatesOnNotifyDataErrors`, `ElementName`, `RelativeSource`, `Type? DataType`. |
-| `RelativeSource` | Compile-time only (consumed inside `{Binding}`; an error anywhere else). ctors `()`, `(RelativeSourceMode)`; `Mode`, `AncestorType`, `AncestorLevel = 1`. |
-| `BindingOperations` | `UnsetValue`, `DoNothing` sentinels; `Bind(Widget target, string propertyName, Func<object, object?>? targetGetter, Action<object, object?> targetSetter, Type targetType, IBinding binding) → BindingExpression` (+ 5-arg overload without getter); `GetBindingExpression(Widget, string)`, `GetBindingExpressions(Widget)`, `ClearBinding(Widget, string)`, `ClearAllBindings(Widget)`, `Evaluate(IBinding, object? source, Type targetType)` (one-shot, for per-item bindings). |
-| `BindingExpression : IDisposable` | `Target`, `TargetProperty`, `TargetType`, `Binding`, `EffectiveMode`, `DataItem` (resolved source), `HasError`, `IsDisposed`, `UpdateTarget()`, `UpdateSource()`, `Dispose()` (detach). Created only by `Bind`. |
+| `PathNode` | ctor `(string name, Type valueType, Func<object, object?> get, Action<object, object?>? set, bool notifies)`; `Name`, `ValueType`, `Get`, `Set`, `Notifies`. |
+| `CompiledBindingPath` | ctors `(BindingSourceKind source, string? elementName, Type? ancestorType, int ancestorLevel, PathNode[] nodes)`, `(params PathNode[] nodes)`; `Source`, `ElementName`, `AncestorType`, `AncestorLevel`, `Nodes`, `ValueType`, `IsWritable`. |
+| `CompiledBinding : IBinding` | ctors `()`, `(CompiledBindingPath)`; `Path`, `Mode`, `Converter`, `ConverterParameter`, `StringFormat`, `FallbackValue`, `TargetNullValue` (both default `UnsetValue`), `UpdateSourceTrigger`, `ValidatesOnExceptions`, `ValidatesOnNotifyDataErrors`. |
+| `BindingExtension` | XAML syntax only (rewritten by the compiler). ctors `()`, `(string path)`; the properties in [XAML syntax](#xaml-syntax). |
+| `RelativeSource` | Compile-time only, inside `{Binding}`. ctors `()`, `(RelativeSourceMode)`; `Mode`, `AncestorType`, `AncestorLevel = 1`. |
+| `BindingOperations` | `UnsetValue`, `DoNothing`; `Bind(Widget target, string propertyName, Func<object, object?>? targetGetter, Action<object, object?> targetSetter, Type targetType, IBinding binding)` (+ overload without the getter) → `BindingExpression`; `GetBindingExpression(Widget, string)`, `GetBindingExpressions(Widget)`, `ClearBinding(Widget, string)`, `ClearAllBindings(Widget)`, `Evaluate(IBinding, object? source, Type targetType)` (one-shot, used for per-item bindings). |
+| `BindingExpression : IDisposable` | `Target`, `TargetProperty`, `TargetType`, `Binding`, `EffectiveMode`, `DataItem`, `HasError`, `IsDisposed`, `UpdateTarget()`, `UpdateSource()`, `Dispose()`. |
 | `ValidationError` | `record (object? ErrorContent, Exception? Exception, BindingExpression? BindingExpression)` |
-| `Validation` | `GetErrors(Widget)`, `GetHasErrors(Widget)`, `Add/RemoveErrorsChangedHandler(Widget, EventHandler<ValidationErrorsChangedEventArgs>)`, `SetErrors(BindingExpression, IEnumerable<ValidationError>)`, `MarkInvalid(ValidationError)`, `ClearErrors(BindingExpression)`. |
+| `Validation` | `GetErrors(Widget)`, `GetHasErrors(Widget)`, `AddErrorsChangedHandler`/`RemoveErrorsChangedHandler(Widget, EventHandler<ValidationErrorsChangedEventArgs>)`, `SetErrors(BindingExpression, IEnumerable<ValidationError>)`, `MarkInvalid(ValidationError)`, `ClearErrors(BindingExpression)`. |
 
-`Widget` (implemented on this branch unless noted):
+On `Widget` (namespace `Nexer.Ui`): `INotifyPropertyChanged` (`PropertyChanged`, protected `SetProperty<T>` and
+`OnPropertyChanged`), `object? DataContext`, `event DataContextChanged`, `bool IsAttachedToTree`,
+`event AttachedToTree`, `event DetachedFromTree`. On `Application`: `object? DataContext` (the root of
+inheritance). `Command` (`sealed record Command(string Name) : ICommand`) has `static Parse(string)`.
 
-- `: INotifyPropertyChanged` — `event PropertyChanged`, `protected bool SetProperty<T>(ref T, T, [CallerMemberName] string?)`,
-  `protected void OnPropertyChanged([CallerMemberName] string?)`.
-- `object? DataContext { get; set; }` — effective value = local ?? `Parent.DataContext` ?? (window) `Application.DataContext`.
-  Setting `null` reverts to the inherited value. `event EventHandler? DataContextChanged` is raised on the widget and
-  every inheriting descendant when the effective value changes (local set, ancestor set, `Application.DataContext`
-  set, re-parenting via `AttachChild`/`DetachChild`).
-- `bool IsAttachedToTree`, `event AttachedToTree`, `event DetachedFromTree`. `internal void SetAttachedToTree(bool)`
-  propagates to the subtree; **controls agent** must call it from `Application.AddWindow`/`CloseWindow` and when a
-  child is attached to / detached from an attached parent.
+## Diagnostics
 
-`Application.DataContext` (`object?`) — root of inheritance; notifies windows without a local value.
+Compile-time diagnostics (errors unless noted); `NXAML0101`–`NXAML0149` are reserved for bindings.
 
-`Command` (`sealed record Command(string Name)`) now implements `System.Windows.Input.ICommand`:
-`CanExecute` → `true`, `Execute` → `Application.Current?.ExecuteCommand(this)`, `CanExecuteChanged` never fires.
+| Code | Meaning |
+|---|---|
+| NXAML0101 | `{Binding}` with a DataContext source but no `x:DataType` in scope (or a per-item binding whose item type cannot be inferred and has no `DataType=`) |
+| NXAML0102 | Unknown member in a binding path (including no indexer / attached getter for the segment) |
+| NXAML0103 | Member is not public / not an instance property |
+| NXAML0104 | TwoWay/OneWayToSource binding to a read-only path |
+| NXAML0105 | Warning: source and target types have no built-in conversion and no `Converter` |
+| NXAML0106 | Invalid binding target (not a `Widget`, no public setter, two-way without a public getter, binding outside a property, multiple values, `ElementName`/`RelativeSource` on a per-item binding) |
+| NXAML0107 | Unknown `ElementName` |
+| NXAML0108 | Invalid `RelativeSource` (bad mode, missing or non-`Widget` `AncestorType`, combined with `ElementName`). Outside `{Binding}`, `{RelativeSource}` fails with NXAML0001. |
+| NXAML0109 | Invalid path syntax, unresolvable type in a cast/attached segment, impossible cast |
 
-## What the compiler emits
+## Limitations
 
-For `<Label Text="{Binding Child.Title, Mode=OneWay}"/>` (inside `x:DataType="local:Vm"`), after the label is
-constructed and before it is added to its parent:
+- No `MultiBinding`, `PriorityBinding`, reflection (untyped) bindings, data templates (items render as text), styles
+  or triggers.
+- Paths cannot call methods or use multi-argument indexers.
+- `UpdateSourceTrigger=LostFocus` is only honoured by `Field`; other widgets update on every change.
+- Item text refresh on item `PropertyChanged` covers `List` and `TreeView`, and only the first segment of
+  `DisplayMemberBinding` (`{Binding Address.City}` refreshes when the item raises `Address`, not when the address
+  raises `City`). `ComboBox`'s edit text does not follow item changes; reset `ItemsSource` or raise a collection
+  `Reset` to refresh.
+- A source that coerces a value written by a two-way binding is not reflected in the target until its next change.
+- A named `Command` (e.g. `Command="Exit"`) ignores `CommandParameter` and is always executable.
+
+## Compiler implementation notes
+
+The compiler side lives in `src\Nexer.Xaml.Compiler\Transformers\BindingTransformers.cs` (with
+`NexerBindingAccessors`, `NexerBindingSetter` and `NexerBindingState`); tests are in
+`tests\Nexer.Xaml.Tests\BindingCompilerTests.cs`, `tests\Nexer.Ui.Xaml.Tests\BindingCompilationTests.cs` and
+`BindingEndToEndTests.cs` (SRE loader plus Cecil-compiled `Views\BindingWindow.xaml`/`Views\MvvmWindow.xaml`).
+
+What is emitted, for `<Label Text="{Binding Child.Title, Mode=OneWay}"/>` inside `x:DataType="local:Vm"` (after the
+label is constructed, before it is added to its parent):
 
 ```csharp
 BindingOperations.Bind(label, "Text",
-    getter: XamlBindingAccessors_x.Get_0 /* Label.Text */,       // null if the property has no public getter
-    setter: XamlBindingAccessors_x.Set_0 /* Label.Text */,
+    XamlBindingAccessors_x.Get_0 /* Label.Text; null without a public getter */,
+    XamlBindingAccessors_x.Set_0 /* Label.Text */,
     typeof(string),
     new CompiledBinding {
         Path = new CompiledBindingPath(BindingSourceKind.DataContext, null, null, 1, new[] {
             new PathNode("Child", typeof(Child), Get_1, Set_1 /* or null */, notifies: true /* Vm : INPC */),
             new PathNode("Title", typeof(string), Get_2, Set_2, notifies: true) }),
         Mode = BindingMode.OneWay,
-        // Converter, ConverterParameter, StringFormat, FallbackValue, TargetNullValue, UpdateSourceTrigger,
-        // ValidatesOn* are assigned only when present in XAML (FallbackValue/TargetNullValue as strings).
+        // Other properties are assigned only when present in XAML (FallbackValue/TargetNullValue as strings).
     });
 ```
 
-- Accessors are static methods on a nested helper type: `Get(object)` = `isinst Owner` guard (→ `UnsetValue`), call
-  the getter, box; `Set(object, object?)` = guard (→ no-op), `unbox.any`/`castclass` the value, call the setter.
-  Target setters receive a value already converted to `targetType` (or `null`).
-- Source kinds: `DataContext` (root type = nearest `x:DataType`, or `DataType=` on the binding), `Self` (target
-  type), `ElementName` (type of the `x:Name`/`Name`d element in the document), `FindAncestor` (`AncestorType`,
-  `AncestorLevel`).
-- **Default mode** is resolved by the compiler: if XAML gives no `Mode` and the target property has
-  `[BindsTwoWayByDefault]`, it emits `Mode = TwoWay`; otherwise `Mode` stays `Default`, which the runtime treats as
-  `OneWay`. Two-way (or OneWayToSource) to a path without a setter is a compile error.
-- Properties whose type is assignable from `CompiledBinding` (`IBinding`: `DisplayMemberBinding`, `ChildrenBinding`;
-  not `object`) get the `CompiledBinding` object itself (no `Bind` call) and are evaluated per item (DataContext
-  source only). The item type is `DataType=` on the binding if given, otherwise **inferred** when `ItemsSource` on
-  the same element is itself a `{Binding}` whose leaf type implements `IEnumerable<T>` (or is `T[]`): the item type
-  is `T`. Otherwise NXAML0101.
-- Binding targets must be `Widget`s with a public instance setter (no `TreeItem`, `ThemeColor`, …) — NXAML0106;
-  TwoWay/OneWayToSource bindings also need a public getter on the target property.
-- **Path grammar** (see [xaml.md](xaml.md#compiled-bindings)): `''`/`.` (the source itself), dotted properties,
-  indexers `[0]`/`[key]`/`['key']` (int indexer preferred, then string; arrays via `IList<T>`; node name `Item[]`,
-  `Notifies` = owner implements INPC — sources should raise `PropertyChanged("Item[]")`), attached properties
-  `(prefix:Type.Prop)` (static `GetProp(owner)`, read-only, node name `(Type.Prop)`, `Notifies = false`) and casts
-  `((prefix:Type)path)` (no node of its own: the next node's accessor guards on the cast type, so the previous
-  node's `ValueType` is the pre-cast member type).
-- Indexer getters run the real indexer, so they can throw (`ArgumentOutOfRangeException`, `KeyNotFoundException`);
-  **the runtime must treat an exception from `PathNode.Get` as "unresolved"** (fallback), like `UnsetValue`.
-- **Access**: accessors call members directly. With the build step (Cecil) they are emitted into the compiled
-  assembly, so internal view models of that assembly work. The SRE loader grants its dynamic assembly
-  `IgnoresAccessChecksTo` for every assembly whose types a binding touches (`NexerXamlDocument.AccessedAssemblies`),
-  so non-public view models work there too. Members themselves must still be public (NXAML0103).
-
-## Runtime semantics (runtime-engine agent)
-
-Implemented in `src\Nexer.Ui\Data\BindingExpression.cs`; tests in `tests\Nexer.Ui.Tests\Data\`.
-
-- **Source resolution** (repeated on every attach, `DataContextChanged` and `UpdateTarget()`): `DataContext` →
-  `Target.DataContext`; `Self` → `Target`; `ElementName` → walk the target and its ancestors, first
-  `NameScope.GetNameScope(w)?.Find(name)` hit (a name registered after `Bind` — compiled XAML registers names at the
-  end of the document — is found on attach); `FindAncestor` → the `AncestorLevel`-th ancestor (starting at
-  `Target.Parent`, up to and including the window) that is an instance of `AncestorType`. Re-parenting is seen
-  through the detach/attach pair (or `DataContextChanged`).
-- **Lifecycle**: `Bind` registers the expression (replacing an existing one for the same property). On an attached
-  target it activates immediately; otherwise it evaluates once **only if a source resolves** (so a widget bound
-  before it is added to its parent is not reset to the default). Subscriptions (`INotifyPropertyChanged` on every
-  node owner that implements it at runtime, `INotifyDataErrorInfo.ErrorsChanged` on the leaf owner, the target's
-  `PropertyChanged` for TwoWay/OneWayToSource) exist **only while `Target.IsAttachedToTree`**: `AttachedToTree`
-  subscribes and re-evaluates, `DetachedFromTree` unsubscribes, so a long-lived view model never keeps a closed
-  window alive. `DataContextChanged`, `AttachedToTree` and `DetachedFromTree` are raised by the target itself and
-  stay subscribed until `Dispose`; `DataContextChanged` always re-evaluates (without subscribing while detached).
-  An owner shared by several nodes is subscribed once.
-- **Path walk**: node *i* is read from the value of node *i−1*; a `null` intermediate, `UnsetValue` (wrong owner
-  type, e.g. a DataContext of another type) or an exception from a getter = unresolved → `FallbackValue` (if set,
-  converted to the target type) else the target type's default (`null`/`default(T)`, which for `string` is `null`).
-  A `null` leaf is resolved (→ `TargetNullValue`). When a node owner raises `PropertyChanged` with that node's name
-  (`null`/empty = all), the path is re-walked from that node down (old downstream owners are unsubscribed).
-- **Source → target**: unresolved → fallback; `null` with `TargetNullValue` set → `TargetNullValue` (the converter
-  is **not** called, as in WPF/Avalonia); otherwise `Converter.Convert(value, targetType, parameter,
-  CultureInfo.CurrentCulture)` (`UnsetValue` → fallback, `DoNothing` → target untouched) → if `targetType == string`
-  and `StringFormat` set: `string.Format(culture, fmt, v)` (a format without `{` is treated as `{0:fmt}`) →
-  conversion (below) → `targetSetter`. Any exception in this pipeline → fallback (never thrown to the source).
-- **Modes**: `Default` = `OneWay`. `OneTime` evaluates without subscriptions, and only when the resolved source
-  object differs from the one it last evaluated (first activation, DataContext change); `UpdateTarget()` always
-  evaluates. `OneWayToSource` pushes the target value to the source when it activates / the source is (re)resolved,
-  then on target changes; source changes never touch the target.
-- **Target → source** (TwoWay, OneWayToSource): on the target's `PropertyChanged(TargetProperty)` when
-  `UpdateSourceTrigger` is `Default`/`PropertyChanged`; `Explicit` only via `UpdateSource()`; `LostFocus` when the
-  target implements the internal `ILostFocusSource` (`Field`), otherwise like `PropertyChanged`. Requires a resolved
-  leaf owner and a leaf `Set`. Value via `targetGetter` → `ConvertBack(value, leaf.ValueType, …)` (`DoNothing`/
-  `UnsetValue` → source untouched) → conversion to the leaf's `ValueType` → leaf `Set`. Echo suppression: source
-  notifications are ignored while the expression writes the source (the target is not re-read/re-formatted while the
-  user types; a source that coerces the value is not reflected until its next change), and target notifications are
-  ignored while it writes the target, so there is no ping-pong.
-- **Conversion rules** (both directions, always `CultureInfo.CurrentCulture`): `null` → `null` for reference/nullable
-  targets, `default` otherwise; assignable → as is; `string` target → `IFormattable.ToString(null, culture)`/
-  `ToString()`; from `string`: empty/whitespace → `null` for nullables, enums via `Enum.Parse` (ignore case), `bool`,
-  `char` (exactly one character), `Guid`, `TimeSpan`, `DateTimeOffset`, numerics/`DateTime` via
-  `Convert.ChangeType` (culture-aware parse); numbers → enums via `Enum.ToObject`; other `IConvertible` pairs via
-  `Convert.ChangeType`; anything else fails (`InvalidCastException`). Failure source→target → fallback; failure
-  target→source → validation error, source unchanged.
-- **Validation**: when `ValidatesOnExceptions`, exceptions from `ConvertBack`, conversion or the source setter become
-  `ValidationError(ex.Message, ex, expr)` (otherwise they are swallowed and the source is untouched); a successful
-  source update, or a later source → target transfer, clears it. When `ValidatesOnNotifyDataErrors` and the leaf owner
-  implements `INotifyDataErrorInfo`, `GetErrors(leafName)` is mirrored as `ValidationError(error, null, expr)` after
-  every walk and on `ErrorsChanged` for that name (or all); this applies to every mode, not only two-way. The
-  expression publishes its errors with `Validation.SetErrors(expr, …)` (the exception error first), which raises the
-  errors-changed handlers and invalidates the application only when its set actually changes. `Dispose` clears them.
-- **Threading**: a source `PropertyChanged`/`ErrorsChanged` raised where `(Target.Application ??
-  Application.Current).CheckAccess()` is false is marshalled with `Application.Post`; notifications arriving before
-  the posted work runs are collapsed into one full re-walk. With no application (or no running loop) updates apply
-  inline. The widget tree is touched only on the UI thread.
-- `ClearBinding`/`Dispose` unsubscribe everything and leave the property value as is.
-
-## Controls contract (controls agent)
-
-- Every authorable/bindable property raises `PropertyChanged` when it changes, **including by user input**
-  (`SetProperty`). `[BindsTwoWayByDefault]` on: `Field.Text`, `CheckBox.Checked`, `RadioGroup.Selected`,
-  `List.SelectedIndex`, `List.SelectedItem`, `ComboBox.Text`, `ComboBox.SelectedIndex`, `ComboBox.SelectedItem`,
-  `TreeView.SelectedItem`, scroller `Value`. (`ProgressBar.Value` stays OneWay.)
-- **ICommand**: `Command` on `Button`, `MenuItem`, `CheckBox`, `Label`, `StatusKey` becomes
-  `System.Windows.Input.ICommand?`, plus `object? CommandParameter`. `Command="Exit"` keeps working (the existing
-  `Command` converter produces the record, which is an `ICommand`). Code that dispatches named commands checks
-  `command is Command named` before calling `Application.ExecuteCommand`; otherwise `Execute(CommandParameter)`.
-  While attached, subscribe to `CanExecuteChanged` → effective enabled state (`Enabled && CanExecute(parameter)`).
-- **Items**: `IEnumerable? ItemsSource` on `List`, `ComboBox`, `TreeView`; `INotifyCollectionChanged` incremental
-  updates (Reset fallback), subscribed while attached; `Items` and `ItemsSource` are mutually exclusive (setting one
-  while the other is in use throws `InvalidOperationException`). `IBinding? DisplayMemberBinding` (evaluated per
-  item with `BindingOperations.Evaluate(binding, item, typeof(string))`, else `item?.ToString()`). `TreeView`:
-  `IBinding? ChildrenBinding` (evaluated to `IEnumerable?` per item, lazily on expansion). `SelectedItem` returns the
-  source item when `ItemsSource` is used.
-- **Validation visuals**: theme keys (`tfield.error`, `tcheckbox.error`, … — Nexer extensions, not Jexer) used when
-  `Validation.GetHasErrors(this)`; the window status bar shows the focused widget's first error.
-- Raise `AttachedToTree`/`DetachedFromTree` via `SetAttachedToTree` (see above).
-
-## Diagnostics
-
-Binding diagnostics use `NXAML0101`–`NXAML0149` (four digits like the other codes; `NXAML0100` is the existing
-Obsolete warning). Errors unless noted.
-
-| Code | Meaning |
-|---|---|
-| NXAML0101 | `{Binding}` with a DataContext source but no `x:DataType` in scope (or no `DataType=` for `IBinding` properties) |
-| NXAML0102 | Unknown member in a binding path (including no indexer / attached getter for the segment) |
-| NXAML0103 | Member is not public / not an instance property |
-| NXAML0104 | TwoWay/OneWayToSource binding to a read-only path |
-| NXAML0105 | Warning: source and target types have no built-in conversion (per *Conversion rules*) and no `Converter` |
-| NXAML0106 | Invalid binding target (not a `Widget`, no public setter, two-way without a public getter, binding used outside a property, multiple values, `ElementName`/`RelativeSource` on a per-item binding) |
-| NXAML0107 | Unknown `ElementName` |
-| NXAML0108 | Invalid `RelativeSource` (bad mode, missing or non-`Widget` `AncestorType`, combined with `ElementName`). Outside `{Binding}` a `{RelativeSource}` fails with NXAML0001 (no `ProvideValue`). |
-| NXAML0109 | Invalid binding path syntax, unresolvable type in a cast/attached segment, impossible cast |
-
-## Ownership
-
-| Area | Owner |
-|---|---|
-| `src\Nexer.Ui\Data\` contract surface (`// CONTRACT:` files) | coordinator |
-| `BindingExpression` internals, `BindingOperations` implementation, conversion, validation store, marshalling | runtime-engine agent |
-| Rest of `src\Nexer.Ui` (INPC in controls, lifecycle raising, ICommand, ItemsSource, validation visuals) and `Nexer.Ui.Testing` | controls agent |
-| `src\Nexer.Xaml.*` (`Transformers\BindingTransformers.cs`: indexers, NXAML0105, `[DeferredContent]` reset, item-type inference, loader access targets for view-model assemblies) | compiler agent |
-| Integration, demo MVVM window, docs | coordinator |
-
-`BindingExpression` implements the runtime semantics above (it replaced the spike's OneWay/OneTime-only body; the
-public members are unchanged).
-
-## Out of scope (v1)
-
-`MultiBinding`, `PriorityBinding`, reflection bindings without `x:DataType`, data templates (items render as text),
-styles/triggers, `UpdateSourceTrigger=LostFocus` on non-`Field` widgets, method calls / multi-argument indexers in paths.
+- **Syntax pass.** `{Binding X}` parses to a markup-extension node (`BindingExtension`). `BindingSyntaxTransformer`
+  runs right after `TypeReferenceResolver` and **before** `MarkupExtensionTransformer` (which reports an error for any
+  markup extension without `ProvideValue`; `{RelativeSource}` is consumed here for the same reason). It strips
+  `Path`/`ElementName`/`RelativeSource`/`DataType` and the positional argument, retypes the node to `CompiledBinding`
+  and re-points the remaining properties at it, so XamlX handles `Mode`, `Converter="{StaticResource k}"` etc.
+  normally. It also records `x:DataType` per element (pre-order, so ancestors come first).
+- **Assignment pass.** `BindingAssignmentTransformer` runs after `PropertyReferenceResolver` (it needs the resolved
+  target property to read `[BindsTwoWayByDefault]` and to detect `IBinding` properties) and just before
+  `ConvertPropertyValuesToAssignmentsTransformer`. It resolves the path (recursive-descent parser for indexers,
+  attached and cast segments), finds the nearest `x:DataType` through `context.ParentNodes()`, reports NXAML0101–0109
+  and turns the property value into an assignment with the custom `NexerBindingSetter`
+  (`IXamlILOptimizedEmitablePropertySetter`), bypassing XamlX's value-type setter matching (no ambiguity for
+  `object` properties). Properties assignable from `CompiledBinding` but not `object` get the binding object itself.
+- **Accessors.** `NexerBindingAccessors` defines a private nested `XamlBindingAccessors_<guid>` per document (the
+  `XamlClosure_` pattern: `DefineSubType` + `AddAfterEmitCallbacks(CreateType)`), with `static object Get_n(object)`
+  and `static void Set_n(object, object)`, de-duplicated per CLR member. Getters guard with `isinst Owner` and return
+  `UnsetValue` for an owner of another type (bindings re-evaluate whenever an inherited DataContext changes); setters
+  are then a no-op. `IXamlILEmitter` has no exception blocks, so throwing getters (indexers) are handled by the
+  runtime. Delegates are `ldnull; ldftn; newobj`. Identical for Cecil and SRE.
+- **Access.** With the Cecil build step accessors live in the compiled assembly, so internal view models of that
+  assembly work. The SRE loader adds `IgnoresAccessChecksTo` for every assembly a binding touches (source, path and
+  target types including generic arguments and array elements, collected during the transform as
+  `NexerXamlDocument.AccessedAssemblies`). Members must still be public (NXAML0103).
+- **Gotchas.** `XamlAstClrProperty` has no `PropertyType` (look the CLR property up on the owner). Cecil
+  `IXamlType.Interfaces` lists only directly declared interfaces, so INPC/`IEnumerable<T>`/indexer lookups walk them
+  recursively. When `Bind` runs the target is not yet in the tree (XamlX initializes a child completely before adding
+  it), so the first evaluation usually happens when the parent attaches it (`DataContextChanged`).

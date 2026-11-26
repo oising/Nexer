@@ -15,7 +15,7 @@ terminal emulator and a console host) that can be used on their own.
 | `src\Nexer.Rendering` | `VtRenderer`: diffs cell surfaces into minimal VT output (true colour/256/16 colours). |
 | `src\Nexer.Emulation` | Headless terminal emulator (`Terminal`) that interprets VT output into a screen model. |
 | `src\Nexer.Hosting` | `ConsoleTerminalHost`: raw mode, alternate screen, input/resize pumps, restore on exit. |
-| `src\Nexer.Ui` | The widget toolkit (port of Jexer): `Application`, `Window`, controls, menus, dialogs, layouts, XAML runtime types (`Nexer.Ui.Markup`). |
+| `src\Nexer.Ui` | The widget toolkit (port of Jexer): `Application`, `Window`, controls, menus, dialogs, layouts, XAML runtime types (`Nexer.Ui.Markup`), compiled data binding (`Nexer.Ui.Data`). |
 | `src\Nexer.Ui.Testing` | `HeadlessHost` / `UiDriver`: run an application without a terminal, script input, inspect frames. |
 | `src\Nexer.Xaml.Compiler` | XamlX-based compiler for the `https://nexer.dev/ui` namespace. |
 | `src\Nexer.Xaml.Build` + `build\Nexer.Xaml.targets` | Build step that compiles `.xaml` into the app assembly (Cecil). |
@@ -26,7 +26,7 @@ terminal emulator and a console host) that can be used on their own.
 | `tests\*` | xUnit tests per project, plus `Nexer.Ui.Xaml.Tests` (XAML against real controls) and `Nexer.Demo.Tests` (end-to-end). |
 
 Design documents: [architecture](docs/architecture.md), [controls](docs/controls.md), [XAML](docs/xaml.md),
-[backend](docs/backend.md), [compatibility](COMPATIBILITY.md).
+[data binding](docs/binding.md), [backend](docs/backend.md), [compatibility](COMPATIBILITY.md).
 
 ## Running the demo
 
@@ -37,7 +37,8 @@ dotnet run --project samples\Nexer.Demo
 Run it in a VT terminal such as Windows Terminal. F10 or Alt+letter opens the menus, F6 switches windows, Ctrl+W
 closes a window and Alt+X exits (with confirmation). The demo windows cover buttons, check boxes, radio groups,
 text and password fields, combo boxes, spinners, progress bars, lists, trees, directory lists, message boxes, input
-boxes, the file open box, a scrollable window, split panes and translucent windows.
+boxes, the file open box, a scrollable window, split panes, translucent windows and an MVVM form with data binding
+(Demo → Data binding).
 
 `dotnet run --project samples\Nexer.Demo -- --smoke` builds every demo window headlessly, renders one frame of each
 and exits 0 (add `--dump` to print the frames).
@@ -99,6 +100,29 @@ var driver = new UiDriver(new MyApplication(), 80, 25);
 driver.Press("Alt+F");
 Assert.Contains("Exit", driver.Text());
 ```
+
+### MVVM and data binding
+
+Widgets have an inherited `DataContext` and XAML `{Binding}`s are compiled against `x:DataType` (no reflection;
+unknown members are build errors). Two-way bindings, converters, `StringFormat`, `ElementName`/`RelativeSource`,
+validation (`INotifyDataErrorInfo` and conversion errors), `ItemsSource`/`ObservableCollection` and `ICommand`
+are supported, and view-model changes from other threads are marshalled to the UI thread:
+
+```xml
+<Window xmlns="https://nexer.dev/ui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MyApp" x:Class="MyApp.PersonWindow" x:DataType="local:PersonViewModel">
+  <Field Text="{Binding Name}" Width="20" />
+  <List Y="2" Height="5" ItemsSource="{Binding People}" DisplayMemberBinding="{Binding Name}"
+        SelectedItem="{Binding Selected}" />
+  <Button Y="8" Text="&amp;Remove" Command="{Binding RemoveCommand}" CommandParameter="{Binding Selected}" />
+</Window>
+```
+
+```csharp
+app.Windows.Add(new PersonWindow { DataContext = new PersonViewModel() });
+```
+
+See [docs/binding.md](docs/binding.md).
 
 ## Build and test
 

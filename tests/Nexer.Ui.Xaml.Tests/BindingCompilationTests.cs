@@ -29,7 +29,7 @@ public sealed class BindingTestChild : INotifyPropertyChanged
     public void Raise(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
-/// <summary>Compiled <c>{Binding}</c> through the SRE loader and the Cecil build step (binding spike).</summary>
+/// <summary>Compiled <c>{Binding}</c> through the SRE loader and the Cecil build step.</summary>
 public class BindingCompilationTests
 {
     private const string Ns = "xmlns='https://nexer.dev/ui' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml' "

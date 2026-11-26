@@ -66,7 +66,8 @@ public sealed class BindingExtension
 
 /// <summary>
 /// A binding source relative to the binding target. In XAML: <c>{RelativeSource Self}</c> or
-/// <c>{RelativeSource FindAncestor, AncestorType=local:MyWindow, AncestorLevel=1}</c>. Like
+/// <c>{RelativeSource FindAncestor, AncestorType=local:MyWindow, AncestorLevel=1}</c> (giving only
+/// <see cref="AncestorType"/> implies <see cref="RelativeSourceMode.FindAncestor"/>). Like
 /// <see cref="BindingExtension"/>, it is consumed by the XAML compiler (no <c>ProvideValue</c>).
 /// </summary>
 public sealed class RelativeSource
