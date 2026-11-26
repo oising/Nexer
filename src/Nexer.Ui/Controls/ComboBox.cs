@@ -1,5 +1,7 @@
 // Ported from Jexer TComboBox.java (MIT, © Autumn Lamonte).
+using System.Collections;
 using Nexer.Input;
+using Nexer.Ui.Data;
 using Nexer.Ui.Markup;
 
 namespace Nexer.Ui.Controls;
@@ -24,11 +26,20 @@ public class ComboBox : Widget
         editField.Submitted += (_, _) => Changed?.Invoke(this, EventArgs.Empty);
         list.ItemActivated += (_, _) =>
         {
-            editField.Text = list.SelectedItem ?? "";
+            editField.Text = list.SelectedText ?? "";
             HideList();
             Changed?.Invoke(this, EventArgs.Empty);
         };
         list.ItemsChanged += (_, _) => OnItemsChanged();
+        editField.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(Field.Text)) OnPropertyChanged(nameof(Text));
+        };
+        list.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(List.SelectedIndex) or nameof(List.SelectedItem)) OnPropertyChanged(e.PropertyName);
+            else if (e.PropertyName == nameof(Visible)) OnPropertyChanged(nameof(IsListOpen));
+        };
         Children.Add(editField);
         Children.Add(list);
         Height = 1;
@@ -38,21 +49,68 @@ public class ComboBox : Widget
     [Content]
     public ListItemCollection Items => list.Items;
 
-    /// <summary>The current text. Setting it selects the matching list item (case-sensitive), if any.</summary>
+    /// <summary>
+    /// The source of the drop-down values (any objects, shown via <see cref="DisplayMemberBinding"/> or
+    /// <c>ToString()</c>); mutually exclusive with <see cref="Items"/> (see <see cref="List.ItemsSource"/>).
+    /// </summary>
+    public IEnumerable? ItemsSource
+    {
+        get => list.ItemsSource;
+        set
+        {
+            if (ReferenceEquals(list.ItemsSource, value)) return;
+            list.ItemsSource = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>The binding evaluated against each <see cref="ItemsSource"/> item to get its display text.</summary>
+    public IBinding? DisplayMemberBinding
+    {
+        get => list.DisplayMemberBinding;
+        set
+        {
+            if (ReferenceEquals(list.DisplayMemberBinding, value)) return;
+            list.DisplayMemberBinding = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// The selected list value (the source item when <see cref="ItemsSource"/> is used), or null. Setting it copies its
+    /// display text into the text. Binds two-way by default.
+    /// </summary>
+    [BindsTwoWayByDefault]
+    public object? SelectedItem
+    {
+        get => list.SelectedItem;
+        set
+        {
+            list.SelectedItem = value;
+            if (list.Items.Count > 0 || value == null) editField.Text = list.SelectedText ?? "";
+        }
+    }
+
+    /// <summary>
+    /// The current text (typed when <see cref="LimitToListValue"/> is false). Setting it selects the matching list item
+    /// (case-sensitive), if any. Binds two-way by default.
+    /// </summary>
+    [BindsTwoWayByDefault]
     public string Text
     {
         get => editField.Text;
         set => SetText(value, true);
     }
 
-    /// <summary>Index of the selected list value, or -1. Setting it copies that value into the text.</summary>
+    /// <summary>Index of the selected list value, or -1. Setting it copies that value into the text. Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int SelectedIndex
     {
         get => list.SelectedIndex;
         set
         {
             list.SelectedIndex = value;
-            if (list.Items.Count > 0 || value < 0) editField.Text = list.SelectedItem ?? "";
+            if (list.Items.Count > 0 || value < 0) editField.Text = list.SelectedText ?? "";
         }
     }
 
@@ -62,9 +120,11 @@ public class ComboBox : Widget
         get => limitToListValue;
         set
         {
+            if (limitToListValue == value) return;
             limitToListValue = value;
             editField.Enabled = !value;
             if (!value) Activate(editField);
+            OnPropertyChanged();
         }
     }
 
@@ -74,8 +134,10 @@ public class ComboBox : Widget
         get => maxValuesHeight;
         set
         {
+            if (maxValuesHeight == value) return;
             maxValuesHeight = value;
             SizeList();
+            OnPropertyChanged();
         }
     }
 
@@ -113,7 +175,7 @@ public class ComboBox : Widget
     {
         SizeList();
         if (editField.Text.Length > 0) SetText(editField.Text, true);
-        else if (list.SelectedIndex >= 0) editField.Text = list.SelectedItem ?? "";
+        else if (list.SelectedIndex >= 0) editField.Text = list.SelectedText ?? "";
     }
 
     private void SizeList()
@@ -195,7 +257,7 @@ public class ComboBox : Widget
         ArgumentNullException.ThrowIfNull(context);
         bool active = IsAbsoluteActive;
         if (!active && list.IsActive && list.Visible) HideList();
-        var color = GetColor(active ? "tcombobox.active" : "tcombobox.inactive");
+        var color = GetColor(Validation.GetHasErrors(this) ? "tcombobox.error" : active ? "tcombobox.active" : "tcombobox.inactive");
         context.PutChar(Width - 3, 0, GraphicsChars.DownArrowLeft, color);
         context.PutChar(Width - 2, 0, GraphicsChars.DownArrow, color);
         context.PutChar(Width - 1, 0, GraphicsChars.DownArrowRight, color);

@@ -43,6 +43,7 @@ public class Panel : Widget, IFillsWindow
         {
             title = value?.Trim();
             Invalidate();
+            OnPropertyChanged();
         }
     }
 
@@ -54,6 +55,7 @@ public class Panel : Widget, IFillsWindow
         {
             titlePosition = value;
             Invalidate();
+            OnPropertyChanged();
         }
     }
 
@@ -65,6 +67,7 @@ public class Panel : Widget, IFillsWindow
         {
             borderStyle = value ?? BorderStyle.None;
             Invalidate();
+            OnPropertyChanged();
         }
     }
 

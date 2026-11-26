@@ -39,6 +39,7 @@ public class Menu : Window
         {
             mnemonic = new MnemonicString(value ?? "");
             UpdateLayout();
+            OnPropertyChanged();
         }
     }
 
@@ -46,7 +47,13 @@ public class Menu : Window
     public MnemonicString Mnemonic => mnemonic;
 
     /// <summary>Whether items reserve two columns for an icon (Jexer <c>jexer.menuIcons</c>, default true).</summary>
-    public bool UseIcons { get; set; } = true;
+    public bool UseIcons
+    {
+        get => useIconsValue;
+        set => SetProperty(ref useIconsValue, value);
+    }
+
+    private bool useIconsValue = true;
 
     /// <summary>True while the menu is open.</summary>
     public bool IsOpen
@@ -56,6 +63,7 @@ public class Menu : Window
         {
             if (value) UpdateLayout();
             IsActive = value;
+            OnPropertyChanged();
         }
     }
 
@@ -206,7 +214,7 @@ public class Menu : Window
         {
             foreach (var w in ChildList.ToArray())
             {
-                if (w is MenuItem item && item.Enabled && item.Mnemonic.Matches(key.Char))
+                if (w is MenuItem item && item.IsEffectivelyEnabled && item.Mnemonic.Matches(key.Char))
                 {
                     Activate(item);
                     item.HandleKey(new KeyEvent(Key.Enter));
@@ -241,6 +249,7 @@ public class MenuItem : Widget
         {
             mnemonic = new MnemonicString(value ?? "");
             (Parent as Menu)?.UpdateLayout();
+            OnPropertyChanged();
         }
     }
 
@@ -248,20 +257,58 @@ public class MenuItem : Widget
     public MnemonicString Mnemonic => mnemonic;
 
     /// <summary>Global accelerator, active whenever no menu is open and no modal window is shown.</summary>
-    public KeyGesture Shortcut { get; set; }
+    public KeyGesture Shortcut
+    {
+        get => shortcut;
+        set => SetProperty(ref shortcut, value);
+    }
+
+    private KeyGesture shortcut;
 
     /// <summary>Whether choosing the item toggles <see cref="Checked"/>.</summary>
-    public bool Checkable { get; set; }
+    public bool Checkable
+    {
+        get => checkableValue;
+        set => SetProperty(ref checkableValue, value);
+    }
+
+    private bool checkableValue;
 
     /// <summary>Whether a check mark is shown (only when <see cref="Checkable"/>).</summary>
-    public bool Checked { get; set; }
+    public bool Checked
+    {
+        get => checkedValue;
+        set => SetProperty(ref checkedValue, value);
+    }
+
+    private bool checkedValue;
 
     /// <summary>Optional icon (one grapheme, typically an emoji) drawn when the menu uses icons.</summary>
-    public string? Icon { get; set; }
+    public string? Icon
+    {
+        get => iconValue;
+        set => SetProperty(ref iconValue, value);
+    }
 
-    /// <summary>Command posted when the item is chosen.</summary>
-    public Command? Command { get; set; }
+    private string? iconValue;
 
+    /// <summary>
+    /// Command executed when the item is chosen (an <see cref="System.Windows.Input.ICommand"/>; a named <see cref="Ui.Command"/>
+    /// such as <c>Command="Exit"</c> is dispatched through <see cref="Application.ExecuteCommand"/>). While attached,
+    /// <c>CanExecute</c> feeds <see cref="Widget.IsEffectivelyEnabled"/>.
+    /// </summary>
+    public System.Windows.Input.ICommand? Command
+    {
+        get => CommandCore;
+        set => CommandCore = value;
+    }
+
+    /// <summary>The parameter passed to <see cref="Command"/>'s <c>CanExecute</c>/<c>Execute</c>.</summary>
+    public object? CommandParameter
+    {
+        get => CommandParameterCore;
+        set => CommandParameterCore = value;
+    }
     /// <summary>Raised (on the UI thread, after the menu closes) when the item is chosen.</summary>
     public event EventHandler? Click;
 
@@ -301,7 +348,7 @@ public class MenuItem : Widget
         app.Post(() =>
         {
             RaiseClick();
-            if (Command is { } command) app.ExecuteCommand(command);
+            ExecuteCommandCore(app);
         });
     }
 
@@ -328,7 +375,7 @@ public class MenuItem : Widget
 
     /// <summary>Colour of the label for the current state.</summary>
     protected Nexer.Core.CellStyle MenuColor =>
-        IsAbsoluteActive ? GetColor("tmenu.highlighted") : Enabled ? GetColor("tmenu") : GetColor("tmenu.disabled");
+        IsAbsoluteActive ? GetColor("tmenu.highlighted") : IsEffectivelyEnabled ? GetColor("tmenu") : GetColor("tmenu.disabled");
 
     /// <inheritdoc/>
     protected internal override void Draw(DrawContext context)
@@ -336,7 +383,7 @@ public class MenuItem : Widget
         var background = GetColor("tmenu");
         var menuColor = MenuColor;
         var mnemonicColor = IsAbsoluteActive ? GetColor("tmenu.mnemonic.highlighted")
-            : Enabled ? GetColor("tmenu.mnemonic") : GetColor("tmenu.disabled");
+            : IsEffectivelyEnabled ? GetColor("tmenu.mnemonic") : GetColor("tmenu.disabled");
         bool useIcons = UsesIcons;
         var style = (Parent as Menu)?.CurrentBorderStyle ?? BorderStyle.Single;
         context.PutChar(0, 0, style.Vertical, background);
@@ -404,8 +451,17 @@ public class SubMenu : MenuItem
 {
     private readonly Menu menu = new() { IsSubMenu = true };
 
+    /// <summary>Creates a submenu item.</summary>
+    public SubMenu()
+    {
+        // The nested menu inherits this item's DataContext and is attached/detached with it.
+        menu.LogicalParent = this;
+    }
+
     /// <summary>The nested menu.</summary>
     public Menu InnerMenu => menu;
+
+    private protected override IEnumerable<Widget> LogicalChildren => [menu];
 
     private protected override WidgetCollection? RedirectedChildren => menu.Children;
 

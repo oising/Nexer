@@ -130,21 +130,21 @@ public class ListTests
         d.Key(Nexer.Input.Key.Down);
         Assert.Same(root, tree.SelectedItem);
         d.Key(Nexer.Input.Key.Down);
-        Assert.Equal("a", tree.SelectedItem!.Text);
+        Assert.Equal("a", tree.SelectedTreeItem!.Text);
         Assert.Equal(d.Theme("ttreeview.selected"), d.Style(7, 3));
 
         d.Press("Space");
-        Assert.False(tree.SelectedItem.IsExpanded);
+        Assert.False(tree.SelectedTreeItem!.IsExpanded);
         Assert.Equal("├─[+] a", d.Row(3, 1, 7));
         Assert.Equal("└─ b", d.Row(4, 1, 4));
 
         d.Click(4, 3);
-        Assert.True(tree.SelectedItem.IsExpanded);
+        Assert.True(tree.SelectedTreeItem!.IsExpanded);
         Assert.Equal("│ ├─ a1", d.Row(4, 1, 7));
 
         d.Click(6, 5);
-        Assert.Equal("a2", tree.SelectedItem.Text);
-        Assert.True(tree.SelectedItem.IsSelected);
+        Assert.Equal("a2", tree.SelectedTreeItem!.Text);
+        Assert.True(tree.SelectedTreeItem!.IsSelected);
         Assert.Equal(1, activated);
         d.Key(Nexer.Input.Key.Enter);
         Assert.Equal(2, activated);

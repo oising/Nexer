@@ -1,5 +1,6 @@
 // Ported from Jexer THScroller.java, TVScroller.java and TScrollable.java (MIT, © Autumn Lamonte).
 using Nexer.Input;
+using Nexer.Ui.Data;
 
 namespace Nexer.Ui.Controls;
 
@@ -19,12 +20,25 @@ public abstract class ScrollerBase : Widget
     }
 
     /// <summary>Smallest value (Jexer top/left value).</summary>
-    public int Minimum { get; set; }
+    public int Minimum
+    {
+        get => minimum;
+        set => SetProperty(ref minimum, value);
+    }
+
+    private int minimum;
 
     /// <summary>Largest value (Jexer bottom/right value; default 100).</summary>
-    public int Maximum { get; set; } = 100;
+    public int Maximum
+    {
+        get => maximum;
+        set => SetProperty(ref maximum, value);
+    }
 
-    /// <summary>Current value. Not clamped when set directly (as Jexer).</summary>
+    private int maximum = 100;
+
+    /// <summary>Current value. Not clamped when set directly (as Jexer). Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int Value
     {
         get => value;
@@ -32,16 +46,29 @@ public abstract class ScrollerBase : Widget
         {
             if (this.value == value) return;
             this.value = value;
+            OnPropertyChanged();
             ValueChanged?.Invoke(this, EventArgs.Empty);
             Invalidate();
         }
     }
 
     /// <summary>Arrow step (default 1).</summary>
-    public int SmallChange { get; set; } = 1;
+    public int SmallChange
+    {
+        get => smallChange;
+        set => SetProperty(ref smallChange, value);
+    }
+
+    private int smallChange = 1;
 
     /// <summary>Page step (default 20).</summary>
-    public int BigChange { get; set; } = 20;
+    public int BigChange
+    {
+        get => bigChange;
+        set => SetProperty(ref bigChange, value);
+    }
+
+    private int bigChange = 20;
 
     /// <summary>Raised whenever <see cref="Value"/> changes.</summary>
     public event EventHandler? ValueChanged;
@@ -213,13 +240,43 @@ public class HScroller : ScrollerBase
 /// </summary>
 public abstract class ScrollableWidget : Widget
 {
+    private HScroller? horizontalScroller;
+    private VScroller? verticalScroller;
+
     /// <summary>The horizontal scroller, if any.</summary>
-    public HScroller? HorizontalScroller { get; protected set; }
+    public HScroller? HorizontalScroller
+    {
+        get => horizontalScroller;
+        protected set
+        {
+            if (ReferenceEquals(horizontalScroller, value)) return;
+            horizontalScroller?.ValueChanged -= OnHorizontalValueChanged;
+            horizontalScroller = value;
+            horizontalScroller?.ValueChanged += OnHorizontalValueChanged;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>The vertical scroller, if any.</summary>
-    public VScroller? VerticalScroller { get; protected set; }
+    public VScroller? VerticalScroller
+    {
+        get => verticalScroller;
+        protected set
+        {
+            if (ReferenceEquals(verticalScroller, value)) return;
+            verticalScroller?.ValueChanged -= OnVerticalValueChanged;
+            verticalScroller = value;
+            verticalScroller?.ValueChanged += OnVerticalValueChanged;
+            OnPropertyChanged();
+        }
+    }
 
-    /// <summary>Vertical scroll position (0 without a vertical scroller).</summary>
+    private void OnHorizontalValueChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(HorizontalValue));
+
+    private void OnVerticalValueChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(VerticalValue));
+
+    /// <summary>Vertical scroll position (0 without a vertical scroller). Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int VerticalValue
     {
         get => VerticalScroller?.Value ?? 0;
@@ -229,7 +286,8 @@ public abstract class ScrollableWidget : Widget
         }
     }
 
-    /// <summary>Horizontal scroll position (0 without a horizontal scroller).</summary>
+    /// <summary>Horizontal scroll position (0 without a horizontal scroller). Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int HorizontalValue
     {
         get => HorizontalScroller?.Value ?? 0;
