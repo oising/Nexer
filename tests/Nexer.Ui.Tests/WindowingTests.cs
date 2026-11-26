@@ -247,7 +247,7 @@ public class WindowingTests
         d.Press("Ctrl+W");
         Assert.DoesNotContain(dialog, app.Windows);
         // The generic overload's continuation runs asynchronously, so await rather than checking IsCompleted.
-        Assert.Null(await task.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.Null(await task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -310,9 +310,9 @@ public class WindowingTests
     {
         var app = new Application();
         var host = new HeadlessHost(20, 5, TimeProvider.System);
-        var run = app.RunAsync(host);
+        var run = app.RunAsync(host, TestContext.Current.CancellationToken);
         host.CompleteInput();
-        await run.WaitAsync(TimeSpan.FromSeconds(10));
+        await run.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         Assert.NotNull(host.Frame);
     }
 

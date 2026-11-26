@@ -32,7 +32,7 @@ public class GeneratorTests
             """, "namespace App { public class Custom : Nexer.Xaml.Fixtures.Widget { } }");
 
         Assert.Empty(diagnostics);
-        Assert.Empty(output.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(output.GetDiagnostics(TestContext.Current.CancellationToken).Where(d => d.Severity == DiagnosticSeverity.Error));
         Assert.Contains("public global::Nexer.Xaml.Fixtures.Button Ok = default!;", generated);
         Assert.Contains("internal global::Nexer.Xaml.Fixtures.Label Caption = default!;", generated);
         Assert.Contains("internal global::App.Custom Mine = default!;", generated);
@@ -54,7 +54,7 @@ public class GeneratorTests
             """, "namespace App { public class Model { public string Name { get; set; } = \"\"; } }");
 
         Assert.Empty(diagnostics);
-        Assert.Empty(output.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(output.GetDiagnostics(TestContext.Current.CancellationToken).Where(d => d.Severity == DiagnosticSeverity.Error));
         Assert.Contains("internal global::Nexer.Xaml.Fixtures.Label Caption = default!;", generated);
         Assert.DoesNotContain("Binding", generated);
         Assert.DoesNotContain("DataType", generated);
@@ -72,7 +72,7 @@ public class GeneratorTests
             """, $"<Widget {Ns} x:Class='Outer+Inner'><Button x:Name='B' /></Widget>");
 
         Assert.Empty(diagnostics);
-        Assert.Empty(output.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(output.GetDiagnostics(TestContext.Current.CancellationToken).Where(d => d.Severity == DiagnosticSeverity.Error));
         Assert.Contains("partial class Outer", generated);
         Assert.Contains("partial class Inner", generated);
     }
@@ -89,7 +89,7 @@ public class GeneratorTests
             """, $"<Window {Ns} x:Class='App.MainView'><Button x:Name='Ok' /></Window>");
 
         Assert.Empty(diagnostics);
-        Assert.Empty(output.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(output.GetDiagnostics(TestContext.Current.CancellationToken).Where(d => d.Severity == DiagnosticSeverity.Error));
         Assert.Contains(" Ok = default!;", generated);
         Assert.DoesNotContain("void InitializeComponent", generated);
     }
@@ -118,12 +118,14 @@ public class GeneratorTests
     [Fact]
     public void CachesUnchangedDocuments()
     {
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
         var xaml = new InMemoryAdditionalText("MainView.xaml", $"<Window {Ns} x:Class='App.MainView'><Button x:Name='Ok' /></Window>");
         var compilation = CreateCompilation(CodeBehind);
         GeneratorDriver driver = CSharpGeneratorDriver.Create([new XamlCodeBehindGenerator().AsSourceGenerator()], [xaml],
             driverOptions: new GeneratorDriverOptions(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true));
-        driver = driver.RunGenerators(compilation);
-        driver = driver.RunGenerators(compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText("class Unrelated { }")));
+        driver = driver.RunGenerators(compilation, cancellationToken);
+        var unrelated = CSharpSyntaxTree.ParseText("class Unrelated { }", cancellationToken: cancellationToken);
+        driver = driver.RunGenerators(compilation.AddSyntaxTrees(unrelated), cancellationToken);
 
         var steps = driver.GetRunResult().Results[0].TrackedSteps;
         Assert.Contains(steps.SelectMany(s => s.Value).SelectMany(s => s.Outputs), o => o.Reason == IncrementalStepRunReason.Cached);
