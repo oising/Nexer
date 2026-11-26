@@ -133,6 +133,8 @@ public class CompiledRealControlsTests
         Assert.Equal(KeyGesture.Parse("Ctrl+O"), open.Shortcut);
         var wrap = Assert.IsType<MenuItem>(app.Menus[1].Children[1]);
         Assert.True(wrap.Checkable && wrap.Checked);
+        // Command="Tile" on an ICommand property compiles to Command.Parse (the well-known instance).
+        Assert.Same(Command.Tile, Assert.IsType<MenuItem>(app.Menus[1].Children[0]).Command);
 
         var d = new UiDriver(app, 60, 20);
         Assert.Equal("  File  Window", d.Row(0).TrimEnd());

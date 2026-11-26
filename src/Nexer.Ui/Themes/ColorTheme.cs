@@ -55,11 +55,11 @@ public partial class ColorTheme : IAddChild<ThemeColor>
     /// <summary>Sets a colour from <see cref="StyleSyntax"/> text such as <c>"bold white on blue"</c>.</summary>
     public void SetColor(string key, string spec) => SetColor(key, StyleSyntax.Parse(spec));
 
-    /// <summary>Resets to Jexer's default theme.</summary>
+    /// <summary>Resets to Jexer's default theme (plus the Nexer <see cref="ExtensionColorSpecs"/>).</summary>
     public void SetDefaultTheme()
     {
         colors.Clear();
-        foreach (var (key, spec) in DefaultColorSpecs)
+        foreach (var (key, spec) in DefaultColorSpecs.Concat(ExtensionColorSpecs))
         {
             colors[key] = StyleSyntax.Parse(spec);
         }

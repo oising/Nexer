@@ -1,6 +1,10 @@
 // Ported from Jexer TTreeItem.java, TTreeView.java and TTreeViewScrollable.java (MIT, © Autumn Lamonte).
+using System.Collections;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using Nexer.Input;
+using Nexer.Ui.Data;
 using Nexer.Ui.Markup;
 
 namespace Nexer.Ui.Controls;
@@ -141,7 +145,7 @@ public class TreeItem
     }
 
     /// <summary>True when this is the tree view's selected item.</summary>
-    public bool IsSelected => TreeView?.SelectedItem == this;
+    public bool IsSelected => TreeView?.SelectedTreeItem == this;
 
     /// <summary>The parent item, or null for a root.</summary>
     public TreeItem? Parent { get; internal set; }
@@ -198,6 +202,156 @@ public class TreeItem
 }
 
 /// <summary>
+/// A tree item generated for an <see cref="TreeView.ItemsSource"/> object. Its children come from
+/// <see cref="TreeView.ChildrenBinding"/>, are created when it is first expanded, and follow an
+/// <see cref="INotifyCollectionChanged"/> collection while the tree view is attached.
+/// </summary>
+internal sealed class SourceTreeItem : TreeItem
+{
+    private readonly TreeView view;
+    private readonly bool isRoot;
+    private IEnumerable? children;
+    private INotifyCollectionChanged? observed;
+    private INotifyPropertyChanged? observedSource;
+    private bool loaded;
+
+    internal SourceTreeItem(TreeView view, object? source, bool isRoot)
+    {
+        this.view = view;
+        this.isRoot = isRoot;
+        Source = source;
+        if (isRoot)
+        {
+            children = source as IEnumerable;
+            Load();
+            return;
+        }
+
+        Text = view.ItemText(source);
+        children = view.ItemChildren(source);
+        IsExpanded = false;
+        IsExpandable = children is ICollection collection ? collection.Count > 0 : children != null;
+    }
+
+    internal object? Source { get; }
+
+    protected internal override void OnExpand()
+    {
+        if (IsExpanded && !loaded) Load();
+    }
+
+    private void Load()
+    {
+        loaded = true;
+        Sync();
+        if (view.IsAttachedToTree) Observe();
+    }
+
+    /// <summary>Re-reads the children of this item and of its loaded descendants, reusing items by source identity.</summary>
+    internal void SyncTree()
+    {
+        if (!loaded) return;
+        Sync();
+        foreach (var item in Items.OfType<SourceTreeItem>()) item.SyncTree();
+    }
+
+    private void Sync()
+    {
+        var existing = Items.OfType<SourceTreeItem>().ToList();
+        var next = new List<TreeItem>();
+        if (children != null)
+        {
+            foreach (var source in children)
+            {
+                int index = existing.FindIndex(i => ReferenceEquals(i.Source, source));
+                if (index >= 0)
+                {
+                    next.Add(existing[index]);
+                    existing.RemoveAt(index);
+                }
+                else
+                {
+                    next.Add(new SourceTreeItem(view, source, false));
+                }
+            }
+        }
+
+        foreach (var removed in existing) removed.Unobserve();
+        if (!isRoot) IsExpandable = next.Count > 0;
+        Items.ReplaceAll(next);
+    }
+
+    internal void Observe()
+    {
+        if (!isRoot && observedSource == null && Source is INotifyPropertyChanged inpc && DisplayMember.Watches(view.DisplayMemberBinding))
+        {
+            observedSource = inpc;
+            inpc.PropertyChanged += OnSourcePropertyChanged;
+        }
+
+        if (!loaded) return;
+        if (observed == null && children is INotifyCollectionChanged incc)
+        {
+            observed = incc;
+            incc.CollectionChanged += OnChildrenChanged;
+        }
+
+        foreach (var item in Items.OfType<SourceTreeItem>()) item.Observe();
+    }
+
+    internal void Unobserve()
+    {
+        if (observedSource != null)
+        {
+            observedSource.PropertyChanged -= OnSourcePropertyChanged;
+            observedSource = null;
+        }
+
+        if (observed != null)
+        {
+            observed.CollectionChanged -= OnChildrenChanged;
+            observed = null;
+        }
+
+        foreach (var item in Items.OfType<SourceTreeItem>()) item.Unobserve();
+    }
+
+    private void OnSourcePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (!DisplayMember.Affects(view.DisplayMemberBinding, e.PropertyName)) return;
+        if (view.Application is { } app && !app.CheckAccess())
+        {
+            app.Post(RefreshText);
+            return;
+        }
+
+        RefreshText();
+    }
+
+    private void RefreshText()
+    {
+        if (observedSource == null) return;
+        string text = view.ItemText(Source);
+        if (text != Text) Text = text;
+    }
+
+    private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (view.Application is { } app && !app.CheckAccess())
+        {
+            app.Post(() =>
+            {
+                if (observed != null) Sync();
+            });
+            return;
+        }
+
+        Sync();
+        if (view.IsAttachedToTree) Observe();
+    }
+}
+
+/// <summary>
 /// A scrollable tree (Jexer <c>TTreeViewScrollable</c> with its <c>TTreeView</c>). Set <see cref="Root"/> to a
 /// <see cref="TreeItem"/> hierarchy. Up/Down move the selection, Left/Right/Space expand or collapse, Enter or a click
 /// raises <see cref="ItemActivated"/>, PgUp/PgDn/Home/End move by pages, and Shift/Ctrl/Alt+arrows scroll.
@@ -210,6 +364,11 @@ public class TreeView : ScrollableWidget
     private int topLine;
     private int maxLineWidth;
     private bool syncing;
+    private TreeItem? notifiedSelected;
+    private IEnumerable? itemsSource;
+    private IBinding? displayMemberBinding;
+    private IBinding? childrenBinding;
+    private SourceTreeItem? sourceRoot;
 
     /// <summary>Creates an empty tree view.</summary>
     public TreeView()
@@ -226,29 +385,169 @@ public class TreeView : ScrollableWidget
         HorizontalScroller.ValueChanged += (_, _) => Invalidate();
     }
 
-    /// <summary>The root item (content property).</summary>
+    /// <summary>
+    /// The root item (content property). Mutually exclusive with <see cref="ItemsSource"/> (setting it while
+    /// <see cref="ItemsSource"/> is in use throws <see cref="InvalidOperationException"/>).
+    /// </summary>
     [Content]
     public TreeItem? Root
     {
-        get => root;
+        get => sourceRoot != null ? null : root;
         set
         {
-            if (root == value) return;
-            if (value?.Parent != null) throw new InvalidOperationException("The root item must not have a parent.");
-            if (root != null) root.TreeViewOwner = null;
-            root = value;
-            if (value != null) value.TreeViewOwner = this;
-            selected = null;
-            topLine = 0;
-            ReflowData();
+            if (sourceRoot != null) throw new InvalidOperationException("Root cannot be set while ItemsSource is in use.");
+            SetRoot(value);
         }
     }
 
-    /// <summary>The selected item. Setting it scrolls the item to the middle of the view.</summary>
-    public TreeItem? SelectedItem
+    /// <summary>
+    /// The top-level items as any objects (shown without a root row); null uses <see cref="Root"/>. Each item is
+    /// shown as the result of <see cref="DisplayMemberBinding"/> (or <c>ToString()</c>) and its children are the
+    /// result of <see cref="ChildrenBinding"/>, read when the item is first expanded. <see cref="INotifyCollectionChanged"/>
+    /// collections are observed while the view is attached to the tree. Setting it while <see cref="Root"/> is set
+    /// throws <see cref="InvalidOperationException"/>.
+    /// </summary>
+    public IEnumerable? ItemsSource
+    {
+        get => itemsSource;
+        set
+        {
+            if (ReferenceEquals(itemsSource, value)) return;
+            if (value != null && sourceRoot == null && root != null)
+            {
+                throw new InvalidOperationException("Root is in use; clear it before setting ItemsSource.");
+            }
+
+            itemsSource = value;
+            ResetSource();
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>The binding evaluated against each <see cref="ItemsSource"/> item to get its text; null uses <c>ToString()</c>.</summary>
+    public IBinding? DisplayMemberBinding
+    {
+        get => displayMemberBinding;
+        set
+        {
+            if (SetProperty(ref displayMemberBinding, value) && itemsSource != null) ResetSource();
+        }
+    }
+
+    /// <summary>
+    /// The binding evaluated against each <see cref="ItemsSource"/> item to get its children (an
+    /// <see cref="IEnumerable"/>); null makes every item a leaf.
+    /// </summary>
+    public IBinding? ChildrenBinding
+    {
+        get => childrenBinding;
+        set
+        {
+            if (SetProperty(ref childrenBinding, value) && itemsSource != null) ResetSource();
+        }
+    }
+
+    /// <summary>
+    /// The selected item: the source object when <see cref="ItemsSource"/> is used, else the <see cref="TreeItem"/>.
+    /// Setting it selects the matching (already created) item and scrolls it to the middle of the view. Binds two-way by
+    /// default.
+    /// </summary>
+    [BindsTwoWayByDefault]
+    public object? SelectedItem
+    {
+        get => selected is SourceTreeItem s ? s.Source : selected;
+        set => Select(sourceRoot != null ? FindSourceItem(sourceRoot, value) : value as TreeItem, true);
+    }
+
+    /// <summary>The selected <see cref="TreeItem"/> (generated for a source object when <see cref="ItemsSource"/> is used).</summary>
+    public TreeItem? SelectedTreeItem
     {
         get => selected;
         set => Select(value, true);
+    }
+
+    internal string ItemText(object? item)
+    {
+        if (displayMemberBinding != null)
+        {
+            return BindingOperations.Evaluate(displayMemberBinding, item, typeof(string)) as string ?? "";
+        }
+
+        return item?.ToString() ?? "";
+    }
+
+    internal IEnumerable? ItemChildren(object? item) =>
+        childrenBinding == null ? null : BindingOperations.Evaluate(childrenBinding, item, typeof(IEnumerable)) as IEnumerable;
+
+    private void SetRoot(TreeItem? value)
+    {
+        if (root == value) return;
+        if (value?.Parent != null) throw new InvalidOperationException("The root item must not have a parent.");
+        if (root != null) root.TreeViewOwner = null;
+        root = value;
+        if (value != null) value.TreeViewOwner = this;
+        selected = null;
+        topLine = 0;
+        ReflowData();
+        OnPropertyChanged(nameof(Root));
+    }
+
+    private void ResetSource()
+    {
+        var previous = SelectedItem;
+        sourceRoot?.Unobserve();
+        sourceRoot = null;
+        if (itemsSource == null)
+        {
+            SetRoot(null);
+            return;
+        }
+
+        var newRoot = new SourceTreeItem(this, itemsSource, true);
+        sourceRoot = newRoot;
+        SetRoot(newRoot);
+        if (IsAttachedToTree) newRoot.Observe();
+        if (previous != null && FindSourceItem(newRoot, previous) is { } item) Select(item, false);
+    }
+
+    private static SourceTreeItem? FindSourceItem(TreeItem parent, object? source)
+    {
+        if (source == null) return null;
+        foreach (var item in parent.Items.OfType<SourceTreeItem>())
+        {
+            if (ReferenceEquals(item.Source, source) || Equals(item.Source, source)) return item;
+            if (FindSourceItem(item, source) is { } found) return found;
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAttachedToTree()
+    {
+        if (sourceRoot != null)
+        {
+            // Changes made while detached were not observed.
+            sourceRoot.SyncTree();
+            sourceRoot.Observe();
+        }
+
+        base.OnAttachedToTree();
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDetachedFromTree()
+    {
+        sourceRoot?.Unobserve();
+        base.OnDetachedFromTree();
+    }
+
+    private void NotifySelection()
+    {
+        if (notifiedSelected == selected) return;
+        notifiedSelected = selected;
+        OnPropertyChanged(nameof(SelectedItem));
+        OnPropertyChanged(nameof(SelectedTreeItem));
     }
 
     /// <summary>The visible (expanded) items in display order.</summary>
@@ -294,6 +593,9 @@ public class TreeView : ScrollableWidget
     {
         rows.Clear();
         root?.ExpandTree("", true, rows);
+
+        // An ItemsSource has no root row: its items are the top level.
+        if (root != null && root == sourceRoot && rows.Count > 0) rows.RemoveAt(0);
         foreach (var item in rows)
         {
             maxLineWidth = Math.Max(maxLineWidth, TextMetrics.Width(item.Text) + item.Prefix.Length + 4);
@@ -327,6 +629,7 @@ public class TreeView : ScrollableWidget
         }
 
         Invalidate();
+        NotifySelection();
     }
 
     private void Toggle(TreeItem item)

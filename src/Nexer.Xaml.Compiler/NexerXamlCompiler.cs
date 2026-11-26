@@ -15,8 +15,15 @@ namespace Nexer.Xaml.Compiler;
 /// <summary>A parsed and transformed XAML document, ready to be emitted.</summary>
 public sealed class NexerXamlDocument
 {
-    internal NexerXamlDocument(XamlDocument document, XamlILCompiler compiler, IXamlType rootType, IXamlType? classType, string? filePath)
+    internal NexerXamlDocument(
+        XamlDocument document,
+        XamlILCompiler compiler,
+        IXamlType rootType,
+        IXamlType? classType,
+        string? filePath,
+        IReadOnlyCollection<string> accessedAssemblies)
     {
+        AccessedAssemblies = accessedAssemblies;
         Document = document;
         Compiler = compiler;
         RootType = rootType;
@@ -35,6 +42,12 @@ public sealed class NexerXamlDocument
 
     /// <summary>The source file path, if any.</summary>
     public string? FilePath { get; }
+
+    /// <summary>
+    /// Names of the assemblies whose members compiled bindings access directly (view models, target widgets). Hosts
+    /// emitting into a separate assembly must be granted access to non-public members of these assemblies.
+    /// </summary>
+    public IReadOnlyCollection<string> AccessedAssemblies { get; }
 
     internal XamlILCompiler Compiler { get; }
 
@@ -63,6 +76,7 @@ public sealed record NexerXamlEmittedMethods(
 public sealed class NexerXamlCompiler
 {
     private readonly NexerXamlDiagnosticSink _sink = new();
+    private Lazy<NexerBindingTypes?>? _bindingTypes;
     private int _documentCounter;
 
     /// <summary>Creates a compiler for <paramref name="typeSystem"/>.</summary>
@@ -94,7 +108,7 @@ public sealed class NexerXamlCompiler
         _sink.Add(new NexerXamlDiagnostic(code, NexerXamlSeverity.Error, message, filePath, 0, 0));
 
     /// <summary>Creates the XamlX runtime context type (one per assembly is enough).</summary>
-    public IXamlType CreateContextType(IXamlTypeBuilder<IXamlILEmitter> builder) => CreateILCompiler(null, null).CreateContextType(builder);
+    public IXamlType CreateContextType(IXamlTypeBuilder<IXamlILEmitter> builder) => CreateILCompiler(null, null, out _).CreateContextType(builder);
 
     /// <summary>
     /// Parses and transforms <paramref name="xaml"/>. Returns <see langword="null"/> when errors were reported
@@ -121,7 +135,7 @@ public sealed class NexerXamlCompiler
         }
 
         var classTransformer = new XClassTransformer(rootTypeOverride);
-        var compiler = CreateILCompiler(classTransformer, new XNameTransformer());
+        var compiler = CreateILCompiler(classTransformer, new XNameTransformer(), out var bindingState);
         try
         {
             compiler.Transform(document);
@@ -137,7 +151,7 @@ public sealed class NexerXamlCompiler
         }
 
         var rootType = ((XamlValueWithManipulationNode)document.Root).Type.GetClrType();
-        return new NexerXamlDocument(document, compiler, rootType, classTransformer.ClassType, filePath);
+        return new NexerXamlDocument(document, compiler, rootType, classTransformer.ClassType, filePath, bindingState.AccessedAssemblies);
     }
 
     /// <summary>
@@ -292,7 +306,7 @@ public sealed class NexerXamlCompiler
         return method;
     }
 
-    private XamlILCompiler CreateILCompiler(XClassTransformer? classTransformer, XNameTransformer? nameTransformer)
+    private XamlILCompiler CreateILCompiler(XClassTransformer? classTransformer, XNameTransformer? nameTransformer, out NexerBindingState bindingState)
     {
         var compiler = new XamlILCompiler(Configuration, new XamlLanguageEmitMappings<IXamlILEmitter, XamlILNodeEmitResult>(), true)
         {
@@ -310,6 +324,11 @@ public sealed class NexerXamlCompiler
             compiler.Transformers.Insert(index, nameTransformer);
         }
 
+        _bindingTypes ??= new Lazy<NexerBindingTypes?>(() => NexerBindingTypes.TryCreate(TypeSystem));
+        bindingState = new NexerBindingState(_bindingTypes.Value);
+        compiler.Transformers.Insert(compiler.Transformers.FindIndex(t => t is MarkupExtensionTransformer), new BindingSyntaxTransformer(bindingState));
+        compiler.Transformers.Insert(compiler.Transformers.FindIndex(t => t is ConvertPropertyValuesToAssignmentsTransformer),
+            new BindingAssignmentTransformer(bindingState));
         return compiler;
     }
 

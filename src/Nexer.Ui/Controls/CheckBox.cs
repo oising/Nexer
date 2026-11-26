@@ -2,6 +2,7 @@
 using System.Text;
 using Nexer.Core;
 using Nexer.Input;
+using Nexer.Ui.Data;
 
 namespace Nexer.Ui.Controls;
 
@@ -30,21 +31,49 @@ public class CheckBox : Widget
         {
             mnemonic = new MnemonicString(value ?? "");
             Width = TextMetrics.Width(mnemonic.RawLabel) + 4;
+            OnPropertyChanged();
         }
     }
 
     /// <summary>The parsed mnemonic.</summary>
     public MnemonicString Mnemonic => mnemonic;
 
-    /// <summary>Whether the box is checked. Setting it does not raise <see cref="Changed"/> (as Jexer).</summary>
-    public bool Checked { get; set; }
+    /// <summary>Whether the box is checked. Setting it does not raise <see cref="Changed"/> (as Jexer). Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
+    public bool Checked
+    {
+        get => checkedValue;
+        set => SetProperty(ref checkedValue, value);
+    }
+
+    private bool checkedValue;
 
     /// <summary>When true (default) the check box keeps the background already drawn beneath it.</summary>
-    public bool MatchWindowBackground { get; set; } = true;
+    public bool MatchWindowBackground
+    {
+        get => matchWindowBackground;
+        set => SetProperty(ref matchWindowBackground, value);
+    }
 
-    /// <summary>Command executed after each user change.</summary>
-    public Command? Command { get; set; }
+    private bool matchWindowBackground = true;
 
+    /// <summary>
+    /// Command executed when the user changes the check box (an <see cref="System.Windows.Input.ICommand"/>; a named <see cref="Ui.Command"/>
+    /// such as <c>Command="Exit"</c> is dispatched through <see cref="Application.ExecuteCommand"/>). While attached,
+    /// <c>CanExecute</c> feeds <see cref="Widget.IsEffectivelyEnabled"/>.
+    /// </summary>
+    public System.Windows.Input.ICommand? Command
+    {
+        get => CommandCore;
+        set => CommandCore = value;
+    }
+
+    /// <summary>The parameter passed to <see cref="Command"/>'s <c>CanExecute</c>/<c>Execute</c>.</summary>
+    public object? CommandParameter
+    {
+        get => CommandParameterCore;
+        set => CommandParameterCore = value;
+    }
     /// <summary>Raised after each user change (click, Space, Enter, Esc, mnemonic).</summary>
     public event EventHandler? Changed;
 
@@ -52,7 +81,7 @@ public class CheckBox : Widget
 
     internal override bool TryInvokeMnemonic(Widget parent, Rune c)
     {
-        if (!Enabled || !Visible || !mnemonic.Matches(c)) return false;
+        if (!IsEffectivelyEnabled || !Visible || !mnemonic.Matches(c)) return false;
         parent.Activate(this);
         OnKeypress(new KeyEvent(Key.Character, new Rune(' ')));
         return true;
@@ -95,14 +124,14 @@ public class CheckBox : Widget
     protected void Dispatch()
     {
         Changed?.Invoke(this, EventArgs.Empty);
-        if (Command is { } command) (Application ?? Application.Current)?.ExecuteCommand(command);
+        ExecuteCommandCore();
     }
 
     /// <inheritdoc/>
     protected internal override void Draw(DrawContext context)
     {
         bool active = IsAbsoluteActive;
-        var color = GetColor(active ? "tcheckbox.active" : "tcheckbox.inactive");
+        var color = Validation.GetHasErrors(this) ? GetColor("tcheckbox.error") : GetColor(active ? "tcheckbox.active" : "tcheckbox.inactive");
         var mnemonicColor = GetColor(active ? "tcheckbox.mnemonic.highlighted" : "tcheckbox.mnemonic");
         ToggleDrawing.Draw(context, MatchWindowBackground, '[', Checked ? GraphicsChars.Check : ' ', ']', mnemonic, color, mnemonicColor);
     }

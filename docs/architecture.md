@@ -38,7 +38,8 @@ Xaml.Generators (Roslyn, netstandard2.0, no project references)
 | `Nexer.Input` | Agent C | Byte-fed decoder producing `InputEvent`s. |
 | `Nexer.Rendering` | Agent C | `CellSurface` → VT bytes (diff renderer). |
 | `Nexer.Hosting` | Agent C | Console session (Windows/Unix), `ConsoleTerminalHost : ITerminalHost`. |
-| `Nexer.Ui` (except `Markup\`) | Agent A | Widgets, windows, application, menus, themes, layout, drawing. |
+| `Nexer.Ui` (except `Markup\`, `Data\`) | Agent A | Widgets, windows, application, menus, themes, layout, drawing; DataContext, INPC, `ICommand` and `ItemsSource` support in the controls. |
+| `Nexer.Ui\Data\` (namespace `Nexer.Ui.Data`) | Coordinator (contract) | Compiled data binding runtime: `CompiledBinding`, `BindingExpression`, `BindingOperations`, conversion, `Validation`. See [binding.md](binding.md). |
 | `Nexer.Ui.Testing` | Agent A | `HeadlessHost : ITerminalHost`, screen dumps, scripted input. |
 | `Nexer.Ui\Markup\` | Agent B | Markup extensions and XAML runtime helpers (contract file is coordinator-owned). |
 | `Nexer.Xaml.Compiler`, `.Build`, `.Loader`, `.Generators`, `build\` | Agent B | XAML compilation and loading. |
@@ -56,8 +57,9 @@ Files marked `// CONTRACT:` may only be changed by the coordinator:
 | `src\Nexer.Input\InputEvents.cs` | `Key`, `KeyModifiers`, `MouseButton`, `MouseEventKind`, `InputEvent` records. |
 | `src\Nexer.Hosting\ITerminalHost.cs` | `TerminalSize`, `CursorState`, `ITerminalHost`. |
 | `src\Nexer.Ui\Markup\MarkupContracts.cs` | XAML marker attributes and service interfaces matched by XamlX. |
-| `src\Nexer.Ui\Properties\XmlnsDefinitions.cs` | `https://nexer.dev/ui` → `Nexer.Ui`, `.Controls`, `.Layout`, `.Menus`, `.Markup`. |
+| `src\Nexer.Ui\Properties\XmlnsDefinitions.cs` | `https://nexer.dev/ui` → `Nexer.Ui`, `.Controls`, `.Layout`, `.Menus`, `.Markup`, `.Data`. |
 | `src\Nexer.Ui\StyleSyntax.cs` | Jexer colour syntax → `CellStyle` (used by themes and the compile-time converter). |
+| `src\Nexer.Ui\Data\*.cs` | Binding public surface (`IBinding`, `CompiledBinding`, `CompiledBindingPath`, `BindingExtension`, `BindingOperations`, `BindingExpression`, `Validation`, …). See [binding.md](binding.md). |
 
 Additive extensions (new members) are possible by request; renames/removals are not.
 
@@ -93,6 +95,10 @@ Additive extensions (new members) are possible by request; renames/removals are 
 - Modal UI is `Task<T> ShowModalAsync()`; awaiting continues on the UI context. No nested loops,
   no secondary UI threads (this replaces Jexer's `yield()`).
 - `Application.Invoke`/`InvokeAsync`/`Post` marshal work from other threads.
+- Data binding: view-model notifications (`PropertyChanged`, `ErrorsChanged`, `CollectionChanged`,
+  `CanExecuteChanged`) raised off the UI thread are marshalled with `Application.Post` before touching widgets.
+  Widgets subscribe to view-model events only while `IsAttachedToTree` (their window belongs to an application),
+  so closed windows are not kept alive by long-lived view models. See [binding.md](binding.md#threading-and-lifetime).
 
 ## XAML object-model rules (Agent A must follow; Agent B relies on them)
 
@@ -104,12 +110,14 @@ Additive extensions (new members) are possible by request; renames/removals are 
    Adding sets `Parent`/`Window` and applies Jexer `addChild` rules.
 4. Settable CLR properties for everything authorable. Value types used in attributes expose
    `static T Parse(string)` (e.g. `Rect`, `Thickness`, `KeyGesture`) so XamlX can convert them.
-5. Events are plain CLR events (`EventHandler` / `EventHandler<T>`). Optional `ICommand`-like
-   `Command` properties.
+5. Events are plain CLR events (`EventHandler` / `EventHandler<T>`). `Command` properties are
+   `System.Windows.Input.ICommand?` (bindable; literal text becomes `Command.Parse`).
 6. `[DeferredContent]` properties are typed `object` (templates, lazily built menus).
 7. `Name` is a `string` property on `Widget`; name scopes are populated by the XAML compiler.
 8. Attached properties: `public static T GetFoo(Widget)` / `SetFoo(Widget, T)` pairs.
 9. Do not rely on constructor order between parent and children; finalize in `EndInit`.
+10. Bindable properties raise `PropertyChanged` (`Widget : INotifyPropertyChanged`); properties users edit are
+    `[BindsTwoWayByDefault]`. `DataContext` is inherited (see [binding.md](binding.md)).
 
 ## Rendering pipeline
 

@@ -58,10 +58,22 @@ public class MessageBox : Window
     }
 
     /// <summary>The message; <c>'\n'</c> separates lines.</summary>
-    public string Message { get; set; } = "";
+    public string Message
+    {
+        get => messageValue;
+        set => SetProperty(ref messageValue, value);
+    }
+
+    private string messageValue = "";
 
     /// <summary>The buttons shown.</summary>
-    public MessageBoxButtons Buttons { get; set; } = MessageBoxButtons.Ok;
+    public MessageBoxButtons Buttons
+    {
+        get => buttonsValue;
+        set => SetProperty(ref buttonsValue, value);
+    }
+
+    private MessageBoxButtons buttonsValue = MessageBoxButtons.Ok;
 
     /// <summary>The chosen button. Until one is chosen: OK, Cancel, No or Cancel depending on <see cref="Buttons"/>.</summary>
     public MessageBoxResult Result { get; protected set; }
@@ -220,7 +232,11 @@ public class InputBox : MessageBox
     public string Text
     {
         get => inputField.Text;
-        set => inputField.Text = value;
+        set
+        {
+            inputField.Text = value;
+            OnPropertyChanged();
+        }
     }
 
     /// <summary>
@@ -294,13 +310,31 @@ public class FileOpenBox : Window
     }
 
     /// <summary>The starting directory (default: the current directory).</summary>
-    public string? Path { get; set; }
+    public string? Path
+    {
+        get => pathValue;
+        set => SetProperty(ref pathValue, value);
+    }
+
+    private string? pathValue;
 
     /// <summary>The purpose; sets the title and the label of the Open button.</summary>
-    public FileOpenBoxType Type { get; set; } = FileOpenBoxType.Open;
+    public FileOpenBoxType Type
+    {
+        get => typeValue;
+        set => SetProperty(ref typeValue, value);
+    }
+
+    private FileOpenBoxType typeValue = FileOpenBoxType.Open;
 
     /// <summary>File name filters: regular expressions separated by <c>';'</c> (see <see cref="DirectoryList.Filter"/>).</summary>
-    public string? Filter { get; set; }
+    public string? Filter
+    {
+        get => filterValue;
+        set => SetProperty(ref filterValue, value);
+    }
+
+    private string? filterValue;
 
     /// <summary>The chosen file name, or null.</summary>
     public string? FileName { get; private set; }

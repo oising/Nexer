@@ -28,6 +28,7 @@ public class Label : Widget
         {
             mnemonic = new MnemonicString(value ?? "");
             Width = TextMetrics.Width(mnemonic.RawLabel);
+            OnPropertyChanged();
         }
     }
 
@@ -35,14 +36,40 @@ public class Label : Widget
     public MnemonicString Mnemonic => mnemonic;
 
     /// <summary>Theme key for the text colour (default <c>"tlabel"</c>).</summary>
-    public string ColorKey { get; set; } = "tlabel";
+    public string ColorKey
+    {
+        get => colorKey;
+        set => SetProperty(ref colorKey, value);
+    }
+
+    private string colorKey = "tlabel";
 
     /// <summary>When true (default) the label keeps the background already drawn beneath it.</summary>
-    public bool MatchWindowBackground { get; set; } = true;
+    public bool MatchWindowBackground
+    {
+        get => matchWindowBackground;
+        set => SetProperty(ref matchWindowBackground, value);
+    }
 
-    /// <summary>Command executed when the mnemonic is pressed.</summary>
-    public Command? Command { get; set; }
+    private bool matchWindowBackground = true;
 
+    /// <summary>
+    /// Command executed when the mnemonic is pressed (an <see cref="System.Windows.Input.ICommand"/>; a named <see cref="Ui.Command"/>
+    /// such as <c>Command="Exit"</c> is dispatched through <see cref="Application.ExecuteCommand"/>). While attached,
+    /// <c>CanExecute</c> feeds <see cref="Widget.IsEffectivelyEnabled"/>.
+    /// </summary>
+    public System.Windows.Input.ICommand? Command
+    {
+        get => CommandCore;
+        set => CommandCore = value;
+    }
+
+    /// <summary>The parameter passed to <see cref="Command"/>'s <c>CanExecute</c>/<c>Execute</c>.</summary>
+    public object? CommandParameter
+    {
+        get => CommandParameterCore;
+        set => CommandParameterCore = value;
+    }
     /// <summary>Raised when the mnemonic is pressed.</summary>
     public event EventHandler? Click;
 
@@ -50,7 +77,7 @@ public class Label : Widget
 
     internal override bool TryInvokeMnemonic(Widget parent, Rune c)
     {
-        if (!Visible || !mnemonic.Matches(c)) return false;
+        if (!Visible || !CommandCanExecute || !mnemonic.Matches(c)) return false;
         Dispatch();
         return true;
     }
@@ -59,7 +86,7 @@ public class Label : Widget
     public void Dispatch()
     {
         Click?.Invoke(this, EventArgs.Empty);
-        if (Command is { } command) (Application ?? Application.Current)?.ExecuteCommand(command);
+        ExecuteCommandCore();
     }
 
     /// <inheritdoc/>

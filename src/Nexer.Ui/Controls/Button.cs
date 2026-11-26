@@ -30,6 +30,7 @@ public class Button : Widget
         {
             mnemonic = new MnemonicString(value ?? "");
             Width = TextMetrics.Width(mnemonic.RawLabel) + 3;
+            OnPropertyChanged();
         }
     }
 
@@ -37,11 +38,31 @@ public class Button : Widget
     public MnemonicString Mnemonic => mnemonic;
 
     /// <summary>Whether the shadow is drawn (Jexer <c>noButtonShadow</c> inverted).</summary>
-    public bool ShowShadow { get; set; } = true;
+    public bool ShowShadow
+    {
+        get => showShadow;
+        set => SetProperty(ref showShadow, value);
+    }
 
-    /// <summary>Command executed when the button is pressed.</summary>
-    public Command? Command { get; set; }
+    private bool showShadow = true;
 
+    /// <summary>
+    /// Command executed when the button is pressed (an <see cref="System.Windows.Input.ICommand"/>; a named <see cref="Ui.Command"/>
+    /// such as <c>Command="Exit"</c> is dispatched through <see cref="Application.ExecuteCommand"/>). While attached,
+    /// <c>CanExecute</c> feeds <see cref="Widget.IsEffectivelyEnabled"/>.
+    /// </summary>
+    public System.Windows.Input.ICommand? Command
+    {
+        get => CommandCore;
+        set => CommandCore = value;
+    }
+
+    /// <summary>The parameter passed to <see cref="Command"/>'s <c>CanExecute</c>/<c>Execute</c>.</summary>
+    public object? CommandParameter
+    {
+        get => CommandParameterCore;
+        set => CommandParameterCore = value;
+    }
     /// <summary>True while the left button is held down on the button.</summary>
     public bool IsPressed { get; private set; }
 
@@ -52,7 +73,7 @@ public class Button : Widget
 
     internal override bool TryInvokeMnemonic(Widget parent, Rune c)
     {
-        if (!Enabled || !Visible || !mnemonic.Matches(c)) return false;
+        if (!IsEffectivelyEnabled || !Visible || !mnemonic.Matches(c)) return false;
         OnKeypress(new KeyEvent(Key.Enter));
         return true;
     }
@@ -102,14 +123,14 @@ public class Button : Widget
     {
         IsPressed = false;
         Click?.Invoke(this, EventArgs.Empty);
-        if (Command is { } command) (Application ?? Application.Current)?.ExecuteCommand(command);
+        ExecuteCommandCore();
     }
 
     /// <inheritdoc/>
     protected internal override void Draw(DrawContext context)
     {
         CellStyle buttonColor, mnemonicColor;
-        if (!Enabled)
+        if (!IsEffectivelyEnabled)
         {
             buttonColor = GetColor("tbutton.disabled");
             mnemonicColor = buttonColor;

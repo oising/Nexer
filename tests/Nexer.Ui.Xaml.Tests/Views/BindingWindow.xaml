@@ -1,0 +1,21 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Nexer.Ui.Xaml.Tests.Views"
+        x:Class="Nexer.Ui.Xaml.Tests.Views.BindingWindow"
+        x:DataType="local:BindingWindowViewModel"
+        Title="Bindings" Bounds="0,0,40,12">
+  <Window.Resources>
+    <local:UpperCaseConverter x:Key="Upper" />
+  </Window.Resources>
+  <Label x:Name="GreetingLabel" Text="{Binding Greeting}" X="1" Y="0" />
+  <Label x:Name="NestedLabel" Text="{Binding Child.Title}" X="1" Y="1" />
+  <Label x:Name="SelfLabel" X="3" Y="2" Text="{Binding X, RelativeSource={RelativeSource Self}}" />
+  <Label x:Name="IndexLabel" Text="{Binding Items[1]}" X="1" Y="3" />
+  <Label x:Name="ConverterLabel" Text="{Binding Greeting, Converter={StaticResource Upper}}" X="1" Y="4" />
+  <Label x:Name="AttachedLabel" AnchorLayout.Anchor="Right" Text="{Binding (AnchorLayout.Anchor), RelativeSource={RelativeSource Self}}" X="1" Y="5" />
+  <Label x:Name="ElementLabel" Text="{Binding Text, ElementName=GreetingLabel}" X="1" Y="6" />
+  <Panel X="1" Y="7" Width="30" Height="2">
+    <Label x:Name="AncestorLabel" Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+  </Panel>
+  <Label x:Name="InternalLabel" Text="{Binding Secret, DataType=local:InternalViewModel}" X="1" Y="9" />
+</Window>

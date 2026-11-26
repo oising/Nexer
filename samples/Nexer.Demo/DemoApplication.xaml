@@ -21,6 +21,7 @@
     </Menu>
     <Menu Title="&amp;Demo">
       <MenuItem Text="N&amp;ew Main Window..." Click="OnNewMainWindow" />
+      <MenuItem Text="&amp;Data binding (MVVM)..." Click="OnBindingDemo" />
       <MenuSeparator />
       <MenuItem x:Name="TranslucenceItem" Text="&amp;Translucent windows" Checkable="True" Click="OnTranslucence" />
       <MenuItem x:Name="StatusBarItem" Text="Hide &amp;status bar" Checkable="True" Click="OnHideStatusBar" />

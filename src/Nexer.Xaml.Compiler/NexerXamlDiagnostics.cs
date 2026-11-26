@@ -32,6 +32,35 @@ public static class NexerXamlDiagnosticCodes
 
     /// <summary>Warning: an obsolete member is used.</summary>
     public const string Obsolete = "NXAML0100";
+
+    // NXAML0101-NXAML0149 are reserved for compiled bindings (docs\binding.md).
+
+    /// <summary>A DataContext binding has no <c>x:DataType</c> in scope (or a per-item binding has no <c>DataType</c>).</summary>
+    public const string MissingDataType = "NXAML0101";
+
+    /// <summary>A binding path segment does not name a readable property of the source type.</summary>
+    public const string UnknownMember = "NXAML0102";
+
+    /// <summary>A binding path segment is not public.</summary>
+    public const string InaccessibleMember = "NXAML0103";
+
+    /// <summary>A two-way (or one-way-to-source) binding's path ends in a read-only property.</summary>
+    public const string TwoWayToReadOnly = "NXAML0104";
+
+    /// <summary>Warning: the source and target types of a binding are not convertible.</summary>
+    public const string BindingTypeMismatch = "NXAML0105";
+
+    /// <summary>A binding is assigned to something that cannot be bound (non-widget target, no public setter, collection item).</summary>
+    public const string InvalidBindingTarget = "NXAML0106";
+
+    /// <summary>A binding's <c>ElementName</c> does not exist in the document.</summary>
+    public const string UnknownElementName = "NXAML0107";
+
+    /// <summary>A binding's <c>RelativeSource</c> is invalid or unsupported.</summary>
+    public const string InvalidRelativeSource = "NXAML0108";
+
+    /// <summary>A binding path is malformed or uses unsupported syntax.</summary>
+    public const string InvalidBindingPath = "NXAML0109";
 }
 
 /// <summary>Severity of a <see cref="NexerXamlDiagnostic"/>.</summary>

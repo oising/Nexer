@@ -1,12 +1,29 @@
 // Ported from Jexer TCommand.java (MIT, © Autumn Lamonte).
+using System.Windows.Input;
+
 namespace Nexer.Ui;
 
 /// <summary>
 /// A named command dispatched through the widget tree (Jexer's <c>TCommand</c>). Commands compare by name.
 /// </summary>
-/// <remarks>XAML text form: the command name, e.g. <c>Command="Exit"</c>; well-known names map to the static instances.</remarks>
-public sealed record Command(string Name)
+/// <remarks>
+/// XAML text form: the command name, e.g. <c>Command="Exit"</c>; well-known names map to the static instances.
+/// Implements <see cref="ICommand"/>: <see cref="ICommand.Execute"/> runs <see cref="Application.ExecuteCommand"/> on
+/// <see cref="Application.Current"/>; <see cref="ICommand.CanExecute"/> is always true.
+/// </remarks>
+public sealed record Command(string Name) : ICommand
 {
+    // Explicit no-op accessors: a field-like event would take part in the record's value equality.
+    event EventHandler? ICommand.CanExecuteChanged
+    {
+        add { }
+        remove { }
+    }
+
+    bool ICommand.CanExecute(object? parameter) => true;
+
+    void ICommand.Execute(object? parameter) => Application.Current?.ExecuteCommand(this);
+
     /// <summary>Exit the application (asks for confirmation, as Jexer).</summary>
     public static Command Exit { get; } = new("Exit");
 

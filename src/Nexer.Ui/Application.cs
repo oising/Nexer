@@ -30,6 +30,7 @@ public class Application : IResourceProvider
     private readonly AutoResetEvent wake = new(false);
     private readonly UiSynchronizationContext context;
     private ResourceDictionary? resources;
+    private object? dataContext;
     private Desktop? desktop;
     private CellSurface? surface;
     private ITerminalHost? host;
@@ -82,6 +83,29 @@ public class Application : IResourceProvider
 
     /// <summary>The colour theme.</summary>
     public ColorTheme Theme { get; set; } = new();
+
+    /// <summary>
+    /// The root data context for <c>{Binding}</c>: inherited by every window (and its widgets) that has no data context
+    /// of its own. Setting it raises <see cref="Widget.DataContextChanged"/> through the inheriting windows.
+    /// </summary>
+    public object? DataContext
+    {
+        get => dataContext;
+        set
+        {
+            if (ReferenceEquals(dataContext, value)) return;
+            IEnumerable<Window> roots = windows;
+            if (desktop != null) roots = roots.Append(desktop);
+            roots = roots.Concat(Menus);
+            if (ActiveMenu != null) roots = roots.Append(ActiveMenu);
+            var affected = roots.Distinct().Where(w => !w.HasLocalDataContext && w.LogicalParent == null && w.Application == this).ToList();
+            dataContext = value;
+            foreach (var window in affected)
+            {
+                window.OnDataContextChanged();
+            }
+        }
+    }
 
     /// <summary>Application-wide resources (looked up after widget resources).</summary>
     public ResourceDictionary Resources => resources ??= [];
@@ -484,7 +508,7 @@ public class Application : IResourceProvider
         if (!windowWillShortcut && !IsModalActive)
         {
             var item = Menus.FindAccelerator(key);
-            if (item != null && item.Enabled)
+            if (item != null && item.IsEffectivelyEnabled)
             {
                 item.Dispatch();
                 return;
@@ -778,6 +802,9 @@ public class Application : IResourceProvider
         ActiveMenu = null;
         invalidated = true;
         CloseSubMenus();
+
+        // Context menus are attached only while open, so their bindings do not outlive them.
+        if (!Menus.Contains(menu)) menu.SetApplication(null);
     }
 
     private void CloseSubMenus()
@@ -792,6 +819,20 @@ public class Application : IResourceProvider
     }
 
     internal void AddSubMenu(Menu menu) => subMenus.Add(menu);
+
+    /// <summary>The first validation error of the focused widget (or its nearest ancestor with errors) in a window.</summary>
+    private static Data.ValidationError? FocusedValidationError(Window window)
+    {
+        Widget focused = window;
+        while (focused.ActiveChild is { IsActive: true } child) focused = child;
+        for (Widget? w = focused; w != null; w = w.Parent)
+        {
+            var errors = Data.Validation.GetErrors(w);
+            if (errors.Count > 0) return errors[0];
+        }
+
+        return null;
+    }
 
     /// <summary>Closes the top-most open submenu.</summary>
     public void CloseSubMenu()
@@ -1293,6 +1334,13 @@ public class Application : IResourceProvider
             var row = new DrawContext(s, 0, DesktopBottom, ScreenWidth, 1, new Rect(0, DesktopBottom, ScreenWidth, 1));
             if (statusBar != null) statusBar.Draw(row, (topLevel ?? (Window?)desktop)?.Theme ?? Theme);
             else StatusBar.DrawEmpty(row, Theme);
+            if (!menuIsActive && topLevel != null && topLevel.IsShown && FocusedValidationError(topLevel) is { } error)
+            {
+                // Nexer extension: the focused widget's first validation error replaces the status bar text.
+                var errorColor = topLevel.Theme.GetColor("tstatusbar.error");
+                row.HLine(0, 0, ScreenWidth, ' ', errorColor);
+                row.PutString(1, 0, error.ToString(), errorColor);
+            }
         }
 
         if (menuIsActive) return CursorState.Hidden;

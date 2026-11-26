@@ -52,11 +52,18 @@ public class Text : ScrollableWidget
             text = (value ?? "").Replace("\r\n", "\n");
             ReflowData();
             Invalidate();
+            OnPropertyChanged();
         }
     }
 
     /// <summary>Theme key for the text colour (default <c>"ttext"</c>).</summary>
-    public string ColorKey { get; set; } = "ttext";
+    public string ColorKey
+    {
+        get => colorKey;
+        set => SetProperty(ref colorKey, value);
+    }
+
+    private string colorKey = "ttext";
 
     /// <summary>Paragraph justification (default <see cref="Justification.Left"/>).</summary>
     public Justification Justification
@@ -66,6 +73,7 @@ public class Text : ScrollableWidget
         {
             justification = value;
             ReflowData();
+            OnPropertyChanged();
         }
     }
 
@@ -77,6 +85,7 @@ public class Text : ScrollableWidget
         {
             lineSpacing = value;
             ReflowData();
+            OnPropertyChanged();
         }
     }
 

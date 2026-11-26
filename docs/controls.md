@@ -1,4 +1,4 @@
-# Nexer.Ui controls (Agent A)
+# Nexer.Ui controls
 
 Port of Jexer's widget/window system (MIT, © Autumn Lamonte) to .NET with a XAML-first API.
 
@@ -62,7 +62,7 @@ All types are in XML namespace `https://nexer.dev/ui`.
   (id, 0 = none), `SelectedButton`, `RequiresSelection`, `SelectionChanged`. `RadioButton` — `Text`,
   `IsSelected` (settable before adding), `Id`.
 - `Field` — `Text`, `Fixed`, `InsertMode`, `BackgroundChar`, `ActiveColorKey`/`InactiveColorKey`, `Changed`
-  (every edit), `Submitted` (Enter). Bracketed paste is inserted as typed text. `PasswordField` shows `*` when
+  (every edit), `Submitted` (Enter), `LostFocus` (leaves the focus path). Bracketed paste is inserted as typed text. `PasswordField` shows `*` when
   unfocused.
 - `Spinner` — `SpinUp`/`SpinDown` events. `ProgressBar` — `Minimum`, `Maximum`, `Value`, glyph properties.
 - `Text` — read-only word-wrapped scrolling text: `Content` (paragraphs separated by a blank line),
@@ -79,11 +79,14 @@ All types are in XML namespace `https://nexer.dev/ui`.
   content = up to two panes. The divider is dragged with the mouse; nested split panes draw ┤ ├ ┬ ┴ ┼ junctions.
   A Panel/SplitPane that is a window's only child fills the client area (also when added unsized); the border
   scrollers of a `ScrollableWindow` do not count as children for this rule.
-- `List` — `[Content] Items` (strings; `ReplaceAll`), `SelectedIndex`, `SelectedItem`, events `SelectionChanged`,
+- `List` — `[Content] Items` (strings; `ReplaceAll`) or `ItemsSource` + `DisplayMemberBinding`, `SelectedIndex`,
+  `SelectedItem` (`object?`: the string, or the source item), `SelectedText`, events `SelectionChanged`,
   `ItemActivated` (Enter/double-click), `ItemClicked`.
-- `ComboBox` — `[Content] Items`, `Text`, `SelectedIndex`, `LimitToListValue` (default true), `MaxValuesHeight`,
-  `ShowList`/`HideList`, `Changed` event. Alt+Down or a click on the arrow opens the list.
-- `TreeView` — `[Content] Root` (a `TreeItem`), `SelectedItem`, `Select(item, center)`, `VisibleItems`, events
+- `ComboBox` — `[Content] Items` or `ItemsSource` + `DisplayMemberBinding`, `Text`, `SelectedIndex`, `SelectedItem`,
+  `LimitToListValue` (default true), `MaxValuesHeight`, `ShowList`/`HideList`, `Changed` event. Alt+Down or a
+  click on the arrow opens the list.
+- `TreeView` — `[Content] Root` (a `TreeItem`) or `ItemsSource` + `DisplayMemberBinding` + `ChildrenBinding`,
+  `SelectedItem` (`object?`: the `TreeItem`, or the source item), `SelectedTreeItem`, `Select(item, center)`, `VisibleItems`, events
   `SelectionChanged`/`ItemActivated`. `TreeItem` is a model object (not a widget): `Text`, `[Content] Items`,
   `IsExpanded`, `IsExpandable`, `IsSelectable`, `Tag`, virtual `OnExpand` for lazy loading.
 - `DirectoryTreeItem` (`Path`; static `OpenPath(view, path)`) and `DirectoryList` (`Path`, `Filter` = regexes
@@ -108,7 +111,7 @@ All types are in XML namespace `https://nexer.dev/ui`.
 ### Nexer.Ui.Menus
 
 - `Menu` (`Title` with mnemonic; content = items), `MenuItem` (`Text`, `Shortcut` KeyGesture, `Checkable`,
-  `Checked`, `Icon`, `Command`, `Click` event), `MenuSeparator`, `SubMenu` (content = nested items).
+  `Checked`, `Icon`, `Command` (`ICommand`), `CommandParameter`, `Click` event), `MenuSeparator`, `SubMenu` (content = nested items).
   Add menus to `Application.Menus`. Alt+mnemonic or F10 opens the menu bar; accelerators work whenever no menu
   is open and no modal window is shown.
 - `StatusBar` (`Text`, `[Content] Keys`) of `StatusKey` (`Key`, `Text`, `Command`, `Click`); set
@@ -122,6 +125,54 @@ All types are in XML namespace `https://nexer.dev/ui`.
   `Click`, `Drag`, `Advance(TimeSpan)`, `Text()`, `Row(y)`, `Style(x, y)`).
 - `ScreenDump.Text` / `ScreenDump.Attributes`; `ScreenSnapshot` cell accessors `GetText`, `GetStyle`, `GetRole`,
   `GetRowText`.
+
+## Data binding support (controls side)
+
+See [binding.md](binding.md) for the binding feature as a whole; this is what the controls provide.
+
+- **Change notification**: `Widget` implements `INotifyPropertyChanged`. Authorable properties of all widgets
+  raise `PropertyChanged` when their value changes (setters use `SetProperty`), including changes made by the
+  user: typing/deleting/pasting in a `Field` (`Text`), toggling a `CheckBox` (`Checked`), choosing a radio button
+  (`RadioGroup.Selected`, `RadioButton.IsSelected`), moving a `List`/`ComboBox`/`TreeView` selection
+  (`SelectedIndex`/`SelectedItem`, `ComboBox.Text`), scroller clicks/drags (`Value`, `VerticalValue`,
+  `HorizontalValue`), dragging a `SplitPane` divider (`Split`) and focus changes (`IsActive`). Existing events
+  (`Changed`, `SelectionChanged`, `ValueChanged`…) still fire as before.
+- `[BindsTwoWayByDefault]`: `Field.Text`, `CheckBox.Checked`, `RadioGroup.Selected`, `List.SelectedIndex`/`SelectedItem`,
+  `ComboBox.Text`/`SelectedIndex`/`SelectedItem`, `TreeView.SelectedItem`, scroller `Value`,
+  `ScrollableWidget`/`ScrollableWindow` `VerticalValue`/`HorizontalValue` and `SplitPane.Split` (not
+  `ProgressBar.Value`). A test checks every attributed property notifies on simulated input.
+- **Lifecycle**: `IsAttachedToTree` is true while a widget's window belongs to an application (windows, the desktop
+  and menu-bar menus are attached when added; context menus only while open). `AttachedToTree` is raised parent
+  first, `DetachedFromTree` children first; inserting/removing a subtree into/from an attached parent raises them
+  for the subtree; repeated calls are no-ops. A `SubMenu`'s nested menu follows its item. Override
+  `OnAttachedToTree`/`OnDetachedFromTree` for subscriptions that must not outlive the tree.
+- **DataContext**: local value, else the parent's, else (for windows/the desktop/menus) `Application.DataContext`;
+  a `SubMenu`'s nested menu inherits from the item. `DataContextChanged` is raised across the subtree on local
+  changes of an ancestor, on re-parenting, on attaching to an application and on `Application.DataContext` changes.
+  Setting `DataContext = null` reverts to the inherited value.
+- **Commands**: `Command` on `Button`, `MenuItem`, `CheckBox`, `Label` and `StatusKey` is an `ICommand` with a
+  `CommandParameter`. A named `Command` (`Command="Exit"`) is dispatched through `Application.ExecuteCommand`; other
+  commands run `Execute(CommandParameter)` when `CanExecute` is true (after the `Click` event). While attached a
+  widget subscribes to `CanExecuteChanged` (marshalled to the UI thread); `IsEffectivelyEnabled` =
+  `Enabled && CanExecute(CommandParameter)` drives drawing, focus, mnemonics and accelerators without changing
+  `Enabled`. `StatusKey` (not a widget) checks `CanExecute` when pressed.
+- **ItemsSource**: `List`, `ComboBox` and `TreeView` accept any `IEnumerable`; `DisplayMemberBinding` (an
+  `IBinding`, evaluated per item with `BindingOperations.Evaluate`) or `ToString()` gives the text. An
+  `INotifyCollectionChanged` source is observed while attached (Add/Remove/Replace/Move update incrementally and keep
+  the selected item; Reset and off-thread changes resynchronise) and re-read on attach. `Items` and `ItemsSource`
+  (`Root` and `ItemsSource` for `TreeView`) are mutually exclusive: the other throws `InvalidOperationException`
+  while one is in use. `SelectedItem` is the source item and can be set to one (a value set before the items arrive
+  is applied when they do). `TreeView` shows the source items as the top level (no root row); `ChildrenBinding`
+  gives each item's children, read when the item is first expanded (the expander shows when the collection is
+  non-empty, or for non-`ICollection` children), observed while attached; generated items are reused by identity
+  so expansion survives changes. Items render as text only (no templates). While attached, `List` and `TreeView`
+  re-read an item's text when the item raises `PropertyChanged` for the first segment of `DisplayMemberBinding`
+  (`ComboBox` and deeper segments are not observed: raise a Reset/Replace to refresh).
+- **Validation visuals**: Nexer extension theme keys (`ColorTheme.ExtensionColorSpecs`, applied after the
+  generated Jexer defaults; not in Jexer): `tfield.error` (also `PasswordField` and a `ComboBox`'s field),
+  `tcheckbox.error`, `tcombobox.error` (the arrow), `tlist.error` (unselected rows) and `tstatusbar.error`. Controls
+  use them while `Validation.GetHasErrors(this)`. The first error of the focused widget (or its nearest ancestor
+  with errors) replaces the status bar row of the active window, Jexer-style, until it is fixed or focus moves.
 
 ## Design notes
 

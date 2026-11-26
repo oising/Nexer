@@ -1,6 +1,7 @@
 // Ported from Jexer TRadioGroup.java and TRadioButton.java (MIT, © Autumn Lamonte).
 using System.Text;
 using Nexer.Input;
+using Nexer.Ui.Data;
 
 namespace Nexer.Ui.Controls;
 
@@ -29,10 +30,12 @@ public class RadioGroup : Widget
         {
             label = value ?? "";
             Width = Math.Max(Width, TextMetrics.Width(label) + 4);
+            OnPropertyChanged();
         }
     }
 
-    /// <summary>The 1-based id of the selected button, or 0 for none.</summary>
+    /// <summary>The 1-based id of the selected button, or 0 for none. Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int Selected
     {
         get => SelectedButton?.Id ?? 0;
@@ -51,7 +54,7 @@ public class RadioGroup : Widget
         get => requiresSelection;
         set
         {
-            requiresSelection = value;
+            if (!SetProperty(ref requiresSelection, value)) return;
             if (value && SelectedButton == null && Buttons.Any()) Select(1);
         }
     }
@@ -62,7 +65,7 @@ public class RadioGroup : Widget
         get => matchWindowBackground;
         set
         {
-            matchWindowBackground = value;
+            if (!SetProperty(ref matchWindowBackground, value)) return;
             foreach (var b in Buttons) b.MatchWindowBackground = value;
         }
     }
@@ -74,10 +77,10 @@ public class RadioGroup : Widget
 
     internal override bool TryInvokeMnemonic(Widget parent, Rune c)
     {
-        if (!Enabled || !Visible) return false;
+        if (!IsEffectivelyEnabled || !Visible) return false;
         foreach (var button in Buttons)
         {
-            if (button.Enabled && button.Mnemonic.Matches(c))
+            if (button.IsEffectivelyEnabled && button.Mnemonic.Matches(c))
             {
                 parent.Activate(this);
                 Activate(button);
@@ -100,6 +103,10 @@ public class RadioGroup : Widget
         if (previous != SelectedButton)
         {
             Invalidate();
+            previous?.NotifyIsSelectedChanged();
+            SelectedButton?.NotifyIsSelectedChanged();
+            OnPropertyChanged(nameof(Selected));
+            OnPropertyChanged(nameof(SelectedButton));
             SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -169,6 +176,7 @@ public class RadioButton : Widget
         {
             mnemonic = new MnemonicString(value ?? "");
             Width = TextMetrics.Width(mnemonic.RawLabel) + 4;
+            OnPropertyChanged();
         }
     }
 
@@ -179,7 +187,13 @@ public class RadioButton : Widget
     public int Id { get; internal set; }
 
     /// <summary>When true (default) the button keeps the background already drawn beneath it.</summary>
-    public bool MatchWindowBackground { get; set; } = true;
+    public bool MatchWindowBackground
+    {
+        get => matchWindowBackgroundValue;
+        set => SetProperty(ref matchWindowBackgroundValue, value);
+    }
+
+    private bool matchWindowBackgroundValue = true;
 
     internal bool IsSelectedField;
     internal bool PendingSelected;
@@ -190,10 +204,19 @@ public class RadioButton : Widget
         get => Parent is RadioGroup ? IsSelectedField : PendingSelected;
         set
         {
-            if (Parent is RadioGroup group) group.Select(value ? Id : 0);
-            else PendingSelected = value;
+            if (Parent is RadioGroup group)
+            {
+                group.Select(value ? Id : 0);
+            }
+            else if (PendingSelected != value)
+            {
+                PendingSelected = value;
+                NotifyIsSelectedChanged();
+            }
         }
     }
+
+    internal void NotifyIsSelectedChanged() => OnPropertyChanged(nameof(IsSelected));
 
     internal override int MnemonicPass => 2;
 

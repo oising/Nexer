@@ -17,6 +17,7 @@ public static class DemoSmoke
         ("Tree View", () => new DemoTreeViewWindow()),
         ("Scrollable Window", () => new DemoScrollableWindow()),
         ("Split Panes", () => new DemoSplitPaneWindow()),
+        ("Data Binding", () => new DemoBindingWindow()),
     ];
 
     /// <summary>

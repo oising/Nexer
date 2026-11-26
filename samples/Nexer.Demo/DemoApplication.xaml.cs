@@ -55,6 +55,8 @@ public partial class DemoApplication : Application
 
     private void OnNewMainWindow(object? sender, EventArgs e) => Windows.Add(new DemoMainWindow());
 
+    private void OnBindingDemo(object? sender, EventArgs e) => Windows.Add(new DemoBindingWindow());
+
     private void OnTranslucence(object? sender, EventArgs e) => Translucence = TranslucenceItem.Checked;
 
     private void OnHideStatusBar(object? sender, EventArgs e) => HideStatusBar = StatusBarItem.Checked;

@@ -1,6 +1,7 @@
 // Ported from Jexer TField.java and TPasswordField.java (MIT, © Autumn Lamonte).
 using System.Text;
 using Nexer.Input;
+using Nexer.Ui.Data;
 
 namespace Nexer.Ui.Controls;
 
@@ -9,9 +10,10 @@ namespace Nexer.Ui.Controls;
 /// otherwise the view scrolls. Raises <see cref="Changed"/> on every edit and <see cref="Submitted"/> on Enter.
 /// Height is always 1.
 /// </summary>
-public class Field : Widget
+public class Field : Widget, ILostFocusSource
 {
     private string text = "";
+    private string notifiedText = "";
 
     /// <summary>Text (UTF-16) index of the cursor.</summary>
     protected int position;
@@ -28,36 +30,73 @@ public class Field : Widget
         CursorVisible = true;
     }
 
-    /// <summary>The text. Setting it moves the cursor home (and truncates a fixed field to its width).</summary>
+    /// <summary>
+    /// The text. Setting a different value moves the cursor home (and truncates a fixed field to its width). Raises
+    /// <see cref="Widget.PropertyChanged"/> for every change, including typing. Binds two-way by default.
+    /// </summary>
+    [BindsTwoWayByDefault]
     public string Text
     {
         get => text;
         set
         {
-            text = value ?? "";
+            value ??= "";
+            if (value == text) return;
+            text = value;
             position = 0;
             screenPosition = 0;
             windowStart = 0;
             if (Fixed && text.Length > Width && Width > 0) text = TextMetrics.Truncate(text, Width);
             UpdateCursor();
             Invalidate();
+            NotifyTextChanged();
         }
     }
 
     /// <summary>When true the text cannot be longer than the field width.</summary>
-    public bool Fixed { get; set; }
+    public bool Fixed
+    {
+        get => fixedValue;
+        set => SetProperty(ref fixedValue, value);
+    }
+
+    private bool fixedValue;
 
     /// <summary>Insert (true, default) or overwrite mode; toggled by Ins.</summary>
-    public bool InsertMode { get; set; } = true;
+    public bool InsertMode
+    {
+        get => insertMode;
+        set => SetProperty(ref insertMode, value);
+    }
+
+    private bool insertMode = true;
 
     /// <summary>Glyph shown in empty cells (default ░).</summary>
-    public char BackgroundChar { get; set; } = GraphicsChars.Hatch;
+    public char BackgroundChar
+    {
+        get => backgroundChar;
+        set => SetProperty(ref backgroundChar, value);
+    }
+
+    private char backgroundChar = GraphicsChars.Hatch;
 
     /// <summary>Theme key used when focused (default <c>"tfield.active"</c>).</summary>
-    public string ActiveColorKey { get; set; } = "tfield.active";
+    public string ActiveColorKey
+    {
+        get => activeColorKey;
+        set => SetProperty(ref activeColorKey, value);
+    }
+
+    private string activeColorKey = "tfield.active";
 
     /// <summary>Theme key used when not focused (default <c>"tfield.inactive"</c>).</summary>
-    public string InactiveColorKey { get; set; } = "tfield.inactive";
+    public string InactiveColorKey
+    {
+        get => inactiveColorKey;
+        set => SetProperty(ref inactiveColorKey, value);
+    }
+
+    private string inactiveColorKey = "tfield.inactive";
 
     /// <summary>Cursor position as a UTF-16 index into <see cref="Text"/>.</summary>
     public int Position => position;
@@ -67,6 +106,15 @@ public class Field : Widget
 
     /// <summary>Raised when Enter is pressed.</summary>
     public event EventHandler? Submitted;
+
+    /// <summary>
+    /// Raised when the field leaves the focus path (it, or an ancestor, is deactivated); bindings with
+    /// <c>UpdateSourceTrigger=LostFocus</c> push the text then.
+    /// </summary>
+    public event EventHandler? LostFocus;
+
+    /// <inheritdoc/>
+    private protected override void OnLostFocus() => LostFocus?.Invoke(this, EventArgs.Empty);
 
     private static int CellWidth(Rune r) => TextMetrics.RuneWidth(r);
 
@@ -318,8 +366,17 @@ public class Field : Widget
     /// <summary>Raises <see cref="Submitted"/> (enter) or <see cref="Changed"/>.</summary>
     protected virtual void Dispatch(bool enter)
     {
+        if (!enter) NotifyTextChanged();
         if (enter) Submitted?.Invoke(this, EventArgs.Empty);
         else Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Raises <see cref="Widget.PropertyChanged"/> for <see cref="Text"/> if it differs from the last notified value.</summary>
+    private void NotifyTextChanged()
+    {
+        if (notifiedText == text) return;
+        notifiedText = text;
+        OnPropertyChanged(nameof(Text));
     }
 
     /// <summary>Converts a column within the text to a UTF-16 index.</summary>
@@ -372,8 +429,9 @@ public class Field : Widget
         }
     }
 
-    /// <summary>The colour for the current focus state.</summary>
-    protected Nexer.Core.CellStyle FieldColor => GetColor(IsAbsoluteActive ? ActiveColorKey : InactiveColorKey);
+    /// <summary>The colour for the current focus state (<c>tfield.error</c> while <see cref="Validation.GetHasErrors"/>).</summary>
+    protected Nexer.Core.CellStyle FieldColor =>
+        (Validation.GetHasErrors(this) || (Parent is ComboBox combo && Validation.GetHasErrors(combo))) ? GetColor("tfield.error") : GetColor(IsAbsoluteActive ? ActiveColorKey : InactiveColorKey);
 
     /// <inheritdoc/>
     protected internal override void Draw(DrawContext context)

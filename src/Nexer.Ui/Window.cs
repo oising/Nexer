@@ -38,11 +38,25 @@ public class Window : Widget
     /// <summary>The application this window has been added to, if any.</summary>
     public override Application? Application => application;
 
+    private protected override object? InheritedRootDataContext => application?.DataContext;
+
     /// <summary>The window title, drawn centred in the top border.</summary>
-    public virtual string? Title { get; set; }
+    public virtual string? Title
+    {
+        get => titleValue;
+        set => SetProperty(ref titleValue, value);
+    }
+
+    private string? titleValue;
 
     /// <summary>Whether the user can resize the window (Jexer <c>RESIZABLE</c>, default true).</summary>
-    public bool Resizable { get; set; } = true;
+    public bool Resizable
+    {
+        get => resizableValue;
+        set => SetProperty(ref resizableValue, value);
+    }
+
+    private bool resizableValue = true;
 
     /// <summary>Whether the window is modal (implies <see cref="Centered"/>).</summary>
     public bool Modal
@@ -50,8 +64,10 @@ public class Window : Widget
         get => modal;
         set
         {
+            if (modal == value) return;
             modal = value;
-            if (value) centered = true;
+            OnPropertyChanged();
+            if (value) Centered = true;
         }
     }
 
@@ -59,47 +75,125 @@ public class Window : Widget
     public bool Centered
     {
         get => centered;
-        set => centered = value;
+        set => SetProperty(ref centered, value);
     }
 
     /// <summary>Whether the close box is shown and Ctrl+W closes the window (default true; Jexer <c>NOCLOSEBOX</c>).</summary>
-    public bool CloseBox { get; set; } = true;
+    public bool CloseBox
+    {
+        get => closeBox;
+        set => SetProperty(ref closeBox, value);
+    }
+
+    private bool closeBox = true;
 
     /// <summary>Whether the zoom box is shown and F5 maximizes (default true; Jexer <c>NOZOOMBOX</c>).</summary>
-    public bool ZoomBox { get; set; } = true;
+    public bool ZoomBox
+    {
+        get => zoomBox;
+        set => SetProperty(ref zoomBox, value);
+    }
+
+    private bool zoomBox = true;
 
     /// <summary>When true, closing hides the window instead of removing it (Jexer <c>HIDEONCLOSE</c>).</summary>
-    public bool HideOnClose { get; set; }
+    public bool HideOnClose
+    {
+        get => hideOnClose;
+        set => SetProperty(ref hideOnClose, value);
+    }
+
+    private bool hideOnClose;
 
     /// <summary>When true, the position is used as-is (no smart placement; Jexer <c>ABSOLUTEXY</c>).</summary>
-    public bool AbsolutePosition { get; set; }
+    public bool AbsolutePosition
+    {
+        get => absolutePosition;
+        set => SetProperty(ref absolutePosition, value);
+    }
+
+    private bool absolutePosition;
 
     /// <summary>Minimum width when resizing (default 10).</summary>
-    public int MinimumWidth { get; set; } = 10;
+    public int MinimumWidth
+    {
+        get => minimumWidth;
+        set => SetProperty(ref minimumWidth, value);
+    }
+
+    private int minimumWidth = 10;
 
     /// <summary>Minimum height when resizing (default 2).</summary>
-    public int MinimumHeight { get; set; } = 2;
+    public int MinimumHeight
+    {
+        get => minimumHeight;
+        set => SetProperty(ref minimumHeight, value);
+    }
+
+    private int minimumHeight = 2;
 
     /// <summary>Maximum width when resizing; values not above the minimum mean unlimited.</summary>
-    public int MaximumWidth { get; set; }
+    public int MaximumWidth
+    {
+        get => maximumWidth;
+        set => SetProperty(ref maximumWidth, value);
+    }
+
+    private int maximumWidth;
 
     /// <summary>Maximum height when resizing; values not above the minimum mean unlimited.</summary>
-    public int MaximumHeight { get; set; }
+    public int MaximumHeight
+    {
+        get => maximumHeight;
+        set => SetProperty(ref maximumHeight, value);
+    }
+
+    private int maximumHeight;
 
     /// <summary>Border style while active (default double).</summary>
-    public BorderStyle ActiveBorderStyle { get; set; } = BorderStyle.Double;
+    public BorderStyle ActiveBorderStyle
+    {
+        get => activeBorderStyle;
+        set => SetProperty(ref activeBorderStyle, value);
+    }
+
+    private BorderStyle activeBorderStyle = BorderStyle.Double;
 
     /// <summary>Border style while active and modal (default double).</summary>
-    public BorderStyle ModalBorderStyle { get; set; } = BorderStyle.Double;
+    public BorderStyle ModalBorderStyle
+    {
+        get => modalBorderStyle;
+        set => SetProperty(ref modalBorderStyle, value);
+    }
+
+    private BorderStyle modalBorderStyle = BorderStyle.Double;
 
     /// <summary>Border style while inactive (default single).</summary>
-    public BorderStyle InactiveBorderStyle { get; set; } = BorderStyle.Single;
+    public BorderStyle InactiveBorderStyle
+    {
+        get => inactiveBorderStyle;
+        set => SetProperty(ref inactiveBorderStyle, value);
+    }
+
+    private BorderStyle inactiveBorderStyle = BorderStyle.Single;
 
     /// <summary>Border style while being moved or resized (default single).</summary>
-    public BorderStyle MovingBorderStyle { get; set; } = BorderStyle.Single;
+    public BorderStyle MovingBorderStyle
+    {
+        get => movingBorderStyle;
+        set => SetProperty(ref movingBorderStyle, value);
+    }
+
+    private BorderStyle movingBorderStyle = BorderStyle.Single;
 
     /// <summary>Per-window colour theme override; null uses the application theme.</summary>
-    public ColorTheme? OwnTheme { get; set; }
+    public ColorTheme? OwnTheme
+    {
+        get => ownTheme;
+        set => SetProperty(ref ownTheme, value);
+    }
+
+    private ColorTheme? ownTheme;
 
     /// <summary>
     /// Opacity used when <see cref="Ui.Application.Translucence"/> is on: 0 (transparent) to 255 (opaque). Default
@@ -110,8 +204,7 @@ public class Window : Widget
         get => alpha;
         set
         {
-            alpha = Math.Clamp(value, 0, 255);
-            Invalidate();
+            if (SetProperty(ref alpha, Math.Clamp(value, 0, 255))) Invalidate();
         }
     }
 
@@ -135,13 +228,21 @@ public class Window : Widget
         get => statusBar;
         set
         {
+            if (ReferenceEquals(statusBar, value)) return;
             statusBar = value;
             if (value != null) value.Owner = this;
+            OnPropertyChanged();
         }
     }
 
     /// <summary>The value passed to <see cref="Close(object?)"/>; result of <see cref="ShowModalAsync"/>.</summary>
-    public object? DialogResult { get; set; }
+    public object? DialogResult
+    {
+        get => dialogResult;
+        set => SetProperty(ref dialogResult, value);
+    }
+
+    private object? dialogResult;
 
     /// <summary>Raised before the window closes; set <see cref="CancelEventArgs.Cancel"/> to keep it open.</summary>
     public event EventHandler<CancelEventArgs>? Closing;
@@ -165,7 +266,30 @@ public class Window : Widget
 
     internal bool PositionIsDesktopRelative { get; set; } = true;
 
-    internal void SetApplication(Application? app) => application = app;
+    /// <summary>
+    /// Sets the owning application. Attaching raises <see cref="Widget.DataContextChanged"/> (if the inherited value
+    /// changes) and then <see cref="Widget.AttachedToTree"/> over the window's subtree; detaching raises
+    /// <see cref="Widget.DetachedFromTree"/> while <see cref="Application"/> is still set.
+    /// </summary>
+    internal void SetApplication(Application? app)
+    {
+        if (ReferenceEquals(application, app)) return;
+        if (application != null)
+        {
+            SetAttachedToTree(false);
+            var before = DataContext;
+            application = null;
+            if (!ReferenceEquals(before, DataContext)) OnDataContextChanged();
+        }
+
+        if (app != null)
+        {
+            var before = DataContext;
+            application = app;
+            if (!ReferenceEquals(before, DataContext)) OnDataContextChanged();
+            SetAttachedToTree(true);
+        }
+    }
 
     /// <summary>
     /// Called when the window is added to an application, before it is placed; dialogs build their content here

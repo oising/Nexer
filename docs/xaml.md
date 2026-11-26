@@ -152,11 +152,12 @@ var diagnostics = XamlLoader.Validate(xamlText);               // compile only, 
 - Assemblies referenced by `Nexer.Ui`, the calling assembly, the root instance's assembly and the entry assembly are
   force-loaded so xmlns definitions resolve; the type system is rebuilt when new assemblies are loaded.
 - Each compiled document lives in its own non-collectible dynamic assembly with `IgnoresAccessChecksTo` for the
-  root's assembly, so private event handlers on the root instance work.
+  root's assembly, so private event handlers on the root instance work, and for every assembly whose types a
+  compiled binding touches (`NexerXamlDocument.AccessedAssemblies`), so internal view models work.
 
 ## Supported syntax
 
-- Namespaces: `https://nexer.dev/ui` (maps `Nexer.Ui`, `.Controls`, `.Layout`, `.Menus`, `.Markup` via
+- Namespaces: `https://nexer.dev/ui` (maps `Nexer.Ui`, `.Controls`, `.Layout`, `.Menus`, `.Markup`, `.Data` via
   `XmlnsDefinitionAttribute`; any assembly can add its own), `clr-namespace:Ns;assembly=Asm`, `using:Ns`, and the
   XAML language namespace `http://schemas.microsoft.com/winfx/2006/xaml`.
 - Elements, attribute and property-element syntax, content properties (`[Content]` on a property, or on the class
@@ -168,8 +169,10 @@ var diagnostics = XamlLoader.Validate(xamlText);               // compile only, 
 - Directives: `x:Class`, `x:Name`, `x:Key`, `x:ClassModifier`, `x:FieldModifier`, `x:Subclass` and `x:Uid` (the
   last four are consumed by the generator or ignored by the compiler).
 - Markup extensions: `{StaticResource key}` / `{StaticResource ResourceKey=key}`, `{x:Null}`,
-  `{x:Type Button}`, `{x:Static Command.Quit}` (static fields, properties and constants), and any type with a
-  `ProvideValue(IServiceProvider)` method.
+  `{x:Type Button}`, `{x:Static Command.Quit}` (static fields, properties and constants), `{Binding}` /
+  `{RelativeSource}` (compiled, see below), and any type with a `ProvideValue(IServiceProvider)` method.
+- `x:DataType="prefix:Type"` on any element: the DataContext type for `{Binding}`s on that element and its
+  descendants (see [binding.md](binding.md)).
 
 ### `{StaticResource}`
 
@@ -195,9 +198,57 @@ Attribute text is converted at **compile time** where possible (no parsing at ru
 | `Rect` (namespace `Nexer*`) | `x,y,w,h` | `new Rect(int,int,int,int)` if that constructor exists, else `Rect.Parse` |
 | `Thickness` (namespace `Nexer*`) | `1`, `1,2` (h,v), `l,t,r,b` | `new Thickness(l,t,r,b)` if that constructor exists, else `Thickness.Parse` |
 | `KeyGesture` (namespace `Nexer*`) | `Ctrl+Q`, `Alt+Shift+F10`, `Ctrl++` | syntax validated at compile time, `KeyGesture.Parse` at runtime |
+| `System.Windows.Input.ICommand` (e.g. `Button.Command`) | `Exit`, `Open` | `Nexer.Ui.Command.Parse(text)` at runtime (well-known instances such as `Command.Exit`, else a named `Command`) |
 | any other type with `static T Parse(string)` | — | `T.Parse(text)` at runtime (e.g. `Command`) |
 
 Mnemonic text such as `&amp;File` is plain string content (`&` must be escaped in XML).
+
+### Compiled bindings
+
+`{Binding}` is compiled to direct accessor calls (no reflection); the runtime semantics are in
+[binding.md](binding.md).
+
+```xml
+<Window x:DataType="local:MainViewModel" ...>
+  <Field Text="{Binding Customer.Name}" />                       <!-- TwoWay: Field.Text is [BindsTwoWayByDefault] -->
+  <Label Text="{Binding Orders[0].Total, StringFormat=N2, FallbackValue=-}" />
+  <Label Text="{Binding Text, ElementName=Search}" />
+  <Label Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+  <List ItemsSource="{Binding Orders}" DisplayMemberBinding="{Binding Description}" />  <!-- item type inferred -->
+</Window>
+```
+
+- **Properties**: `Path` (or the positional argument), `Mode` (`Default`, `OneWay`, `TwoWay`, `OneTime`,
+  `OneWayToSource`), `Converter` (usually `{StaticResource}`), `ConverterParameter`, `StringFormat`,
+  `FallbackValue`, `TargetNullValue` (strings or markup extensions), `UpdateSourceTrigger`, `ValidatesOnExceptions`,
+  `ValidatesOnNotifyDataErrors`, `ElementName`, `RelativeSource` (`{RelativeSource Self}`,
+  `{RelativeSource FindAncestor, AncestorType=T, AncestorLevel=n}`; `AncestorType` alone implies `FindAncestor`),
+  `DataType` (overrides `x:DataType`).
+- **Source type**: DataContext → the nearest `x:DataType` on the element or an ancestor (a `[DeferredContent]`
+  property starts a new scope: templates need their own `x:DataType`), or `DataType=`; `Self` → the target element's
+  type; `ElementName` → the named element's type (any `x:Name`/`Name` in the document, forward references allowed);
+  `FindAncestor` → `AncestorType` (must be a `Widget` type).
+- **Path grammar**:
+
+  | Form | Example | Notes |
+  |------|---------|-------|
+  | source itself | `{Binding}`, `{Binding .}` | no nodes |
+  | property | `Name`, `Customer.Address.City` | public instance properties; value-type owners allowed |
+  | indexer | `Items[0]`, `Map[key]`, `Map['two words']` | int indexer preferred, then string (`this[]`, `IList<T>`, `IReadOnlyList<T>`, `IDictionary<string,T>`, arrays); node name `Item[]` |
+  | attached property | `(local:Tag.Label)`, `(AnchorLayout.Anchor)` | static `GetLabel(owner)`; read-only |
+  | cast | `((local:Dog)Pet).Breed` | changes the static type; checked at runtime by the next accessor |
+
+  A path containing spaces or quotes must be quoted as a whole in the markup extension
+  (`{Binding 'Map[two words]'}`).
+- **Mode**: without `Mode` (or with `Mode=Default`) a target property marked `[BindsTwoWayByDefault]` gets `TwoWay`;
+  otherwise `Default` is emitted and means `OneWay` at runtime.
+- **Targets**: public settable instance properties of `Widget`s. Properties typed `IBinding`/`CompiledBinding`
+  (`DisplayMemberBinding`, `ChildrenBinding`) receive the compiled binding itself, evaluated per item; their item type
+  is `DataType=` or inferred from an `ItemsSource="{Binding …}"` on the same element (`IEnumerable<T>` → `T`).
+- **Access**: view models may be internal to the assembly containing the XAML (build step) or to any assembly (SRE
+  loader); the bound members must be public.
+- **Commands**: `Command="{Binding SaveCommand}"` binds any `ICommand`; a literal `Command="Exit"` is parsed into a
+  named `Command` (see *Value conversion*).
 
 ## Diagnostics
 
@@ -208,8 +259,9 @@ Views\MainWindow.xaml(12,9): error NXAML0002: Invalid CellStyle value 'bold on n
 ```
 
 The build step prints them, MSBuild's `Exec` turns them into build errors (clickable in IDEs), and the step stops
-before replacing the assembly. `XamlLoader` throws `NexerXamlCompilationException` with the same diagnostics.
-Several errors in one file are reported together.
+before replacing the assembly. `XamlLoader` throws `NexerXamlCompilationException` with the same diagnostics
+(`XamlLoader.Validate` also returns warnings). Several errors in one file are reported together. Warnings
+(`NXAML0100`, `NXAML0105`) are printed as `file(line,col): warning CODE: …` and surface as MSBuild warnings.
 
 | Code | Meaning |
 |------|---------|
@@ -221,6 +273,15 @@ Several errors in one file are reported together.
 | NXAML0006 | Misplaced directive (e.g. `x:Class` on a non-root element) |
 | NXAML0007 | Emit/build-step failure |
 | NXAML0100 | Warning: use of an `[Obsolete]` member |
+| NXAML0101 | `{Binding}` without an `x:DataType` in scope (or a per-item binding whose item type cannot be inferred) |
+| NXAML0102 | Unknown member, indexer or attached property in a binding path |
+| NXAML0103 | Binding path member is not public / not an instance property |
+| NXAML0104 | TwoWay/OneWayToSource binding to a read-only path |
+| NXAML0105 | Warning: binding source/target types have no built-in conversion and no `Converter` |
+| NXAML0106 | Invalid binding target (not a `Widget`, no public setter, two-way without a public getter, not a property value, …) |
+| NXAML0107 | Unknown `ElementName` |
+| NXAML0108 | Invalid `RelativeSource` (missing or non-`Widget` `AncestorType`, combined with `ElementName`, …) |
+| NXAML0109 | Invalid binding path syntax, unknown type in a cast/attached segment, impossible cast |
 | NXAMLG001–4 | Generator warnings: `x:Class` not found, class not `partial`, `x:Name` field skipped (invalid identifier / clashes with a member), duplicate `x:Class` |
 
 ## Object-model assumptions
@@ -258,7 +319,8 @@ type systems and has no dependency on concrete controls). The compiler relies on
 
 ## Limitations
 
-- No `{Binding}`, styles/templates beyond `[DeferredContent]` factories, or `x:Arguments`/`x:TypeArguments`
+- `{Binding}` is compiled only (requires `x:DataType`; no reflection bindings, `MultiBinding`, method calls or
+  multi-argument indexers in paths). No styles/templates beyond `[DeferredContent]` factories, or `x:Arguments`/`x:TypeArguments`
   constructors beyond what XamlX provides; no `x:Code`.
 - Event handlers in documents *without* `x:Class` must be public (they are emitted into a helper type).
 - The rewritten assembly is not re-signed (strong naming unsupported); no NuGet packaging yet (in-repo project

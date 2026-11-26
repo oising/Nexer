@@ -1,0 +1,33 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Nexer.Demo"
+        x:Class="Nexer.Demo.DemoBindingWindow"
+        x:DataType="local:BindingDemoViewModel"
+        Title="Data Binding" Width="62" Height="20" Centered="True">
+  <Window.StatusBar>
+    <StatusBar Text="MVVM: DataContext + compiled {Binding}">
+      <StatusKey Key="F1" Text="Help" Command="Help" />
+      <StatusKey Key="F10" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="Name:" X="1" Y="1" />
+  <Field x:Name="NameField" X="12" Y="1" Width="20" Text="{Binding Name}" />
+  <Label Text="Age:" X="1" Y="2" />
+  <Field x:Name="AgeField" X="12" Y="2" Width="6" Text="{Binding Age}" />
+  <CheckBox x:Name="SubscribedBox" X="12" Y="3" Text="Su&amp;bscribed" Checked="{Binding Subscribed}" />
+  <Label x:Name="SummaryLabel" X="1" Y="5" Width="58" Text="{Binding Summary}" />
+
+  <Label Text="People:" X="1" Y="7" />
+  <List x:Name="PeopleList" X="12" Y="7" Width="24" Height="6" ItemsSource="{Binding People}"
+        DisplayMemberBinding="{Binding Name}" SelectedItem="{Binding Selected}" />
+  <Button x:Name="AddButton" Text="&amp;Add" X="39" Y="7" Command="{Binding AddCommand}" />
+  <Button x:Name="RemoveButton" Text="&amp;Remove" X="39" Y="9" Command="{Binding RemoveCommand}"
+          CommandParameter="{Binding Selected}" />
+
+  <Label Text="Selected:" X="1" Y="14" />
+  <Label x:Name="SelectedLabel" X="12" Y="14" Width="40"
+         Text="{Binding Selected.Description, FallbackValue=(nobody)}" />
+  <Label Text="Echo:" X="1" Y="15" />
+  <Label x:Name="EchoLabel" X="12" Y="15" Width="40" Text="{Binding Text, ElementName=NameField}" />
+</Window>
