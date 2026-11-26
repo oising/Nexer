@@ -174,6 +174,9 @@ public static class XamlLoader
             names.Add(documentAssembly);
         }
 
+        // Compiled bindings call view-model and widget members directly from the dynamic assembly.
+        names.UnionWith(document.AccessedAssemblies);
+
         return names;
     }
 

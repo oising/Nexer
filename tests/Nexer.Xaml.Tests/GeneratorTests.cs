@@ -43,6 +43,25 @@ public class GeneratorTests
     }
 
     [Fact]
+    public void IgnoresBindingsAndDataType()
+    {
+        var (output, diagnostics, generated) = Run(CodeBehind, $$$"""
+            <Window {{{Ns}}} x:Class='App.MainView' xmlns:n='https://nexer.dev/ui' xmlns:local='clr-namespace:App'
+                    x:DataType='local:Model' Title='{n:Binding Name}'>
+              <Label x:Name='Caption' Text='{n:Binding Title, ElementName=Caption, Mode=TwoWay}' />
+              <Label Text='{n:Binding Name, RelativeSource={n:RelativeSource FindAncestor, AncestorType=Window}}' />
+            </Window>
+            """, "namespace App { public class Model { public string Name { get; set; } = \"\"; } }");
+
+        Assert.Empty(diagnostics);
+        Assert.Empty(output.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Contains("internal global::Nexer.Xaml.Fixtures.Label Caption = default!;", generated);
+        Assert.DoesNotContain("Binding", generated);
+        Assert.DoesNotContain("DataType", generated);
+        Assert.DoesNotContain("Model", generated);
+    }
+
+    [Fact]
     public void SupportsNestedAndGlobalNamespaceTypes()
     {
         var (output, diagnostics, generated) = Run("""

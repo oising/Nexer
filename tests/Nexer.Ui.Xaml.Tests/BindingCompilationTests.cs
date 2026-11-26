@@ -141,7 +141,7 @@ public class BindingCompilationTests
     public void CompiledWindowBindsThroughCecil()
     {
         var window = new BindingWindow();
-        var vm = new BindingWindowViewModel { Greeting = "Hello", Child = new BindingTestChild { Title = "nested" } };
+        var vm = new BindingWindowViewModel { Greeting = "Hello", Child = new BindingTestChild { Title = "nested" }, Items = ["a", "b"] };
 
         window.DataContext = vm;
 
@@ -151,4 +151,30 @@ public class BindingCompilationTests
         var binding = (CompiledBinding)BindingOperations.GetBindingExpression(window.GreetingLabel, nameof(Label.Text))!.Binding;
         Assert.Equal("Greeting", binding.Path!.ToString());
     }
+
+    [Fact]
+    public void CompiledWindowSupportsEveryPathAndSourceThroughCecil()
+    {
+        var window = new BindingWindow();
+
+        window.DataContext = new BindingWindowViewModel { Greeting = "Hello", Items = ["zero", "one"] };
+
+        Assert.Equal("one", window.IndexLabel.Text);
+        Assert.Equal("HELLO", window.ConverterLabel.Text);
+        Assert.Equal("Right", window.AttachedLabel.Text);
+        Assert.Equal(["Items", "Item[]"], PathOf(window.IndexLabel).Nodes.Select(n => n.Name));
+        Assert.IsType<UpperCaseConverter>(BindingOf(window.ConverterLabel).Converter);
+        Assert.Equal("(AnchorLayout.Anchor)", Assert.Single(PathOf(window.AttachedLabel).Nodes).Name);
+        var element = PathOf(window.ElementLabel);
+        Assert.Equal((BindingSourceKind.ElementName, "GreetingLabel"), (element.Source, element.ElementName));
+        var ancestor = PathOf(window.AncestorLabel);
+        Assert.Equal((BindingSourceKind.FindAncestor, typeof(Window), 1), (ancestor.Source, ancestor.AncestorType, ancestor.AncestorLevel));
+        var secret = Assert.Single(PathOf(window.InternalLabel).Nodes);
+        Assert.Equal("hidden", secret.Get(new InternalViewModel { Secret = "hidden" }));
+    }
+
+    private static CompiledBinding BindingOf(Label label) =>
+        (CompiledBinding)BindingOperations.GetBindingExpression(label, nameof(Label.Text))!.Binding;
+
+    private static CompiledBindingPath PathOf(Label label) => BindingOf(label).Path!;
 }
