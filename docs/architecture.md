@@ -56,8 +56,9 @@ Files marked `// CONTRACT:` may only be changed by the coordinator:
 | `src\Nexer.Input\InputEvents.cs` | `Key`, `KeyModifiers`, `MouseButton`, `MouseEventKind`, `InputEvent` records. |
 | `src\Nexer.Hosting\ITerminalHost.cs` | `TerminalSize`, `CursorState`, `ITerminalHost`. |
 | `src\Nexer.Ui\Markup\MarkupContracts.cs` | XAML marker attributes and service interfaces matched by XamlX. |
-| `src\Nexer.Ui\Properties\XmlnsDefinitions.cs` | `https://nexer.dev/ui` → `Nexer.Ui`, `.Controls`, `.Layout`, `.Menus`, `.Markup`. |
+| `src\Nexer.Ui\Properties\XmlnsDefinitions.cs` | `https://nexer.dev/ui` → `Nexer.Ui`, `.Controls`, `.Layout`, `.Menus`, `.Markup`, `.Data`. |
 | `src\Nexer.Ui\StyleSyntax.cs` | Jexer colour syntax → `CellStyle` (used by themes and the compile-time converter). |
+| `src\Nexer.Ui\Data\*.cs` | Binding public surface (`IBinding`, `CompiledBinding`, `CompiledBindingPath`, `BindingExtension`, `BindingOperations`, `BindingExpression`, `Validation`, …). See [binding.md](binding.md). |
 
 Additive extensions (new members) are possible by request; renames/removals are not.
 

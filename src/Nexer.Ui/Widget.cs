@@ -1,6 +1,7 @@
 // Ported from Jexer TWidget.java (MIT, © Autumn Lamonte).
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Nexer.Input;
 using Nexer.Ui.Layout;
@@ -13,9 +14,10 @@ namespace Nexer.Ui;
 /// client origin; windows and bordered panels offset their children by one cell (the border).
 /// </summary>
 [UsableDuringInitialization]
-public class Widget : ISupportInitialize, IResourceProvider
+public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChanged
 {
     private readonly List<Widget> children = [];
+    private object? dataContext;
     private int width, height;
     private bool enabled = true;
     private LayoutManager? layout;
@@ -55,6 +57,84 @@ public class Widget : ISupportInitialize, IResourceProvider
 
     /// <summary>The application owning this widget's window, if attached.</summary>
     public virtual Application? Application => Window?.Application;
+
+    // ---- data binding (contract: see docs\binding.md) ----
+
+    /// <summary>Raised when a bindable property changes (including changes made by user input).</summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Raised when the effective <see cref="DataContext"/> of this widget changes (local set, ancestor change, re-parenting).</summary>
+    public event EventHandler? DataContextChanged;
+
+    /// <summary>Raised after this widget's window is added to an application (see <see cref="IsAttachedToTree"/>).</summary>
+    public event EventHandler? AttachedToTree;
+
+    /// <summary>Raised after this widget's window is removed from its application, or the widget is removed from an attached tree.</summary>
+    public event EventHandler? DetachedFromTree;
+
+    /// <summary>
+    /// The data context used by <c>{Binding}</c>: the local value if set, otherwise the parent's (a window inherits
+    /// <see cref="Nexer.Ui.Application.DataContext"/>). Setting <see langword="null"/> reverts to the inherited value.
+    /// </summary>
+    public object? DataContext
+    {
+        get => dataContext ?? Parent?.DataContext ?? InheritedRootDataContext;
+        set
+        {
+            if (ReferenceEquals(dataContext, value)) return;
+            var old = DataContext;
+            dataContext = value;
+            if (!ReferenceEquals(old, DataContext))
+            {
+                OnDataContextChanged();
+            }
+        }
+    }
+
+    /// <summary>Whether this widget is in a window that belongs to an application (bindings subscribe only while attached).</summary>
+    public bool IsAttachedToTree { get; private set; }
+
+    /// <summary>The data context a root widget (no parent) inherits: <see cref="Nexer.Ui.Application.DataContext"/> for windows.</summary>
+    private protected virtual object? InheritedRootDataContext => null;
+
+    /// <summary>Whether <see cref="DataContext"/> has a local (non-inherited) value.</summary>
+    internal bool HasLocalDataContext => dataContext is not null;
+
+    /// <summary>Raises <see cref="PropertyChanged"/>.</summary>
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    /// <summary>Sets <paramref name="field"/> and raises <see cref="PropertyChanged"/> when the value changes.</summary>
+    /// <returns><see langword="true"/> if the value changed.</returns>
+    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+
+    /// <summary>Raises <see cref="DataContextChanged"/> on this widget and every descendant that inherits its data context.</summary>
+    internal void OnDataContextChanged()
+    {
+        DataContextChanged?.Invoke(this, EventArgs.Empty);
+        foreach (var child in children)
+        {
+            if (child.dataContext is null) child.OnDataContextChanged();
+        }
+    }
+
+    /// <summary>Sets <see cref="IsAttachedToTree"/> for this subtree and raises <see cref="AttachedToTree"/>/<see cref="DetachedFromTree"/>.</summary>
+    internal void SetAttachedToTree(bool attached)
+    {
+        if (IsAttachedToTree == attached) return;
+        IsAttachedToTree = attached;
+        (attached ? AttachedToTree : DetachedFromTree)?.Invoke(this, EventArgs.Empty);
+        foreach (var child in children)
+        {
+            child.SetAttachedToTree(attached);
+        }
+    }
 
     /// <summary>Optional name (populated into XAML name scopes by the compiler).</summary>
     public string? Name { get; set; }
@@ -338,6 +418,7 @@ public class Widget : ISupportInitialize, IResourceProvider
             child.ResumeLayout();
         }
 
+        if (child.dataContext is null && DataContext is not null) child.OnDataContextChanged();
         OnChildAdded(child);
     }
 
@@ -364,6 +445,7 @@ public class Widget : ISupportInitialize, IResourceProvider
         }
 
         ResetTabOrder();
+        if (child.dataContext is null && DataContext is not null) child.OnDataContextChanged();
         OnChildRemoved(child);
     }
 

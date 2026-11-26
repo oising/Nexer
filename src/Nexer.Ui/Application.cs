@@ -30,6 +30,7 @@ public class Application : IResourceProvider
     private readonly AutoResetEvent wake = new(false);
     private readonly UiSynchronizationContext context;
     private ResourceDictionary? resources;
+    private object? dataContext;
     private Desktop? desktop;
     private CellSurface? surface;
     private ITerminalHost? host;
@@ -82,6 +83,25 @@ public class Application : IResourceProvider
 
     /// <summary>The colour theme.</summary>
     public ColorTheme Theme { get; set; } = new();
+
+    /// <summary>
+    /// The root data context for <c>{Binding}</c>: inherited by every window (and its widgets) that has no data context
+    /// of its own. Setting it raises <see cref="Widget.DataContextChanged"/> through the inheriting windows.
+    /// </summary>
+    public object? DataContext
+    {
+        get => dataContext;
+        set
+        {
+            if (ReferenceEquals(dataContext, value)) return;
+            var affected = windows.Where(w => !w.HasLocalDataContext).ToList();
+            dataContext = value;
+            foreach (var window in affected)
+            {
+                window.OnDataContextChanged();
+            }
+        }
+    }
 
     /// <summary>Application-wide resources (looked up after widget resources).</summary>
     public ResourceDictionary Resources => resources ??= [];

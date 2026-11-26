@@ -221,6 +221,7 @@ Several errors in one file are reported together.
 | NXAML0006 | Misplaced directive (e.g. `x:Class` on a non-root element) |
 | NXAML0007 | Emit/build-step failure |
 | NXAML0100 | Warning: use of an `[Obsolete]` member |
+| NXAML0101–0149 | Compiled bindings (missing `x:DataType`, unknown/non-public member, two-way to read-only, …); see [binding.md](binding.md#diagnostics) |
 | NXAMLG001–4 | Generator warnings: `x:Class` not found, class not `partial`, `x:Name` field skipped (invalid identifier / clashes with a member), duplicate `x:Class` |
 
 ## Object-model assumptions
@@ -258,7 +259,8 @@ type systems and has no dependency on concrete controls). The compiler relies on
 
 ## Limitations
 
-- No `{Binding}`, styles/templates beyond `[DeferredContent]` factories, or `x:Arguments`/`x:TypeArguments`
+- `{Binding}` is compiled only (requires `x:DataType`; in progress — see [binding.md](binding.md)). No
+  styles/templates beyond `[DeferredContent]` factories, or `x:Arguments`/`x:TypeArguments`
   constructors beyond what XamlX provides; no `x:Code`.
 - Event handlers in documents *without* `x:Class` must be public (they are emitted into a helper type).
 - The rewritten assembly is not re-signed (strong naming unsupported); no NuGet packaging yet (in-repo project

@@ -38,6 +38,8 @@ public class Window : Widget
     /// <summary>The application this window has been added to, if any.</summary>
     public override Application? Application => application;
 
+    private protected override object? InheritedRootDataContext => application?.DataContext;
+
     /// <summary>The window title, drawn centred in the top border.</summary>
     public virtual string? Title { get; set; }
 

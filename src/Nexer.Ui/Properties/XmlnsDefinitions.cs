@@ -6,3 +6,4 @@ using Nexer.Ui.Markup;
 [assembly: XmlnsDefinition(XamlNamespaces.Ui, "Nexer.Ui.Layout")]
 [assembly: XmlnsDefinition(XamlNamespaces.Ui, "Nexer.Ui.Menus")]
 [assembly: XmlnsDefinition(XamlNamespaces.Ui, "Nexer.Ui.Markup")]
+[assembly: XmlnsDefinition(XamlNamespaces.Ui, "Nexer.Ui.Data")]
