@@ -63,6 +63,7 @@ public sealed record NexerXamlEmittedMethods(
 public sealed class NexerXamlCompiler
 {
     private readonly NexerXamlDiagnosticSink _sink = new();
+    private Lazy<NexerBindingTypes?>? _bindingTypes;
     private int _documentCounter;
 
     /// <summary>Creates a compiler for <paramref name="typeSystem"/>.</summary>
@@ -310,6 +311,11 @@ public sealed class NexerXamlCompiler
             compiler.Transformers.Insert(index, nameTransformer);
         }
 
+        _bindingTypes ??= new Lazy<NexerBindingTypes?>(() => NexerBindingTypes.TryCreate(TypeSystem));
+        var bindingState = new NexerBindingState(_bindingTypes.Value);
+        compiler.Transformers.Insert(compiler.Transformers.FindIndex(t => t is MarkupExtensionTransformer), new BindingSyntaxTransformer(bindingState));
+        compiler.Transformers.Insert(compiler.Transformers.FindIndex(t => t is ConvertPropertyValuesToAssignmentsTransformer),
+            new BindingAssignmentTransformer(bindingState));
         return compiler;
     }
 

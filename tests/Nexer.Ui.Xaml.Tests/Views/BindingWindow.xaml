@@ -1,0 +1,10 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Nexer.Ui.Xaml.Tests.Views"
+        x:Class="Nexer.Ui.Xaml.Tests.Views.BindingWindow"
+        x:DataType="local:BindingWindowViewModel"
+        Title="Bindings" Bounds="0,0,40,10">
+  <Label x:Name="GreetingLabel" Text="{Binding Greeting}" X="1" Y="0" />
+  <Label x:Name="NestedLabel" Text="{Binding Child.Title}" X="1" Y="1" />
+  <Label x:Name="SelfLabel" X="3" Y="2" Text="{Binding X, RelativeSource={RelativeSource Self}}" />
+</Window>
