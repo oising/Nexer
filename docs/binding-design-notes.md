@@ -47,13 +47,23 @@ All four feasibility points were proven on both back ends.
   `isinst T` and return `BindingOperations.UnsetValue` (setters are a no-op); the runtime treats that as unresolved.
 - When `Bind` runs, the target is not yet in the tree (XamlX initializes a child completely before adding it), so the
   initial evaluation sees no DataContext; re-parenting raises `DataContextChanged` (see `Widget.AttachChild`).
-- SRE loader: the dynamic assembly gets `IgnoresAccessChecksTo` only for the root/document assemblies, so view models
-  in other assemblies must be public (or the loader must add the x:DataType assemblies as access targets).
+- SRE loader: the dynamic assembly gets `IgnoresAccessChecksTo` for the root/document assemblies **and** every
+  assembly a binding touches (source/path/target types, including generic arguments and array element types,
+  collected by `NexerBindingState.TrackAccess` during the transform and exposed as
+  `NexerXamlDocument.AccessedAssemblies`), so internal view models work with the loader too.
+- Cecil `IXamlType.Interfaces` lists only directly declared interfaces, so INPC/`IEnumerable<T>`/indexer lookups
+  walk interfaces recursively (`SelfAndInterfaces`); `GetAllProperties` walks base classes only.
+- `IXamlILEmitter` has no exception-block support, so indexer getters cannot be guarded against
+  `ArgumentOutOfRangeException`/`KeyNotFoundException`; the runtime must catch exceptions from `PathNode.Get`.
+- `object`-typed target properties are assignable from `CompiledBinding` too; only non-`object` properties count as
+  per-item (`IBinding`) properties.
 - Diagnostic codes are four digits; `NXAML0100` already exists (Obsolete), so bindings use `NXAML0101`–`NXAML0149`.
 
-## Not done in the spike (compiler agent)
+## Completed after the spike (compiler agent)
 
-Indexers (`Items[0]`, `["key"]`), attached-property and cast path segments, the `NXAML0105` type-mismatch warning,
-`x:DataType` reset inside `[DeferredContent]`, item-type inference for `DisplayMemberBinding`/`ChildrenBinding` from
-`ItemsSource` (they currently require `DataType=` on the binding), ElementName scoping across deferred content, and
-the loader access-target addition above.
+Indexers (`Items[0]`, `Map[key]`, `Map['key']`), attached-property (`(p:Type.Prop)`) and cast (`((p:Type)Path)`)
+segments via a recursive-descent parser, the `NXAML0105` type-mismatch warning (mirrors the runtime conversion rules),
+`x:DataType` reset inside `[DeferredContent]`, item-type inference for `DisplayMemberBinding`/`ChildrenBinding` from a
+sibling `ItemsSource="{Binding …}"` (resolved on demand, in either attribute order), `AncestorType` validation
+(must be a `Widget`), a two-way target without a public getter (NXAML0106), and the loader access targets above.
+ElementName resolves document-wide (names are unique per document, including deferred content).

@@ -92,10 +92,25 @@ BindingOperations.Bind(label, "Text",
 - **Default mode** is resolved by the compiler: if XAML gives no `Mode` and the target property has
   `[BindsTwoWayByDefault]`, it emits `Mode = TwoWay`; otherwise `Mode` stays `Default`, which the runtime treats as
   `OneWay`. Two-way (or OneWayToSource) to a path without a setter is a compile error.
-- Properties whose type is assignable from `CompiledBinding` (`IBinding`: `DisplayMemberBinding`, `ChildrenBinding`)
-  get the `CompiledBinding` object itself (no `Bind` call). These need `DataType=` on the binding (item type
-  inference from `ItemsSource` is a later compiler enhancement) and a DataContext source.
-- Binding targets must be `Widget`s with a public instance setter (no `TreeItem`, `ThemeColor`, …) — NXAML0106.
+- Properties whose type is assignable from `CompiledBinding` (`IBinding`: `DisplayMemberBinding`, `ChildrenBinding`;
+  not `object`) get the `CompiledBinding` object itself (no `Bind` call) and are evaluated per item (DataContext
+  source only). The item type is `DataType=` on the binding if given, otherwise **inferred** when `ItemsSource` on
+  the same element is itself a `{Binding}` whose leaf type implements `IEnumerable<T>` (or is `T[]`): the item type
+  is `T`. Otherwise NXAML0101.
+- Binding targets must be `Widget`s with a public instance setter (no `TreeItem`, `ThemeColor`, …) — NXAML0106;
+  TwoWay/OneWayToSource bindings also need a public getter on the target property.
+- **Path grammar** (see [xaml.md](xaml.md#compiled-bindings)): `''`/`.` (the source itself), dotted properties,
+  indexers `[0]`/`[key]`/`['key']` (int indexer preferred, then string; arrays via `IList<T>`; node name `Item[]`,
+  `Notifies` = owner implements INPC — sources should raise `PropertyChanged("Item[]")`), attached properties
+  `(prefix:Type.Prop)` (static `GetProp(owner)`, read-only, node name `(Type.Prop)`, `Notifies = false`) and casts
+  `((prefix:Type)path)` (no node of its own: the next node's accessor guards on the cast type, so the previous
+  node's `ValueType` is the pre-cast member type).
+- Indexer getters run the real indexer, so they can throw (`ArgumentOutOfRangeException`, `KeyNotFoundException`);
+  **the runtime must treat an exception from `PathNode.Get` as "unresolved"** (fallback), like `UnsetValue`.
+- **Access**: accessors call members directly. With the build step (Cecil) they are emitted into the compiled
+  assembly, so internal view models of that assembly work. The SRE loader grants its dynamic assembly
+  `IgnoresAccessChecksTo` for every assembly whose types a binding touches (`NexerXamlDocument.AccessedAssemblies`),
+  so non-public view models work there too. Members themselves must still be public (NXAML0103).
 
 ## Runtime semantics (runtime-engine agent)
 
@@ -187,14 +202,14 @@ Obsolete warning). Errors unless noted.
 | Code | Meaning |
 |---|---|
 | NXAML0101 | `{Binding}` with a DataContext source but no `x:DataType` in scope (or no `DataType=` for `IBinding` properties) |
-| NXAML0102 | Unknown member in a binding path |
+| NXAML0102 | Unknown member in a binding path (including no indexer / attached getter for the segment) |
 | NXAML0103 | Member is not public / not an instance property |
 | NXAML0104 | TwoWay/OneWayToSource binding to a read-only path |
-| NXAML0105 | Warning: source type not convertible to the target type and no `Converter` (reserved; not yet emitted) |
-| NXAML0106 | Invalid binding target (not a `Widget`, no public setter, binding used outside a property, multiple values) |
+| NXAML0105 | Warning: source and target types have no built-in conversion (per *Conversion rules*) and no `Converter` |
+| NXAML0106 | Invalid binding target (not a `Widget`, no public setter, two-way without a public getter, binding used outside a property, multiple values, `ElementName`/`RelativeSource` on a per-item binding) |
 | NXAML0107 | Unknown `ElementName` |
-| NXAML0108 | Invalid `RelativeSource` (bad mode, missing `AncestorType`, combined with `ElementName`). Outside `{Binding}` a `{RelativeSource}` fails with NXAML0001 (no `ProvideValue`). |
-| NXAML0109 | Invalid / unsupported binding path syntax (indexers, casts, attached properties: not yet) |
+| NXAML0108 | Invalid `RelativeSource` (bad mode, missing or non-`Widget` `AncestorType`, combined with `ElementName`). Outside `{Binding}` a `{RelativeSource}` fails with NXAML0001 (no `ProvideValue`). |
+| NXAML0109 | Invalid binding path syntax, unresolvable type in a cast/attached segment, impossible cast |
 
 ## Ownership
 
@@ -212,4 +227,4 @@ public members are unchanged).
 ## Out of scope (v1)
 
 `MultiBinding`, `PriorityBinding`, reflection bindings without `x:DataType`, data templates (items render as text),
-styles/triggers, `UpdateSourceTrigger=LostFocus` on non-`Field` widgets, cast and attached-property path segments.
+styles/triggers, `UpdateSourceTrigger=LostFocus` on non-`Field` widgets, method calls / multi-argument indexers in paths.
