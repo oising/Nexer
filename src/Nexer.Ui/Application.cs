@@ -820,6 +820,20 @@ public class Application : IResourceProvider
 
     internal void AddSubMenu(Menu menu) => subMenus.Add(menu);
 
+    /// <summary>The first validation error of the focused widget (or its nearest ancestor with errors) in a window.</summary>
+    private static Data.ValidationError? FocusedValidationError(Window window)
+    {
+        Widget focused = window;
+        while (focused.ActiveChild is { IsActive: true } child) focused = child;
+        for (Widget? w = focused; w != null; w = w.Parent)
+        {
+            var errors = Data.Validation.GetErrors(w);
+            if (errors.Count > 0) return errors[0];
+        }
+
+        return null;
+    }
+
     /// <summary>Closes the top-most open submenu.</summary>
     public void CloseSubMenu()
     {
@@ -1320,6 +1334,13 @@ public class Application : IResourceProvider
             var row = new DrawContext(s, 0, DesktopBottom, ScreenWidth, 1, new Rect(0, DesktopBottom, ScreenWidth, 1));
             if (statusBar != null) statusBar.Draw(row, (topLevel ?? (Window?)desktop)?.Theme ?? Theme);
             else StatusBar.DrawEmpty(row, Theme);
+            if (!menuIsActive && topLevel != null && topLevel.IsShown && FocusedValidationError(topLevel) is { } error)
+            {
+                // Nexer extension: the focused widget's first validation error replaces the status bar text.
+                var errorColor = topLevel.Theme.GetColor("tstatusbar.error");
+                row.HLine(0, 0, ScreenWidth, ' ', errorColor);
+                row.PutString(1, 0, error.ToString(), errorColor);
+            }
         }
 
         if (menuIsActive) return CursorState.Hidden;
