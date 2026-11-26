@@ -407,6 +407,23 @@ public sealed class BindingRuntimeTests : IDisposable
         Assert.Null(BindingOperations.Evaluate(binding, new Person(), typeof(string)));
     }
 
+    [Fact]
+    public void ThrowingIndexerGetterIsUnresolvedNotAnError()
+    {
+        var tags = new List<string> { "a" };
+        var item = new PathNode("Item[]", typeof(string), o => ((List<string>)o)[1], null, false);
+        var binding = new CompiledBinding(new CompiledBindingPath(item)) { FallbackValue = "none" };
+        var target = Attached(tags);
+
+        target.BindText(binding);
+
+        Assert.Equal("none", target.Text);
+        Assert.False(Validation.GetHasErrors(target));
+        Assert.Equal("none", BindingOperations.Evaluate(binding, tags, typeof(string)));
+        tags.Add("b");
+        Assert.Equal("b", BindingOperations.Evaluate(binding, tags, typeof(string)));
+    }
+
     private sealed class TitledHost : Widget
     {
         private string? title;

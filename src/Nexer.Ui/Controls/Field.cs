@@ -10,7 +10,7 @@ namespace Nexer.Ui.Controls;
 /// otherwise the view scrolls. Raises <see cref="Changed"/> on every edit and <see cref="Submitted"/> on Enter.
 /// Height is always 1.
 /// </summary>
-public class Field : Widget
+public class Field : Widget, ILostFocusSource
 {
     private string text = "";
     private string notifiedText = "";

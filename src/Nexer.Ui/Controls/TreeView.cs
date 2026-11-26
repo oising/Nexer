@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using Nexer.Input;
 using Nexer.Ui.Data;
 using Nexer.Ui.Markup;
@@ -211,6 +212,7 @@ internal sealed class SourceTreeItem : TreeItem
     private readonly bool isRoot;
     private IEnumerable? children;
     private INotifyCollectionChanged? observed;
+    private INotifyPropertyChanged? observedSource;
     private bool loaded;
 
     internal SourceTreeItem(TreeView view, object? source, bool isRoot)
@@ -281,6 +283,12 @@ internal sealed class SourceTreeItem : TreeItem
 
     internal void Observe()
     {
+        if (!isRoot && observedSource == null && Source is INotifyPropertyChanged inpc && DisplayMember.Watches(view.DisplayMemberBinding))
+        {
+            observedSource = inpc;
+            inpc.PropertyChanged += OnSourcePropertyChanged;
+        }
+
         if (!loaded) return;
         if (observed == null && children is INotifyCollectionChanged incc)
         {
@@ -293,6 +301,12 @@ internal sealed class SourceTreeItem : TreeItem
 
     internal void Unobserve()
     {
+        if (observedSource != null)
+        {
+            observedSource.PropertyChanged -= OnSourcePropertyChanged;
+            observedSource = null;
+        }
+
         if (observed != null)
         {
             observed.CollectionChanged -= OnChildrenChanged;
@@ -300,6 +314,25 @@ internal sealed class SourceTreeItem : TreeItem
         }
 
         foreach (var item in Items.OfType<SourceTreeItem>()) item.Unobserve();
+    }
+
+    private void OnSourcePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (!DisplayMember.Affects(view.DisplayMemberBinding, e.PropertyName)) return;
+        if (view.Application is { } app && !app.CheckAccess())
+        {
+            app.Post(RefreshText);
+            return;
+        }
+
+        RefreshText();
+    }
+
+    private void RefreshText()
+    {
+        if (observedSource == null) return;
+        string text = view.ItemText(Source);
+        if (text != Text) Text = text;
     }
 
     private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)

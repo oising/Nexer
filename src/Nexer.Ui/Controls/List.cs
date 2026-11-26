@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using Nexer.Input;
 using Nexer.Ui.Data;
 using Nexer.Ui.Markup;
@@ -110,6 +111,7 @@ public class List : ScrollableWidget
     private bool syncingSource;
     private bool restoringSelection;
     private object? selectionToRestore;
+    private readonly HashSet<INotifyPropertyChanged> watchedItems = new(ReferenceEqualityComparer.Instance);
 
     /// <summary>Creates an empty list.</summary>
     public List()
@@ -201,7 +203,60 @@ public class List : ScrollableWidget
     protected override void OnDetachedFromTree()
     {
         Unobserve();
+        WatchItems();
         base.OnDetachedFromTree();
+    }
+
+    /// <summary>
+    /// While attached, listens to <see cref="INotifyPropertyChanged"/> on the source items so a change of the property
+    /// <see cref="DisplayMemberBinding"/> reads from an item refreshes that item's text.
+    /// </summary>
+    private void WatchItems()
+    {
+        var next = IsAttachedToTree && DisplayMember.Watches(displayMemberBinding)
+            ? sourceItems.OfType<INotifyPropertyChanged>().ToHashSet<INotifyPropertyChanged>(ReferenceEqualityComparer.Instance)
+            : null;
+        foreach (var item in watchedItems)
+        {
+            if (next == null || !next.Contains(item)) item.PropertyChanged -= OnItemPropertyChanged;
+        }
+
+        if (next != null)
+        {
+            foreach (var item in next)
+            {
+                if (!watchedItems.Contains(item)) item.PropertyChanged += OnItemPropertyChanged;
+            }
+        }
+
+        watchedItems.Clear();
+        if (next != null) watchedItems.UnionWith(next);
+    }
+
+    private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (!DisplayMember.Affects(displayMemberBinding, e.PropertyName)) return;
+        if (Application is { } app && !app.CheckAccess())
+        {
+            app.Post(() => RefreshItemText(sender));
+            return;
+        }
+
+        RefreshItemText(sender);
+    }
+
+    private void RefreshItemText(object? item)
+    {
+        if (item is not INotifyPropertyChanged watched || !watchedItems.Contains(watched)) return;
+        UpdateFromSource(() =>
+        {
+            for (int i = 0; i < sourceItems.Count; i++)
+            {
+                if (!ReferenceEquals(sourceItems[i], item)) continue;
+                string text = ItemText(item);
+                if (Items[i] != text) Items[i] = text;
+            }
+        });
     }
 
     private void Observe()
@@ -316,6 +371,7 @@ public class List : ScrollableWidget
             selectionToRestore = restore;
         }
 
+        WatchItems();
         NotifySelection();
     }
 

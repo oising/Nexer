@@ -477,4 +477,76 @@ public class BindingSupportTests
         Assert.Equal(d.Theme("tfield.active"), d.Style(1, 2));
         Assert.NotEqual(d.Theme("tstatusbar.error"), d.Style(0, 13));
     }
+
+    private sealed class Observable : INotifyPropertyChanged
+    {
+        private string name = "";
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string Name
+        {
+            get => name;
+            set
+            {
+                name = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            }
+        }
+
+        public int HandlerCount => PropertyChanged?.GetInvocationList().Length ?? 0;
+    }
+
+    private static CompiledBinding ObservableNameBinding() =>
+        new(new CompiledBindingPath(new PathNode("Name", typeof(string), o => ((Observable)o).Name, null, true)));
+
+    [Fact]
+    public void ItemTextFollowsTheDisplayedPropertyWhileAttached()
+    {
+        var ann = new Observable { Name = "Ann" };
+        var bob = new Observable { Name = "Bob" };
+        var list = new List { Width = 10, Height = 4, DisplayMemberBinding = ObservableNameBinding(), ItemsSource = new ObservableCollection<Observable> { ann, bob } };
+        var tree = new TreeView { Y = 5, Width = 20, Height = 4, DisplayMemberBinding = ObservableNameBinding(), ItemsSource = new[] { ann } };
+        var d = Start(NewWindow(list, tree));
+        list.SelectedItem = bob;
+
+        bob.Name = "Robert";
+        ann.Name = "Anna";
+        d.Pump();
+
+        Assert.Equal(["Anna", "Robert"], list.Items);
+        Assert.Same(bob, list.SelectedItem);
+        Assert.Equal("Robert", d.Row(3, 1, 6));
+        Assert.Equal("Anna", tree.VisibleItems[0].Text);
+        Assert.Contains("Anna", d.Row(7));
+
+        d.Application.Windows.Remove(list.Window!);
+        Assert.Equal(0, ann.HandlerCount);
+        Assert.Equal(0, bob.HandlerCount);
+    }
+
+    [Fact]
+    public void FieldLostFocusTriggerUpdatesTheSourceWhenFocusLeaves()
+    {
+        var vm = new Observable { Name = "Ann" };
+        var field = new Field { Width = 10, DataContext = vm };
+        var other = new Button { Text = "B", Y = 2 };
+        var binding = new CompiledBinding(new CompiledBindingPath(
+            new PathNode("Name", typeof(string), o => ((Observable)o).Name, (o, v) => ((Observable)o).Name = (string)v!, true)))
+        {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.LostFocus,
+        };
+        BindingOperations.Bind(field, nameof(Field.Text), t => ((Field)t).Text, (t, v) => ((Field)t).Text = (string)v!, typeof(string), binding);
+        var d = Start(NewWindow(field, other));
+        Assert.Equal("Ann", field.Text);
+
+        d.Key(Key.End);
+        d.Type("e");
+        Assert.Equal("Anne", field.Text);
+        Assert.Equal("Ann", vm.Name);
+
+        d.Key(Key.Tab);
+        Assert.Equal("Anne", vm.Name);
+    }
 }

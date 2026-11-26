@@ -135,6 +135,7 @@ public class BindingCompilerTests
             <f:DerivedHost Text='inner'>
               <f:BindingHost Text='{Binding Text, RelativeSource={RelativeSource FindAncestor, AncestorType=f:BindingHost, AncestorLevel=2}}' />
               <f:BindingHost Text='{Binding Text, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=f:DerivedHost}}' />
+              <f:BindingHost Text='{Binding Text, RelativeSource={RelativeSource AncestorType=f:DerivedHost}}' />
             </f:DerivedHost>
             <f:BindingHost x:Name='Later' Text='named' />
             """, "Text='outer'");
@@ -148,6 +149,9 @@ public class BindingCompilerTests
         Assert.Equal((BindingSourceKind.FindAncestor, typeof(BindingHost), 2), (level2.Source, level2.AncestorType, level2.AncestorLevel));
         var derived = BindingOf(At(ancestors, 1), nameof(BindingHost.Text)).Path!;
         Assert.Equal((typeof(DerivedHost), 1), (derived.AncestorType, derived.AncestorLevel));
+        var implied = BindingOf(At(ancestors, 2), nameof(BindingHost.Text)).Path!;
+        Assert.Equal((BindingSourceKind.FindAncestor, typeof(DerivedHost)), (implied.Source, implied.AncestorType));
+        Assert.Equal("inner", At(ancestors, 2).Text);
     }
 
     [Theory]
