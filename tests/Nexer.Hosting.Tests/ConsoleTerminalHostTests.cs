@@ -64,7 +64,7 @@ public class ConsoleTerminalHostTests
         Assert.Equal(4, log.Count);
         Assert.Equal("write:\e[?2026l\e[?2004l\e[?1004l\e[?1006l\e[?1002l\e[?1000l\e[m\e[?25h\e[?1049l", log[2]);
         Assert.Equal("restore", log[3]);
-        await host.Input.Completion.WaitAsync(Timeout);
+        await host.Input.Completion.WaitAsync(Timeout, TestContext.Current.CancellationToken);
         Assert.Throws<ObjectDisposedException>(() => host.Present(new CellSurface(1, 1), default));
     }
 
@@ -78,7 +78,7 @@ public class ConsoleTerminalHostTests
         host.Present(surface, new CursorState(true, 3, 2));
         Write(surface, 0, 0, "world");
         await WaitUntil(() => platform.ScreenRow(0) == "hello" && platform.Cursor == (true, 3, 2));
-        await Task.Delay(50);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
         Assert.Equal("hello", platform.ScreenRow(0));
 
         host.Present(surface, CursorState.Hidden);
@@ -107,12 +107,12 @@ public class ConsoleTerminalHostTests
             host.Present(surface, default);
         }
 
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         Assert.Equal(1, platform.FrameWrites);
         time.Advance(TimeSpan.FromMilliseconds(16));
         await WaitUntil(() => platform.ScreenRow(1) == "frame 9");
         time.Advance(TimeSpan.FromMilliseconds(100));
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         Assert.Equal(2, platform.FrameWrites);
     }
 
@@ -140,7 +140,7 @@ public class ConsoleTerminalHostTests
         await WaitUntil(() => platform.FrameWrites == 1);
         host.Present(surface, default);
         host.Present(surface, default);
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
         Assert.Equal(1, platform.FrameWrites);
     }
 
@@ -163,7 +163,7 @@ public class ConsoleTerminalHostTests
         var platform = new FakePlatform();
         await using ConsoleTerminalHost host = Start(platform, new ConsoleTerminalHostOptions { TimeProvider = time });
         platform.Type("\e");
-        await Task.Delay(150);
+        await Task.Delay(150, TestContext.Current.CancellationToken);
         Assert.False(host.Input.TryRead(out _));
         time.Advance(TimeSpan.FromMilliseconds(50));
         Assert.Equal(new KeyEvent(Key.Escape), await Next(host));
@@ -178,7 +178,7 @@ public class ConsoleTerminalHostTests
         platform.EndInput();
         Assert.Equal(new KeyEvent(Key.Character, new Rune('q')), await Next(host));
         Assert.Equal(new KeyEvent(Key.Escape), await Next(host));
-        await host.Input.Completion.WaitAsync(Timeout);
+        await host.Input.Completion.WaitAsync(Timeout, TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public class ConsoleTerminalHostTests
         var surface = new CellSurface(20, 5);
         Write(surface, 0, 0, "x");
         host.Present(surface, default);
-        await Assert.ThrowsAnyAsync<IOException>(() => host.Input.Completion.WaitAsync(Timeout));
+        await Assert.ThrowsAnyAsync<IOException>(() => host.Input.Completion.WaitAsync(Timeout, TestContext.Current.CancellationToken));
         await host.DisposeAsync();
         Assert.Equal("restore", platform.Log[^1]);
     }
