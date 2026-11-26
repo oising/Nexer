@@ -33,7 +33,7 @@ public partial class DemoTreeViewWindow : Window
         }
     }
 
-    private void OnTreeActivated(object? sender, EventArgs e) => Selection.Text = "Tree: " + Tree.SelectedItem?.Text;
+    private void OnTreeActivated(object? sender, EventArgs e) => Selection.Text = "Tree: " + Tree.SelectedTreeItem?.Text;
 
     private void OnFruitChanged(object? sender, EventArgs e) => Selection.Text = "List: " + Fruit.SelectedItem;
 }

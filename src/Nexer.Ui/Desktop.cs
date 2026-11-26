@@ -22,7 +22,13 @@ public class Desktop : Window
     public override bool IsDesktop => true;
 
     /// <summary>The fill character (default <see cref="GraphicsChars.Hatch"/>).</summary>
-    public Rune BackgroundChar { get; set; } = new(GraphicsChars.Hatch);
+    public Rune BackgroundChar
+    {
+        get => backgroundChar;
+        set => SetProperty(ref backgroundChar, value);
+    }
+
+    private Rune backgroundChar = new(GraphicsChars.Hatch);
 
     /// <inheritdoc/>
     protected internal override int ChildOffset => 0;

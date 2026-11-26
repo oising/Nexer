@@ -67,6 +67,18 @@ public static class NexerValueConverters
 
                 result = EmitColor(context, text, type, color);
                 return true;
+            case "System.Windows.Input.ICommand":
+                // Command="Exit": a named Nexer.Ui.Command (an ICommand) via Command.Parse.
+                if (context.Configuration.TypeSystem.FindType("Nexer.Ui.Command") is not { } commandType ||
+                    commandType.Methods.FirstOrDefault(m => m.Name == "Parse" && m.IsStatic && m.IsPublic && m.Parameters.Count == 1 &&
+                        m.Parameters[0].Equals(context.Configuration.WellKnownTypes.String)) is not { } parse)
+                {
+                    return false;
+                }
+
+                result = new XamlStaticOrTargetedReturnMethodCallNode(text, parse,
+                    [new XamlConstantNode(text, context.Configuration.WellKnownTypes.String, text.Text)]);
+                return true;
         }
 
         if (type.Namespace is not { } ns || !(ns == "Nexer" || ns.StartsWith("Nexer.", StringComparison.Ordinal)))

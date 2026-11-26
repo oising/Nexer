@@ -16,8 +16,16 @@ public class StatusKey
     /// <summary>The label shown after the key.</summary>
     public string Text { get; set; } = "";
 
-    /// <summary>Command posted when triggered (optional).</summary>
-    public Command? Command { get; set; }
+    /// <summary>
+    /// Command run when triggered (optional): a named <see cref="Ui.Command"/> is posted with
+    /// <see cref="Application.PostCommand"/>; any other <see cref="System.Windows.Input.ICommand"/> is executed (on the UI
+    /// loop) with <see cref="CommandParameter"/> when <c>CanExecute</c> allows. Status keys are not widgets, so they
+    /// cannot be binding targets.
+    /// </summary>
+    public System.Windows.Input.ICommand? Command { get; set; }
+
+    /// <summary>The parameter passed to <see cref="Command"/>.</summary>
+    public object? CommandParameter { get; set; }
 
     /// <summary>Raised when the shortcut is triggered.</summary>
     public event EventHandler? Click;
@@ -31,7 +39,22 @@ public class StatusKey
     internal void Raise(Application? app)
     {
         Click?.Invoke(this, EventArgs.Empty);
-        if (Command is { } command) app?.PostCommand(command);
+        switch (Command)
+        {
+            case Command named:
+                app?.PostCommand(named);
+                break;
+            case { } command when app != null:
+                var parameter = CommandParameter;
+                app.Post(() =>
+                {
+                    if (command.CanExecute(parameter)) command.Execute(parameter);
+                });
+                break;
+            case { } command:
+                if (command.CanExecute(CommandParameter)) command.Execute(CommandParameter);
+                break;
+        }
     }
 }
 

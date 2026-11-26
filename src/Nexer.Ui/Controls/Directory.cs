@@ -135,6 +135,7 @@ public class DirectoryList : List
         {
             path = string.IsNullOrEmpty(value) ? null : System.IO.Path.GetFullPath(value);
             Refresh();
+            OnPropertyChanged();
         }
     }
 
@@ -146,6 +147,8 @@ public class DirectoryList : List
         {
             filters = value;
             Refresh();
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Filter));
         }
     }
 

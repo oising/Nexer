@@ -75,10 +75,22 @@ public class ProgressBar : Widget
     }
 
     /// <summary>Value at the left end (default 0).</summary>
-    public int Minimum { get; set; }
+    public int Minimum
+    {
+        get => minimum;
+        set => SetProperty(ref minimum, value);
+    }
+
+    private int minimum;
 
     /// <summary>Value at the right end (default 100).</summary>
-    public int Maximum { get; set; } = 100;
+    public int Maximum
+    {
+        get => maximum;
+        set => SetProperty(ref maximum, value);
+    }
+
+    private int maximum = 100;
 
     /// <summary>Current value.</summary>
     public int Value
@@ -86,25 +98,54 @@ public class ProgressBar : Widget
         get => value;
         set
         {
-            this.value = value;
-            Invalidate();
+            if (SetProperty(ref this.value, value)) Invalidate();
         }
     }
 
     /// <summary>Left end glyph (default ├).</summary>
-    public char LeftBorderChar { get; set; } = GraphicsChars.CP437[0xC3];
+    public char LeftBorderChar
+    {
+        get => leftBorderChar;
+        set => SetProperty(ref leftBorderChar, value);
+    }
+
+    private char leftBorderChar = GraphicsChars.CP437[0xC3];
 
     /// <summary>Glyph for the completed part (default ■).</summary>
-    public char CompletedChar { get; set; } = GraphicsChars.Box;
+    public char CompletedChar
+    {
+        get => completedChar;
+        set => SetProperty(ref completedChar, value);
+    }
+
+    private char completedChar = GraphicsChars.Box;
 
     /// <summary>Glyph for the remaining part (default ─).</summary>
-    public char RemainingChar { get; set; } = GraphicsChars.SingleBar;
+    public char RemainingChar
+    {
+        get => remainingChar;
+        set => SetProperty(ref remainingChar, value);
+    }
+
+    private char remainingChar = GraphicsChars.SingleBar;
 
     /// <summary>Right end glyph (default ┤).</summary>
-    public char RightBorderChar { get; set; } = GraphicsChars.CP437[0xB4];
+    public char RightBorderChar
+    {
+        get => rightBorderChar;
+        set => SetProperty(ref rightBorderChar, value);
+    }
+
+    private char rightBorderChar = GraphicsChars.CP437[0xB4];
 
     /// <summary>When true the bar keeps the background already drawn beneath it (default false).</summary>
-    public bool MatchWindowBackground { get; set; }
+    public bool MatchWindowBackground
+    {
+        get => matchWindowBackground;
+        set => SetProperty(ref matchWindowBackground, value);
+    }
+
+    private bool matchWindowBackground;
 
     private void Put(DrawContext context, int x, char ch, Nexer.Core.CellStyle style)
     {

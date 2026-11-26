@@ -78,7 +78,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     /// </summary>
     public object? DataContext
     {
-        get => dataContext ?? Parent?.DataContext ?? InheritedRootDataContext;
+        get => dataContext ?? Parent?.DataContext ?? LogicalParent?.DataContext ?? InheritedRootDataContext;
         set
         {
             if (ReferenceEquals(dataContext, value)) return;
@@ -122,31 +122,190 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         {
             if (child.dataContext is null) child.OnDataContextChanged();
         }
+
+        foreach (var logical in LogicalChildren)
+        {
+            if (logical.dataContext is null) logical.OnDataContextChanged();
+        }
     }
 
-    /// <summary>Sets <see cref="IsAttachedToTree"/> for this subtree and raises <see cref="AttachedToTree"/>/<see cref="DetachedFromTree"/>.</summary>
+    /// <summary>
+    /// Sets <see cref="IsAttachedToTree"/> for this subtree and raises <see cref="AttachedToTree"/>/<see cref="DetachedFromTree"/>:
+    /// parents before children when attaching, children before parents when detaching. Idempotent.
+    /// </summary>
     internal void SetAttachedToTree(bool attached)
     {
         if (IsAttachedToTree == attached) return;
-        IsAttachedToTree = attached;
-        (attached ? AttachedToTree : DetachedFromTree)?.Invoke(this, EventArgs.Empty);
-        foreach (var child in children)
+        if (attached)
         {
-            child.SetAttachedToTree(attached);
+            IsAttachedToTree = true;
+            SubscribeCommand();
+            OnAttachedToTree();
+            foreach (var child in children.ToArray()) child.SetAttachedToTree(true);
+            foreach (var logical in LogicalChildren) logical.SetAttachedToTree(true);
+        }
+        else
+        {
+            foreach (var logical in LogicalChildren) logical.SetAttachedToTree(false);
+            foreach (var child in children.ToArray()) child.SetAttachedToTree(false);
+            IsAttachedToTree = false;
+            UnsubscribeCommand();
+            OnDetachedFromTree();
+        }
+    }
+
+    /// <summary>
+    /// Widgets that are not in <see cref="Children"/> but share this widget's lifecycle and data context (e.g. the
+    /// drop-down list of a <c>ComboBox</c> or the menu of a <c>SubMenu</c>).
+    /// </summary>
+    private protected virtual IEnumerable<Widget> LogicalChildren => [];
+
+    /// <summary>The widget whose data context a parentless logical child (see <see cref="LogicalChildren"/>) inherits.</summary>
+    internal Widget? LogicalParent { get; set; }
+
+    /// <summary>Called after this widget becomes attached (before its children); raises <see cref="AttachedToTree"/>.</summary>
+    protected virtual void OnAttachedToTree() => AttachedToTree?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>Called after this widget is detached (after its children); raises <see cref="DetachedFromTree"/>.</summary>
+    protected virtual void OnDetachedFromTree() => DetachedFromTree?.Invoke(this, EventArgs.Empty);
+
+    // ---- ICommand support (Button, CheckBox, Label, MenuItem) ----
+
+    private System.Windows.Input.ICommand? command;
+    private object? commandParameter;
+    private bool commandSubscribed;
+    private bool commandCanExecute = true;
+
+    /// <summary>The command source state backing a control's <c>Command</c> property.</summary>
+    private protected System.Windows.Input.ICommand? CommandCore
+    {
+        get => command;
+        set
+        {
+            if (ReferenceEquals(command, value)) return;
+            UnsubscribeCommand();
+            command = value;
+            if (IsAttachedToTree) SubscribeCommand();
+            OnPropertyChanged("Command");
+            RequeryCanExecute();
+        }
+    }
+
+    /// <summary>The parameter backing a control's <c>CommandParameter</c> property.</summary>
+    private protected object? CommandParameterCore
+    {
+        get => commandParameter;
+        set
+        {
+            if (Equals(commandParameter, value)) return;
+            commandParameter = value;
+            OnPropertyChanged("CommandParameter");
+            RequeryCanExecute();
+        }
+    }
+
+    /// <summary>The command's last <c>CanExecute</c> result (true without a command).</summary>
+    private protected bool CommandCanExecute => commandCanExecute;
+
+    private void SubscribeCommand()
+    {
+        if (command is null || commandSubscribed) return;
+        command.CanExecuteChanged += OnCanExecuteChanged;
+        commandSubscribed = true;
+        RequeryCanExecute();
+    }
+
+    private void UnsubscribeCommand()
+    {
+        if (!commandSubscribed) return;
+        command?.CanExecuteChanged -= OnCanExecuteChanged;
+        commandSubscribed = false;
+    }
+
+    private void OnCanExecuteChanged(object? sender, EventArgs e)
+    {
+        if (Application is { } app && !app.CheckAccess())
+        {
+            app.Post(RequeryCanExecute);
+            return;
+        }
+
+        RequeryCanExecute();
+    }
+
+    private void RequeryCanExecute()
+    {
+        bool can = command is null || command.CanExecute(commandParameter);
+        if (can == commandCanExecute) return;
+        bool wasEffective = IsEffectivelyEnabled;
+        commandCanExecute = can;
+        OnEffectiveEnabledChanged(wasEffective);
+        Invalidate();
+    }
+
+    /// <summary>
+    /// Executes the command: a named <see cref="Ui.Command"/> goes through <see cref="Application.ExecuteCommand"/>
+    /// (<paramref name="post"/>: <see cref="Application.PostCommand"/>); any other <see cref="System.Windows.Input.ICommand"/>
+    /// is executed with the command parameter when <c>CanExecute</c> allows.
+    /// </summary>
+    private protected void ExecuteCommandCore(Application? app = null, bool post = false)
+    {
+        switch (command)
+        {
+            case null:
+                return;
+            case Command named:
+                app ??= Application ?? Application.Current;
+                if (post) app?.PostCommand(named);
+                else app?.ExecuteCommand(named);
+                return;
+            default:
+                if (command.CanExecute(commandParameter)) command.Execute(commandParameter);
+                return;
         }
     }
 
     /// <summary>Optional name (populated into XAML name scopes by the compiler).</summary>
-    public string? Name { get; set; }
+    public string? Name
+    {
+        get => name;
+        set => SetProperty(ref name, value);
+    }
+
+    private string? name;
 
     /// <summary>Arbitrary user data.</summary>
-    public object? Tag { get; set; }
+    public object? Tag
+    {
+        get => tag;
+        set => SetProperty(ref tag, value);
+    }
+
+    private object? tag;
 
     /// <summary>Column relative to the parent's client origin (absolute for windows).</summary>
-    public int X { get; set; }
+    public int X
+    {
+        get => x;
+        set
+        {
+            if (SetProperty(ref x, value)) OnPropertyChanged(nameof(Bounds));
+        }
+    }
+
+    private int x;
 
     /// <summary>Row relative to the parent's client origin (absolute for windows).</summary>
-    public int Y { get; set; }
+    public int Y
+    {
+        get => y;
+        set
+        {
+            if (SetProperty(ref y, value)) OnPropertyChanged(nameof(Bounds));
+        }
+    }
+
+    private int y;
 
     /// <summary>Width in cells.</summary>
     public int Width
@@ -156,6 +315,8 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         {
             if (width == value) return;
             width = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Bounds));
             NotifySizeChanged();
         }
     }
@@ -168,6 +329,8 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         {
             if (height == value) return;
             height = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Bounds));
             NotifySizeChanged();
         }
     }
@@ -184,51 +347,125 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     {
         X = x;
         Y = y;
-        bool changed = newWidth != width || newHeight != height;
+        bool widthChanged = newWidth != width, heightChanged = newHeight != height;
         width = newWidth;
         height = newHeight;
-        if (changed) NotifySizeChanged();
+        if (widthChanged) OnPropertyChanged(nameof(Width));
+        if (heightChanged) OnPropertyChanged(nameof(Height));
+        if (widthChanged || heightChanged)
+        {
+            OnPropertyChanged(nameof(Bounds));
+            NotifySizeChanged();
+        }
     }
 
-    /// <summary>Whether the widget accepts input. Disabling moves activation to the first enabled sibling.</summary>
+    /// <summary>
+    /// Whether the widget accepts input. Disabling moves activation to the first enabled sibling. See also
+    /// <see cref="IsEffectivelyEnabled"/>, which also accounts for the command's <c>CanExecute</c>.
+    /// </summary>
     public bool Enabled
     {
         get => enabled;
         set
         {
             if (enabled == value) return;
+            bool wasEffective = IsEffectivelyEnabled;
             enabled = value;
-            if (!value)
-            {
-                IsActive = false;
-                if (Parent != null && Parent.ActiveChild == this)
-                {
-                    Parent.ActiveChild = null;
-                    foreach (var w in Parent.children)
-                    {
-                        if (w.enabled && w.CanBeActivated)
-                        {
-                            Parent.Activate(w);
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (Parent != null && Parent.ActiveChild == null && CanBeActivated)
-            {
-                Parent.Activate(this);
-            }
+            OnPropertyChanged();
+            OnEffectiveEnabledChanged(wasEffective);
         }
     }
 
+    /// <summary>
+    /// <see cref="Enabled"/> combined with the <c>CanExecute</c> state of the widget's command (if any): whether the
+    /// widget currently accepts input.
+    /// </summary>
+    public bool IsEffectivelyEnabled => enabled && commandCanExecute;
+
+    private void OnEffectiveEnabledChanged(bool wasEffective)
+    {
+        bool now = IsEffectivelyEnabled;
+        if (now == wasEffective) return;
+        if (!now)
+        {
+            IsActive = false;
+            if (Parent != null && Parent.ActiveChild == this)
+            {
+                Parent.ActiveChild = null;
+                foreach (var w in Parent.children)
+                {
+                    if (w.IsEffectivelyEnabled && w.CanBeActivated)
+                    {
+                        Parent.Activate(w);
+                        break;
+                    }
+                }
+            }
+        }
+        else if (Parent != null && Parent.ActiveChild == null && CanBeActivated)
+        {
+            Parent.Activate(this);
+        }
+
+        OnPropertyChanged(nameof(IsEffectivelyEnabled));
+    }
+
     /// <summary>Whether the widget is drawn.</summary>
-    public bool Visible { get; set; } = true;
+    public bool Visible
+    {
+        get => visible;
+        set
+        {
+            SetProperty(ref visible, value);
+        }
+    }
+
+    private bool visible = true;
 
     /// <summary>Whether Tab/arrow focus traversal can land on this widget.</summary>
-    public bool TabStop { get; set; } = true;
+    public bool TabStop
+    {
+        get => tabStop;
+        set => SetProperty(ref tabStop, value);
+    }
+
+    private bool tabStop = true;
 
     /// <summary>True when this widget is its parent's active child.</summary>
-    public bool IsActive { get; internal set; }
+    public bool IsActive
+    {
+        get => isActive;
+        internal set
+        {
+            if (!SetProperty(ref isActive, value) || value) return;
+
+            // This widget and the chain of active descendants below it lose the keyboard focus.
+            for (Widget? w = this; w != null; w = w.ActiveChildOrNull) w.OnLostFocus();
+        }
+    }
+
+    private bool isActive;
+
+    private Widget? ActiveChildOrNull
+    {
+        get
+        {
+            foreach (var c in children)
+            {
+                if (c.IsActive) return c;
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Called when this widget stops being on the focus path: it, or one of its ancestors, is no longer its parent's
+    /// active child (another widget or window was activated).
+    /// </summary>
+    private protected virtual void OnLostFocus()
+    {
+    }
 
     /// <summary>True when this widget and all its ancestors are active.</summary>
     public bool IsAbsoluteActive => IsActive && (Parent == null || Parent.IsAbsoluteActive);
@@ -249,7 +486,13 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     public int CursorY { get; set; }
 
     /// <summary>When true, keystrokes are sent to all children rather than only the active one.</summary>
-    public bool EchoKeystrokes { get; set; }
+    public bool EchoKeystrokes
+    {
+        get => echoKeystrokes;
+        set => SetProperty(ref echoKeystrokes, value);
+    }
+
+    private bool echoKeystrokes;
 
     /// <summary>Layout manager for the children (e.g. <c>StretchLayout</c>, <c>BoxLayout</c>, <c>AnchorLayout</c>).</summary>
     public LayoutManager? Layout
@@ -261,6 +504,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
             layout?.Detach();
             layout = value;
             if (layout != null && !IsLayoutSuspended) layout.Attach(this, ClientWidth, ClientHeight);
+            OnPropertyChanged();
         }
     }
 
@@ -403,7 +647,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         child.Parent = this;
         // Deviation from Jexer (which activates the last added child): the first tab stop keeps the focus so markup
         // order gives the natural initial focus.
-        if (child.enabled && child.CanBeActivated &&
+        if (child.IsEffectivelyEnabled && child.CanBeActivated &&
             (ActiveChild == null || (!ActiveChild.TabStop && child.TabStop)))
         {
             foreach (var w in children) w.IsActive = false;
@@ -419,6 +663,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         }
 
         if (child.dataContext is null && DataContext is not null) child.OnDataContextChanged();
+        child.SetAttachedToTree(IsAttachedToTree);
         OnChildAdded(child);
     }
 
@@ -427,6 +672,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         int index = children.IndexOf(child);
         Debug.Assert(index >= 0, "Child not found");
         if (index < 0) return;
+        child.SetAttachedToTree(false);
         children.RemoveAt(index);
         layout?.Remove(child);
         child.Parent = null;
@@ -436,7 +682,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
             ActiveChild = null;
             foreach (var w in children)
             {
-                if (w.enabled && w.CanBeActivated && w.Visible)
+                if (w.IsEffectivelyEnabled && w.CanBeActivated && w.Visible)
                 {
                     Activate(w);
                     break;
@@ -469,7 +715,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     public void Activate(Widget child)
     {
         ArgumentNullException.ThrowIfNull(child);
-        if (!child.CanBeActivated || !child.enabled) return;
+        if (!child.CanBeActivated || !child.IsEffectivelyEnabled) return;
         Debug.Assert(child.Parent == this, "Activate called with a non-child");
         foreach (var w in children)
         {
@@ -485,7 +731,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     {
         foreach (var w in children)
         {
-            if (w.enabled && w.CanBeActivated && w.TabOrder >= tabOrder)
+            if (w.IsEffectivelyEnabled && w.CanBeActivated && w.TabOrder >= tabOrder)
             {
                 Activate(w);
                 return;
@@ -496,7 +742,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     /// <summary>Makes this widget active in its parent (Jexer <c>activate()</c>).</summary>
     public void Activate()
     {
-        if (enabled) Parent?.Activate(this);
+        if (IsEffectivelyEnabled) Parent?.Activate(this);
     }
 
     /// <summary>Activates this widget and every ancestor; also activates the containing window.</summary>
@@ -524,7 +770,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
         }
     }
 
-    private bool IsTabCandidate(Widget w) => w.enabled && w.Visible && w.TabStop && w.CanBeActivated;
+    private bool IsTabCandidate(Widget w) => w.IsEffectivelyEnabled && w.Visible && w.TabStop && w.CanBeActivated;
 
     /// <summary>
     /// Moves activation to the next/previous tab stop, bubbling to the parent at either end
@@ -582,7 +828,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     public bool MouseWouldHit(UiMouseEvent mouse)
     {
         ArgumentNullException.ThrowIfNull(mouse);
-        if (!enabled || !Visible) return false;
+        if (!IsEffectivelyEnabled || !Visible) return false;
         int ax = AbsoluteX, ay = AbsoluteY;
         return mouse.AbsoluteX >= ax && mouse.AbsoluteX < ax + width && mouse.AbsoluteY >= ay && mouse.AbsoluteY < ay + height;
     }
@@ -591,14 +837,14 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     public void HandleKey(KeyEvent key)
     {
         ArgumentNullException.ThrowIfNull(key);
-        if (enabled) OnKeypress(key);
+        if (IsEffectivelyEnabled) OnKeypress(key);
     }
 
     /// <summary>Dispatches a mouse event, already re-based into local coordinates (ignored when disabled).</summary>
     public void HandleMouse(UiMouseEvent mouse)
     {
         ArgumentNullException.ThrowIfNull(mouse);
-        if (!enabled) return;
+        if (!IsEffectivelyEnabled) return;
         switch (mouse.Action)
         {
             case MouseAction.Down: OnMouseDown(mouse); break;
@@ -612,7 +858,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     public void HandleCommand(Command command)
     {
         ArgumentNullException.ThrowIfNull(command);
-        if (enabled) OnCommand(command);
+        if (IsEffectivelyEnabled) OnCommand(command);
     }
 
     /// <summary>Handles a key (Jexer <c>TWidget.onKeypress</c>: navigation, mnemonics, then the active child).</summary>
@@ -723,7 +969,7 @@ public class Widget : ISupportInitialize, IResourceProvider, INotifyPropertyChan
     public void HandlePaste(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        if (enabled) OnPaste(text);
+        if (IsEffectivelyEnabled) OnPaste(text);
     }
 
     /// <summary>Handles pasted text; the base forwards to the active child.</summary>

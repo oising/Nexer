@@ -1,4 +1,6 @@
 // Ported from Jexer TSplitPane.java (MIT, © Autumn Lamonte).
+using Nexer.Ui.Data;
+
 namespace Nexer.Ui.Controls;
 
 /// <summary>
@@ -13,6 +15,7 @@ public class SplitPane : Widget, IFillsWindow
 {
     private bool vertical = true;
     private int split;
+    private int notifiedSplit;
     private bool splitSet;
     private Widget? first;
     private Widget? second;
@@ -27,12 +30,17 @@ public class SplitPane : Widget, IFillsWindow
         {
             if (vertical == value) return;
             vertical = value;
+            OnPropertyChanged();
             if (splitSet) LayoutPanes();
             else Center();
         }
     }
 
-    /// <summary>The divider column (vertical) or row (horizontal), relative to the split pane.</summary>
+    /// <summary>
+    /// The divider column (vertical) or row (horizontal), relative to the split pane. Changes made by dragging the
+    /// divider raise <see cref="Widget.PropertyChanged"/>; binds two-way by default.
+    /// </summary>
+    [BindsTwoWayByDefault]
     public int Split
     {
         get => split;
@@ -46,7 +54,13 @@ public class SplitPane : Widget, IFillsWindow
     }
 
     /// <summary>When true, moving the mouse over a pane activates it.</summary>
-    public bool FocusFollowsMouse { get; set; }
+    public bool FocusFollowsMouse
+    {
+        get => focusFollowsMouse;
+        set => SetProperty(ref focusFollowsMouse, value);
+    }
+
+    private bool focusFollowsMouse;
 
     /// <summary>The first pane (left of a vertical split).</summary>
     public Widget? Left
@@ -88,6 +102,8 @@ public class SplitPane : Widget, IFillsWindow
         }
 
         LayoutPanes();
+        OnPropertyChanged(index == 0 ? nameof(Left) : nameof(Right));
+        OnPropertyChanged(index == 0 ? nameof(Top) : nameof(Bottom));
     }
 
     /// <summary>Centres the divider (Jexer <c>center</c>).</summary>
@@ -133,6 +149,12 @@ public class SplitPane : Widget, IFillsWindow
 
     private void LayoutPanes()
     {
+        if (notifiedSplit != split)
+        {
+            notifiedSplit = split;
+            OnPropertyChanged(nameof(Split));
+        }
+
         if (vertical)
         {
             first?.SetDimensions(0, 0, Math.Max(0, split), Height);

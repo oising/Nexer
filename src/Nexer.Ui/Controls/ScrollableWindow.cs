@@ -1,4 +1,6 @@
 // Ported from Jexer TScrollableWindow.java (MIT, © Autumn Lamonte).
+using Nexer.Ui.Data;
+
 namespace Nexer.Ui.Controls;
 
 /// <summary>
@@ -34,6 +36,7 @@ public class ScrollableWindow : Window
         {
             if (value == HasVerticalScroller) return;
             VerticalScroller = value ? new VScroller() : null;
+            OnPropertyChanged();
         }
     }
 
@@ -45,6 +48,7 @@ public class ScrollableWindow : Window
         {
             if (value == HasHorizontalScroller) return;
             HorizontalScroller = value ? new HScroller() : null;
+            OnPropertyChanged();
         }
     }
 
@@ -52,10 +56,13 @@ public class ScrollableWindow : Window
         where T : ScrollerBase
     {
         if (field == value) return;
-        if (field != null && field.Parent == this) Children.Remove(field);
+        var old = field;
+        if (old != null && old.Parent == this) Children.Remove(old);
+        old?.ValueChanged -= OnScrollerValueChanged;
         field = value;
         if (value != null)
         {
+            value.ValueChanged += OnScrollerValueChanged;
             if (value.Parent == null) Children.Add(value);
             PlaceScrollbars();
         }
@@ -66,10 +73,15 @@ public class ScrollableWindow : Window
     {
         if (child == horizontalScroller) horizontalScroller = null;
         if (child == verticalScroller) verticalScroller = null;
+        if (child is ScrollerBase scroller) scroller.ValueChanged -= OnScrollerValueChanged;
         base.OnChildRemoved(child);
     }
 
-    /// <summary>Vertical scroll position (0 without a vertical scroller).</summary>
+    private void OnScrollerValueChanged(object? sender, EventArgs e) =>
+        OnPropertyChanged(ReferenceEquals(sender, verticalScroller) ? nameof(VerticalValue) : nameof(HorizontalValue));
+
+    /// <summary>Vertical scroll position (0 without a vertical scroller). Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int VerticalValue
     {
         get => verticalScroller?.Value ?? 0;
@@ -79,7 +91,8 @@ public class ScrollableWindow : Window
         }
     }
 
-    /// <summary>Horizontal scroll position (0 without a horizontal scroller).</summary>
+    /// <summary>Horizontal scroll position (0 without a horizontal scroller). Binds two-way by default.</summary>
+    [BindsTwoWayByDefault]
     public int HorizontalValue
     {
         get => horizontalScroller?.Value ?? 0;
