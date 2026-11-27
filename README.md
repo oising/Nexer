@@ -169,7 +169,8 @@ check. To make these checks required, enable branch protection on `main` and add
 
 `dotnet pack .\Nexer.slnx -c Release -o artifacts\pkg` produces the NuGet packages (CI uploads them as the `packages`
 artifact). Pushing a `v*` tag (for example `v1.0.0-preview.1`) runs `.github/workflows/release.yml`, which packs with
-that version and publishes to nuget.org using the `NUGET_API_KEY` repository secret. The default version is set in
+that version and publishes to nuget.org via trusted publishing (OIDC; nuget.org policy `nexer-release` for
+`release.yml`, so no API key secret is stored). The default version is set in
 `Directory.Build.props`.
 
 The libraries have no third-party runtime dependencies besides XamlX/Mono.Cecil in the XAML build tooling. Tests use
