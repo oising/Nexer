@@ -2,68 +2,18 @@
 
 [![CI](https://github.com/oising/Nexer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/oising/Nexer/actions/workflows/ci.yml)
 
-Nexer is a .NET 10 text-mode windowing framework for VT terminals in the spirit of Turbo Vision and
-[Jexer](https://gitlab.com/AutumnMeowMeow/jexer): overlapping windows, menus, dialogs, a status bar and a
-widget set, with the UI authored in XAML that is compiled at build time by [XamlX](https://github.com/kekekeks/XamlX).
-Underneath sit reusable, dependency-free VT layers (cell surfaces, an input decoder, a diffing renderer, a headless
-terminal emulator and a console host) that can be used on their own.
+**Build classic text-mode apps for modern terminals in .NET 10, with XAML.** Nexer gives you overlapping windows,
+menus, dialogs, a status bar and a full widget set in the spirit of Turbo Vision and
+[Jexer](https://gitlab.com/AutumnMeowMeow/jexer). You describe the UI in XAML, which is compiled at build time,
+and bind it to view models with MVVM. It runs in any VT terminal with keyboard and mouse.
 
-## Project map
+![The Nexer demo: desktop, menu bar and windows](https://raw.githubusercontent.com/oising/Nexer/main/docs/images/desktop.svg)
 
-| Project | What it is |
-|---------|------------|
-| `src\Nexer.Core` | Cells, colours, styles, `CellSurface`, Unicode grapheme segmentation/width, `VtScanner`. |
-| `src\Nexer.Input` | VT input decoder: keys, mouse, paste, focus and resize events. |
-| `src\Nexer.Rendering` | `VtRenderer`: diffs cell surfaces into minimal VT output (true colour/256/16 colours). |
-| `src\Nexer.Emulation` | Headless terminal emulator (`Terminal`) that interprets VT output into a screen model. |
-| `src\Nexer.Hosting` | `ConsoleTerminalHost`: raw mode, alternate screen, input/resize pumps, restore on exit. |
-| `src\Nexer.Ui` | The widget toolkit (port of Jexer): `Application`, `Window`, controls, menus, dialogs, layouts, XAML runtime types (`Nexer.Ui.Markup`), compiled data binding (`Nexer.Ui.Data`). |
-| `src\Nexer.Ui.Testing` | `HeadlessHost` / `UiDriver`: run an application without a terminal, script input, inspect frames. |
-| `src\Nexer.Xaml.Compiler` | XamlX-based compiler for the `https://nexer.dev/ui` namespace. |
-| `src\Nexer.Xaml.Build` + `build\Nexer.Xaml.targets` | Build step that compiles `.xaml` into the app assembly (Cecil). |
-| `src\Nexer.Xaml.Generators` | Source generator: typed `x:Name` fields and `InitializeComponent()`. |
-| `src\Nexer.Xaml.Loader` | Runtime (System.Reflection.Emit) XAML loader. |
-| `samples\Nexer.Demo` | XAML port of Jexer's demo application. |
-| `samples\Nexer.Backend.Sample` | Low-level host/input/renderer sample without the widget toolkit. |
-| `tests\*` | xUnit tests per project, plus `Nexer.Ui.Xaml.Tests` (XAML against real controls) and `Nexer.Demo.Tests` (end-to-end). |
+| Check boxes, radio buttons, combo box | Data binding with validation | Trees, directory and file lists |
+|:---:|:---:|:---:|
+| ![Controls](https://raw.githubusercontent.com/oising/Nexer/main/docs/images/controls.svg) | ![Data binding](https://raw.githubusercontent.com/oising/Nexer/main/docs/images/binding.svg) | ![Tree view](https://raw.githubusercontent.com/oising/Nexer/main/docs/images/treeview.svg) |
 
-Design documents: [architecture](docs/architecture.md), [controls](docs/controls.md), [XAML](docs/xaml.md),
-[data binding](docs/binding.md), [backend](docs/backend.md), [compatibility](COMPATIBILITY.md).
-
-## NuGet packages
-
-Each runtime assembly ships as its own package; dependencies between them flow automatically.
-
-| Package | Use it for |
-|---------|------------|
-| `Nexer.Core` | Cells, colours, styles, `CellSurface`, Unicode width, `VtScanner`. |
-| `Nexer.Input` | Decoding VT input. |
-| `Nexer.Rendering` | Rendering cell surfaces to VT output. |
-| `Nexer.Hosting` | Running in a real console (`ConsoleTerminalHost`). |
-| `Nexer.Emulation` | The headless terminal emulator. |
-| `Nexer.Ui` | The widget toolkit (brings in Core, Input and Hosting). |
-| `Nexer.Ui.Testing` | Driving an application headlessly in tests. |
-| `Nexer.Xaml` | Build-time XAML: compiles `.xaml` into the assembly and generates code-behind members (development dependency). |
-| `Nexer.Xaml.Loader` | Loading XAML text at runtime. |
-
-## Running the demo
-
-```powershell
-dotnet run --project samples\Nexer.Demo
-```
-
-Run it in a VT terminal such as Windows Terminal. F10 or Alt+letter opens the menus, F6 switches windows, Ctrl+W
-closes a window and Alt+X exits (with confirmation). The demo windows cover buttons, check boxes, radio groups,
-text and password fields, combo boxes, spinners, progress bars, lists, trees, directory lists, message boxes, input
-boxes, the file open box, a scrollable window, split panes, translucent windows and an MVVM form with data binding
-(Demo → Data binding).
-
-`dotnet run --project samples\Nexer.Demo -- --smoke` builds every demo window headlessly, renders one frame of each
-and exits 0 (add `--dump` to print the frames).
-
-## Building an app with XAML
-
-Reference the toolkit and the build-time XAML package:
+## Quick start
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -78,35 +28,20 @@ Reference the toolkit and the build-time XAML package:
 </Project>
 ```
 
-When building against this repository's sources instead, reference the build step and the generator as projects and
-import the targets (see [docs/xaml.md](docs/xaml.md)):
-
-```xml
-<ItemGroup>
-  <ProjectReference Include="..\..\src\Nexer.Ui\Nexer.Ui.csproj" />
-  <ProjectReference Include="..\..\src\Nexer.Hosting\Nexer.Hosting.csproj" />
-  <ProjectReference Include="..\..\src\Nexer.Xaml.Build\Nexer.Xaml.Build.csproj"
-                    ReferenceOutputAssembly="false" OutputItemType="NexerXamlBuildTool" />
-  <ProjectReference Include="..\..\src\Nexer.Xaml.Generators\Nexer.Xaml.Generators.csproj"
-                    ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-</ItemGroup>
-<Import Project="..\..\build\Nexer.Xaml.targets" />
-```
-
-Every `*.xaml` file is compiled into the assembly. Pair it with a partial code-behind class:
+Write a window in XAML (`HelloWindow.xaml`) with a partial code-behind class:
 
 ```xml
 <Window xmlns="https://nexer.dev/ui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="MyApp.HelloWindow" Title="Hello" Bounds="0,0,30,8" Centered="True">
+        x:Class="MyApp.HelloWindow" Title="Hello" Width="30" Height="8" Centered="True">
   <Label X="2" Y="1" Text="Hello, Nexer!" />
-  <Button x:Name="OkButton" X="10" Y="3" Text="&amp;OK" Click="OnOk" />
+  <Button X="10" Y="3" Text="&amp;OK" Click="OnOk" />
 </Window>
 ```
 
 ```csharp
 public partial class HelloWindow : Window
 {
-    public HelloWindow() => InitializeComponent();   // generated
+    public HelloWindow() => InitializeComponent();   // generated from the XAML
     private void OnOk(object? sender, EventArgs e) => Close();
 }
 
@@ -117,24 +52,33 @@ await using var host = await ConsoleTerminalHost.StartAsync(new ConsoleTerminalH
 await app.RunAsync(host);
 ```
 
-`x:Name` fields are `internal` (use `InternalsVisibleTo` for tests). An `x:Class` root of type `Application` declares
-the menu bar and desktop. See [docs/xaml.md](docs/xaml.md) for markup extensions, value conversion and diagnostics
-(XAML errors fail the build with file/line positions), and `samples\Nexer.Demo` for a complete application.
+To see everything in action, run the demo in Windows Terminal or any other VT terminal:
+`dotnet run --project samples\Nexer.Demo`. F10 or Alt+letter opens the menus, F6 switches windows and Alt+X exits.
 
-Applications are testable without a terminal:
+## Controls at a glance
 
-```csharp
-var driver = new UiDriver(new MyApplication(), 80, 25);
-driver.Press("Alt+F");
-Assert.Contains("Exit", driver.Text());
-```
+| Category | Controls |
+|----------|----------|
+| Application | `Application` (menu bar, desktop, status bar, themes), `Window`, `ScrollableWindow`, `Desktop` |
+| Input | `Button`, `CheckBox`, `RadioGroup` + `RadioButton`, `Field`, `PasswordField`, `ComboBox`, `Spinner` |
+| Display | `Label`, `Text` (scrolling, word-wrapped), `ProgressBar` |
+| Lists and trees | `List`, `TreeView` + `TreeItem`, `DirectoryTreeItem`, `DirectoryList` |
+| Layout | `Panel`, `SplitPane`, `HScroller`/`VScroller`, `BoxLayout`, `AnchorLayout`, `StretchLayout` |
+| Menus and status | `Menu`, `MenuItem`, `SubMenu`, `MenuSeparator`, `StatusBar` + `StatusKey`, keyboard accelerators |
+| Dialogs | `MessageBox`, `InputBox`, `FileOpenBox`, modal windows (`await window.ShowModalAsync<T>()`) |
 
-### MVVM and data binding
+Windows can be moved, resized, zoomed, tiled and cascaded, and can be translucent. All of this works from the keyboard and
+the mouse. See [docs/controls.md](docs/controls.md) for the full API.
 
-Widgets have an inherited `DataContext` and XAML `{Binding}`s are compiled against `x:DataType` (no reflection;
-unknown members are build errors). Two-way bindings, converters, `StringFormat`, `ElementName`/`RelativeSource`,
-validation (`INotifyDataErrorInfo` and conversion errors), `ItemsSource`/`ObservableCollection` and `ICommand`
-are supported, and view-model changes from other threads are marshalled to the UI thread:
+## XAML and data binding
+
+- **Compiled at build time.** Every `.xaml` file is compiled into your assembly. You don't need a runtime parser or
+  reflection, and XAML mistakes fail the build with file and line numbers.
+- **Typed code-behind.** Each `x:Name` becomes a field, and `InitializeComponent()` is generated for you.
+- **Compiled bindings.** `{Binding}` is checked against `x:DataType`, so a typo in a member name is a build error.
+  Bindings support two-way binding, converters, `StringFormat`, `ElementName`/`RelativeSource`, validation,
+  `ItemsSource` with `ObservableCollection`, and `ICommand`. Changes made to a view model on another thread are
+  marshalled to the UI thread for you.
 
 ```xml
 <Window xmlns="https://nexer.dev/ui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -150,84 +94,48 @@ are supported, and view-model changes from other threads are marshalled to the U
 app.Windows.Add(new PersonWindow { DataContext = new PersonViewModel() });
 ```
 
-See [docs/binding.md](docs/binding.md).
+See [docs/xaml.md](docs/xaml.md) and [docs/binding.md](docs/binding.md).
 
-## Build and test
+## Develop and test without a terminal
 
-Run from this directory using the .NET 10 SDK:
-
-```powershell
-dotnet build .\Nexer.slnx
-dotnet test .\Nexer.slnx
-dotnet format .\Nexer.slnx --verify-no-changes --exclude external
-```
-
-Clone with `--recurse-submodules` (XamlX lives in `external/XamlX`). Pull requests are gated by
-`.github/workflows/ci.yml`, which runs build, tests and the demo `--smoke` run on Windows and Ubuntu plus the format
-check. To make these checks required, enable branch protection on `main` and add the `Build & test (windows-latest)`,
-`Build & test (ubuntu-latest)` and `Format check` status checks.
-
-`dotnet pack .\Nexer.slnx -c Release -o artifacts\pkg` produces the NuGet packages (CI uploads them as the `packages`
-artifact). Pushing a `v*` tag (for example `v1.0.0-preview.1`) runs `.github/workflows/release.yml`, which packs with
-that version and publishes to nuget.org via trusted publishing (OIDC; nuget.org policy `nexer-release` for
-`release.yml`, so no API key secret is stored). The default version is set in
-`Directory.Build.props`.
-
-The libraries have no third-party runtime dependencies besides XamlX/Mono.Cecil in the XAML build tooling. Tests use
-xUnit. Generated Unicode data and the official fixture ship with the Unicode license and attribution; see
-`THIRD-PARTY-NOTICES.txt`. Regeneration requires Python and network access (`python .\tools\generate_unicode.py`),
-not normal builds/tests. Ported Jexer code is MIT © Autumn Lamonte.
-
-## Headless emulator usage
-
-`Nexer.Emulation` can be used on its own to interpret application output:
+`Nexer.Ui.Testing` runs your whole application headlessly. You can script keys, typing and mouse clicks, then check
+the rendered screen, so UI tests run in CI like any other unit test:
 
 ```csharp
-using Nexer.Emulation;
-
-var terminal = new Terminal(80, 24);
-terminal.Feed("hello \u001b[32mworld\u001b[0m\r\n"u8);
-terminal.CompleteInput(); // Only at EOF, not after each read.
-string text = terminal.Screen.GetText(0, 1);
+var driver = new UiDriver(new MyApplication(), 80, 25);
+driver.Press("Alt+F");                       // open the File menu
+Assert.Contains("Exit", driver.Text());      // the screen as text
+var style = driver.Style(1, 0);              // colours and attributes of any cell
 ```
 
-It is not a complete xterm implementation; see [COMPATIBILITY.md](COMPATIBILITY.md) for precise support.
-## Core and emulation contracts
+- **`--smoke`.** `dotnet run --project samples\Nexer.Demo -- --smoke` builds every demo window headlessly, renders
+  one frame of each and exits 0. Add `--dump` to print the frames as text. It's a quick check that nothing
+  throws and everything draws, and CI runs it on every pull request. Add the same switch to your own app's `Program.cs`
+  (an interactive terminal isn't always available, for example in CI or for coding agents).
+- **Screenshots.** `ScreenDump.Svg(driver.Frame)` turns any frame into an SVG with the real colours, like the
+  images above. They are generated by `dotnet run --project samples\Nexer.Demo -- --screenshots docs\images`.
+- **Coding agents.** The [`nexer-tui` skill](.github/skills/nexer-tui/SKILL.md) teaches agents to build, bind and
+  test Nexer apps headlessly. It includes a ready-to-use starter template.
 
-`CellSurface`, `VtScanner`, and `Terminal` require a single owner; they are not thread-safe.
-Row spans must not be retained across mutations. Surface versions are monotonic,
-and row generations are never consumed/reset by readers. A new renderer must
-establish its own baseline even when every row is still at generation zero.
-This increment tracks whole dirty rows, not minimal intervals.
+## Packages
 
-`Write` accepts one non-control scalar; `WriteCluster` accepts one presegmented
-cluster. Both take width 1 or 2. Low-level surface callers supply width;
-`Terminal` segments/measures automatically. At the right edge, a width-2
-write becomes a styled blank. Replacing either half of a wide glyph blanks its
-partner with default style. Geometry is validated against a configurable cell
-limit before allocation. Cells default to a space with default terminal colors.
+| Package | Use it for |
+|---------|------------|
+| `Nexer.Ui` | The widget toolkit. It brings in the terminal host and the VT layers. |
+| `Nexer.Xaml` | Compiling `.xaml` at build time and generating code-behind (a development dependency). |
+| `Nexer.Ui.Testing` | Running applications headlessly in tests, and exporting SVG screenshots. |
+| `Nexer.Xaml.Loader` | Loading XAML text at runtime. |
 
-The scanner does not interpret parameters numerically or execute commands.
-CSI parameter bytes retain private prefixes, omitted values, and colon syntax.
-DCS callbacks contain the entire body after `ESC P`, including its raw header.
-String payloads are bytes, not automatically decoded text.
+The underlying VT layers (cell surfaces, input decoder, diffing renderer, console host and a headless terminal
+emulator) are separate packages with no dependencies, so you can use them on their own. See [docs/core.md](docs/core.md).
 
-Callback spans are borrowed until that callback returns. Callbacks must not
-reenter the scanner; exceptions from a sink should be treated as a failed stream
-and that scanner discarded. There are no I/O operations, timers, or background
-tasks. `Complete` is explicit EOF, not an ordinary read boundary, and resets
-partial sequence state so the instance can then process a fresh stream.
+## Learn more
 
-OSC ends at BEL or ST; DCS/SOS/PM/APC end at ST. CAN/SUB cancel sequences and are
-consumed rather than emitted as input keys. DEL is ignored outside strings.
-ESC followed by a non-backslash byte inside a string remains opaque payload;
-only CAN/SUB or a proper terminator ends it. This conservative policy prevents
-unsupported or overflowing strings from leaking embedded commands into text.
-Over-limit strings are discarded in full, while over-limit/malformed sequence
-headers are ignored through the next final byte. Raw eight-bit C1 bytes are not
-control introductions in this UTF-8 profile.
+- [Controls](docs/controls.md), [XAML](docs/xaml.md), [data binding](docs/binding.md)
+- [Architecture and repository map](docs/architecture.md), [backend: input, rendering and hosting](docs/backend.md),
+  [VT layers](docs/core.md), [terminal compatibility](COMPATIBILITY.md)
+- [Contributing: build, test, CI and releases](CONTRIBUTING.md)
 
-The scanner bounds raw header bytes rather than allocating numeric parameter
-objects. The emulator additionally bounds numeric values and
-parameter counts. Invalid UTF-8 uses replacement characters; incomplete UTF-8 is
-preserved across feeds and replaced at a control boundary or EOF.
+## License
+
+MIT (see [LICENSE](LICENSE)). The ported Jexer code is MIT © Autumn Lamonte. See `THIRD-PARTY-NOTICES.txt` for the Unicode data.

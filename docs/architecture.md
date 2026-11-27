@@ -15,7 +15,7 @@ XamlX checkout):
 | `..\src\jexer-windowing-analysis.md` (Jexer checkout) | Widget tree, coordinates, window chrome, event/draw order, z-order, layouts, translucence, Java defects (§9). |
 | `..\src\jexer-rendering-analysis.md` (Jexer checkout) | Cell model, diff algorithm, SGR, input parsing, Windows console setup. |
 | [`dotnet-vt-library-design.md`](../dotnet-vt-library-design.md) | Authoritative design for Rendering/Input/Hosting. Overrides Jexer where they differ. |
-| [`README.md`](../README.md), [`COMPATIBILITY.md`](../COMPATIBILITY.md) | What Nexer.Core / Nexer.Emulation guarantee. |
+| [`core.md`](core.md), [`COMPATIBILITY.md`](../COMPATIBILITY.md) | What Nexer.Core / Nexer.Emulation guarantee. |
 | `docs/tui-framework-guide.md` in a XamlX checkout (not in the `external\XamlX` submodule) | XamlX mapping contract, object-model rules, gotchas. |
 | Jexer sources: `..\src\jexer\**` (Jexer checkout) | Behavioural reference for ports. |
 
@@ -47,6 +47,25 @@ Xaml.Generators (Roslyn, netstandard2.0, no project references)
 
 An agent may only edit its own projects and their test projects. If you need something in another
 agent's area, write it up in your final report; the coordinator brokers it.
+
+### Repository map
+
+| Project | What it is |
+|---------|------------|
+| `src\Nexer.Core` | Cells, colours, styles, `CellSurface`, Unicode grapheme segmentation/width, `VtScanner`. |
+| `src\Nexer.Input` | VT input decoder: keys, mouse, paste, focus and resize events. |
+| `src\Nexer.Rendering` | `VtRenderer`: diffs cell surfaces into minimal VT output (true colour/256/16 colours). |
+| `src\Nexer.Emulation` | Headless terminal emulator (`Terminal`) that interprets VT output into a screen model. |
+| `src\Nexer.Hosting` | `ConsoleTerminalHost`: raw mode, alternate screen, input/resize pumps, restore on exit. |
+| `src\Nexer.Ui` | The widget toolkit (port of Jexer): `Application`, `Window`, controls, menus, dialogs, layouts, XAML runtime types (`Nexer.Ui.Markup`), compiled data binding (`Nexer.Ui.Data`). |
+| `src\Nexer.Ui.Testing` | `HeadlessHost` / `UiDriver`: run an application without a terminal, script input, inspect frames, export SVG screenshots. |
+| `src\Nexer.Xaml.Compiler` | XamlX-based compiler for the `https://nexer.dev/ui` namespace. |
+| `src\Nexer.Xaml.Build` + `build\Nexer.Xaml.targets` | Build step that compiles `.xaml` into the app assembly (Cecil). |
+| `src\Nexer.Xaml.Generators` | Source generator: typed `x:Name` fields and `InitializeComponent()`. |
+| `src\Nexer.Xaml.Loader` | Runtime (System.Reflection.Emit) XAML loader. |
+| `samples\Nexer.Demo` | XAML port of Jexer's demo application. |
+| `samples\Nexer.Backend.Sample` | Low-level host/input/renderer sample without the widget toolkit. |
+| `tests\*` | xUnit tests per project, plus `Nexer.Ui.Xaml.Tests` (XAML against real controls) and `Nexer.Demo.Tests` (end-to-end). |
 
 ## Contracts (frozen; coordinator-owned)
 

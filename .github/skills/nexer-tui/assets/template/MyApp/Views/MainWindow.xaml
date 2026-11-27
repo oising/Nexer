@@ -1,0 +1,24 @@
+<Window xmlns="https://nexer.dev/ui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MyApp.Views"
+        x:Class="MyApp.Views.MainWindow"
+        x:DataType="local:MainViewModel"
+        Title="Tasks" Width="60" Height="18" Centered="True">
+  <Window.StatusBar>
+    <StatusBar Text="Type a task and press Enter or Alt+A">
+      <StatusKey Key="F10" Text="Menu" Command="Menu" />
+      <StatusKey Key="Alt+X" Text="Exit" Command="Exit" />
+    </StatusBar>
+  </Window.StatusBar>
+
+  <Label Text="New task:" X="1" Y="1" />
+  <Field x:Name="NewTaskField" X="12" Y="1" Width="30" Text="{Binding NewTask}" Submitted="OnSubmitted" />
+  <Button x:Name="AddButton" Text="&amp;Add" X="44" Y="1" Command="{Binding AddCommand}" />
+
+  <List x:Name="TaskList" X="1" Y="4" Width="40" Height="9" ItemsSource="{Binding Tasks}"
+        DisplayMemberBinding="{Binding Title}" SelectedItem="{Binding Selected}" />
+  <Button x:Name="RemoveButton" Text="&amp;Remove" X="44" Y="4" Command="{Binding RemoveCommand}"
+          CommandParameter="{Binding Selected}" />
+
+  <Label X="1" Y="14" Width="56" Text="{Binding Summary}" />
+</Window>

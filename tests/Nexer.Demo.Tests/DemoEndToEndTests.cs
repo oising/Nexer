@@ -35,6 +35,30 @@ public class DemoEndToEndTests
     }
 
     [Fact]
+    public void ScreenshotModeWritesTheReadmeImages()
+    {
+        string dir = Path.Combine(Path.GetTempPath(), "nexer-shots-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            using var log = new StringWriter();
+            Assert.Equal(0, DemoScreenshots.Run(dir, log));
+            foreach (var (file, title, _) in DemoScreenshots.Shots)
+            {
+                var svg = System.Xml.Linq.XDocument.Load(Path.Combine(dir, file));
+                Assert.Equal(title, svg.Root!.Elements().First().Value);
+            }
+
+            string tree = File.ReadAllText(Path.Combine(dir, "treeview.svg"));
+            Assert.Contains("MyApp", tree, StringComparison.Ordinal);
+            Assert.DoesNotContain(Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar), tree, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            if (Directory.Exists(dir)) Directory.Delete(dir, recursive: true);
+        }
+    }
+
+    [Fact]
     public void MainScreenShowsMenuBarDesktopMainWindowAndStatusBar()
     {
         var (app, d) = Start();

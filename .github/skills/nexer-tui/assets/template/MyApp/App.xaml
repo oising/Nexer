@@ -1,0 +1,28 @@
+<Application xmlns="https://nexer.dev/ui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MyApp.App">
+  <Application.Menus>
+    <Menu Title="&amp;File">
+      <MenuItem Text="&amp;About..." Command="About" />
+      <MenuSeparator />
+      <MenuItem Text="E&amp;xit" Shortcut="Alt+X" Command="Exit" />
+    </Menu>
+    <Menu Title="&amp;Window">
+      <MenuItem Text="&amp;Tile" Command="Tile" />
+      <MenuItem Text="C&amp;ascade" Command="Cascade" />
+      <MenuSeparator />
+      <MenuItem Text="&amp;Next" Shortcut="F6" Command="WindowNext" />
+      <MenuItem Text="&amp;Close" Shortcut="Ctrl+W" Command="WindowClose" />
+    </Menu>
+  </Application.Menus>
+  <Application.Desktop>
+    <Desktop>
+      <Desktop.StatusBar>
+        <StatusBar Text="MyApp">
+          <StatusKey Key="F10" Text="Menu" Command="Menu" />
+          <StatusKey Key="Alt+X" Text="Exit" Command="Exit" />
+        </StatusBar>
+      </Desktop.StatusBar>
+    </Desktop>
+  </Application.Desktop>
+</Application>

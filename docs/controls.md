@@ -125,6 +125,9 @@ All types are in XML namespace `https://nexer.dev/ui`.
   `Click`, `Drag`, `Advance(TimeSpan)`, `Text()`, `Row(y)`, `Style(x, y)`).
 - `ScreenDump.Text` / `ScreenDump.Attributes`; `ScreenSnapshot` cell accessors `GetText`, `GetStyle`, `GetRole`,
   `GetRowText`.
+- `ScreenDump.Svg(frame, SvgOptions?)` renders a frame (or region) as a deterministic SVG. Indexed colours use Jexer's
+  VGA palette, with bold meaning bright. Box-drawing and block characters are drawn as shapes so borders join in any
+  font. The README screenshots are made with it (`Nexer.Demo -- --screenshots docs\images`).
 
 ## Data binding support (controls side)
 
