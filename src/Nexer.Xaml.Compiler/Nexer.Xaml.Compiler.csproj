@@ -14,6 +14,10 @@
     <Compile Include="$(XamlXSrc)XamlX.IL.Cecil\**\*.cs" Exclude="$(XamlXSrc)XamlX.IL.Cecil\obj\**;$(XamlXSrc)XamlX.IL.Cecil\bin\**" Link="XamlX.IL.Cecil\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <Target Name="EnsureXamlXSubmodule" BeforeTargets="BeforeBuild;CoreCompile" Condition="!Exists('$(XamlXSrc)XamlX')">
+    <Error Text="The XamlX git submodule is missing ($(XamlXSrc)). Clone with --recurse-submodules, or run: git submodule update --init --recursive" />
+  </Target>
+
   <ItemGroup>
     <!-- Nexer.Ui is read by metadata only; the colour syntax parser is shared as source so styles are parsed at compile time. -->
     <Compile Include="..\Nexer.Ui\StyleSyntax.cs" Link="Shared\StyleSyntax.cs" />
