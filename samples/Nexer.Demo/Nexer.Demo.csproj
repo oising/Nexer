@@ -3,7 +3,8 @@
   <!--
     Port of Jexer's demo. Every window is authored as .xaml + .xaml.cs code-behind and compiled into this assembly by
     the Nexer XAML build step (Cecil path, see docs\xaml.md). Run it with dotnet run (see README.md)
-    (pass the smoke switch, see Program.cs, to construct and render every demo window headlessly and exit).
+    (pass the smoke switch, see Program.cs, to construct and render every demo window headlessly and exit, or the
+    screenshots switch to write the README images as SVG).
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>

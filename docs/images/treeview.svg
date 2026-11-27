@@ -1,0 +1,298 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="'Cascadia Mono', Consolas, 'DejaVu Sans Mono', Menlo, monospace" font-size="15">
+<title>Nexer demo: tree views, a directory list and a list</title>
+<rect width="100%" height="100%" fill="#000000"/>
+<g shape-rendering="crispEdges">
+<rect x="0" y="0" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="18" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="36" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="54" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="72" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="90" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="90" width="684" height="18" fill="#0000a8"/>
+<rect x="792" y="90" width="108" height="18" fill="#a8a8a8"/>
+<rect x="0" y="108" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="108" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="108" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="126" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="126" width="207" height="18" fill="#0000a8"/>
+<rect x="315" y="126" width="9" height="18" fill="#00a8a8"/>
+<rect x="324" y="126" width="9" height="18" fill="#0000a8"/>
+<rect x="333" y="126" width="45" height="18" fill="#a8a8a8"/>
+<rect x="378" y="126" width="162" height="18" fill="#0000a8"/>
+<rect x="540" y="126" width="9" height="18" fill="#00a8a8"/>
+<rect x="549" y="126" width="9" height="18" fill="#0000a8"/>
+<rect x="558" y="126" width="207" height="18" fill="#a8a8a8"/>
+<rect x="765" y="126" width="9" height="18" fill="#00a8a8"/>
+<rect x="774" y="126" width="18" height="18" fill="#0000a8"/>
+<rect x="810" y="126" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="144" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="144" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="144" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="162" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="162" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="162" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="180" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="180" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="180" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="198" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="198" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="198" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="216" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="216" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="216" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="234" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="234" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="234" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="252" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="252" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="252" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="270" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="270" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="270" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="288" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="288" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="288" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="306" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="306" width="207" height="18" fill="#0000a8"/>
+<rect x="315" y="306" width="9" height="18" fill="#00a8a8"/>
+<rect x="324" y="306" width="216" height="18" fill="#0000a8"/>
+<rect x="540" y="306" width="9" height="18" fill="#00a8a8"/>
+<rect x="549" y="306" width="216" height="18" fill="#0000a8"/>
+<rect x="765" y="306" width="9" height="18" fill="#00a8a8"/>
+<rect x="774" y="306" width="18" height="18" fill="#0000a8"/>
+<rect x="810" y="306" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="324" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="324" width="18" height="18" fill="#0000a8"/>
+<rect x="126" y="324" width="18" height="18" fill="#00a8a8"/>
+<rect x="144" y="324" width="162" height="18" fill="#0000a8"/>
+<rect x="306" y="324" width="9" height="18" fill="#00a8a8"/>
+<rect x="315" y="324" width="18" height="18" fill="#0000a8"/>
+<rect x="333" y="324" width="18" height="18" fill="#00a8a8"/>
+<rect x="351" y="324" width="180" height="18" fill="#0000a8"/>
+<rect x="531" y="324" width="9" height="18" fill="#00a8a8"/>
+<rect x="540" y="324" width="18" height="18" fill="#0000a8"/>
+<rect x="558" y="324" width="9" height="18" fill="#00a8a8"/>
+<rect x="567" y="324" width="189" height="18" fill="#0000a8"/>
+<rect x="756" y="324" width="9" height="18" fill="#00a8a8"/>
+<rect x="765" y="324" width="27" height="18" fill="#0000a8"/>
+<rect x="810" y="324" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="342" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="342" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="342" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="360" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="360" width="207" height="18" fill="#0000a8"/>
+<rect x="315" y="360" width="9" height="18" fill="#00a8a8"/>
+<rect x="324" y="360" width="468" height="18" fill="#0000a8"/>
+<rect x="810" y="360" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="378" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="378" width="207" height="18" fill="#0000a8"/>
+<rect x="315" y="378" width="9" height="18" fill="#00a8a8"/>
+<rect x="324" y="378" width="468" height="18" fill="#0000a8"/>
+<rect x="810" y="378" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="396" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="396" width="18" height="18" fill="#0000a8"/>
+<rect x="126" y="396" width="9" height="18" fill="#00a8a8"/>
+<rect x="135" y="396" width="171" height="18" fill="#0000a8"/>
+<rect x="306" y="396" width="9" height="18" fill="#00a8a8"/>
+<rect x="315" y="396" width="477" height="18" fill="#0000a8"/>
+<rect x="810" y="396" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="414" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="414" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="414" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="432" width="108" height="18" fill="#a8a8a8"/>
+<rect x="108" y="432" width="684" height="18" fill="#0000a8"/>
+<rect x="810" y="432" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="450" width="126" height="18" fill="#a8a8a8"/>
+<rect x="810" y="450" width="90" height="18" fill="#a8a8a8"/>
+<rect x="0" y="468" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="486" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="504" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="522" width="900" height="18" fill="#a8a8a8"/>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="0" y="18" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="36" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="54" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="72" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="90" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="90" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="108" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="108" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="108" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="126" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="126" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="126" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="144" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="144" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="144" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="144" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="144" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="144" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="162" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="162" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="162" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="162" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="162" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="162" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="180" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="180" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="180" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="180" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="180" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="180" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="198" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="198" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="198" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="198" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="198" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="198" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="216" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="216" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="216" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="216" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="216" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="216" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="234" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="234" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="234" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="234" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="234" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="234" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="252" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="252" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="252" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="252" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="252" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="252" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="270" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="270" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="270" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="270" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="270" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="270" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="288" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="315" y="288" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="540" y="288" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="765" y="288" width="9" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="288" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="288" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="306" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="306" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="306" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="324" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="144" y="324" width="162" height="18" fill="#00a8a8" fill-opacity="0.5"/>
+<rect x="351" y="324" width="180" height="18" fill="#00a8a8" fill-opacity="0.5"/>
+<rect x="567" y="324" width="189" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="324" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="324" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="342" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="342" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="342" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="360" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="360" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="360" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="378" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="378" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="378" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="396" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="135" y="396" width="171" height="18" fill="#00a8a8" fill-opacity="0.25"/>
+<rect x="792" y="396" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="396" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="414" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="414" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="414" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="432" width="108" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="792" y="432" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="432" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="450" width="126" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="126" y="450" width="684" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="810" y="450" width="90" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="468" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="486" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="504" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+</g>
+<path fill="#000000" shape-rendering="crispEdges" d="M256 531h1v9h-1z M256 522h1v10h-1z"/>
+<path fill="#0000a8" shape-rendering="crispEdges" d=""/>
+<path fill="#54fc54" shape-rendering="crispEdges" d="M778 439h5v1h-5z M778 443h5v1h-5z M774 439h5v1h-5z M774 443h5v1h-5z M783 439h3v1h-3z M783 443h7v1h-7z M785 432h1v8h-1z M789 432h1v12h-1z"/>
+<path fill="#a80000" shape-rendering="crispEdges" d=""/>
+<path fill="#a8a8a8" shape-rendering="crispEdges" d="M130 153h5v1h-5z M130 153h1v9h-1z M130 144h1v10h-1z M139 153h5v1h-5z M135 153h5v1h-5z M337 153h5v1h-5z M337 153h1v9h-1z M337 144h1v10h-1z M346 153h5v1h-5z M342 153h5v1h-5z M130 171h5v1h-5z M130 171h1v9h-1z M130 162h1v10h-1z M139 171h5v1h-5z M135 171h5v1h-5z M337 171h5v1h-5z M337 171h1v9h-1z M337 162h1v10h-1z M346 171h5v1h-5z M342 171h5v1h-5z M130 189h5v1h-5z M130 189h1v9h-1z M130 180h1v10h-1z M139 189h5v1h-5z M135 189h5v1h-5z M337 189h5v1h-5z M337 180h1v10h-1z M346 189h5v1h-5z M342 189h5v1h-5z M130 207h5v1h-5z M130 207h1v9h-1z M130 198h1v10h-1z M139 207h5v1h-5z M135 207h5v1h-5z M130 225h1v9h-1z M130 216h1v10h-1z M148 225h5v1h-5z M148 225h1v9h-1z M148 216h1v10h-1z M157 225h5v1h-5z M153 225h5v1h-5z M130 243h1v9h-1z M130 234h1v10h-1z M148 243h5v1h-5z M148 243h1v9h-1z M148 234h1v10h-1z M157 243h5v1h-5z M153 243h5v1h-5z M130 261h1v9h-1z M130 252h1v10h-1z M148 261h5v1h-5z M148 252h1v10h-1z M157 261h5v1h-5z M153 261h5v1h-5z M130 279h5v1h-5z M130 270h1v10h-1z M139 279h5v1h-5z M135 279h5v1h-5z M148 297h5v1h-5z M148 297h1v9h-1z M148 288h1v10h-1z M157 297h5v1h-5z M153 297h5v1h-5z M148 315h5v1h-5z M148 306h1v10h-1z M157 315h5v1h-5z M153 315h5v1h-5z"/>
+<path fill="#fcfcfc" shape-rendering="crispEdges" d="M110 97h7v1h-7z M114 101h3v1h-3z M110 97h1v11h-1z M114 101h1v7h-1z M121 97h5v1h-5z M121 101h5v1h-5z M117 97h5v1h-5z M117 101h5v1h-5z M157 97h5v1h-5z M157 101h5v1h-5z M153 97h5v1h-5z M153 101h5v1h-5z M166 97h5v1h-5z M166 101h5v1h-5z M162 97h5v1h-5z M162 101h5v1h-5z M175 97h5v1h-5z M175 101h5v1h-5z M171 97h5v1h-5z M171 101h5v1h-5z M184 97h5v1h-5z M184 101h5v1h-5z M180 97h5v1h-5z M180 101h5v1h-5z M193 97h5v1h-5z M193 101h5v1h-5z M189 97h5v1h-5z M189 101h5v1h-5z M202 97h5v1h-5z M202 101h5v1h-5z M198 97h5v1h-5z M198 101h5v1h-5z M211 97h5v1h-5z M211 101h5v1h-5z M207 97h5v1h-5z M207 101h5v1h-5z M220 97h5v1h-5z M220 101h5v1h-5z M216 97h5v1h-5z M216 101h5v1h-5z M229 97h5v1h-5z M229 101h5v1h-5z M225 97h5v1h-5z M225 101h5v1h-5z M238 97h5v1h-5z M238 101h5v1h-5z M234 97h5v1h-5z M234 101h5v1h-5z M247 97h5v1h-5z M247 101h5v1h-5z M243 97h5v1h-5z M243 101h5v1h-5z M256 97h5v1h-5z M256 101h5v1h-5z M252 97h5v1h-5z M252 101h5v1h-5z M265 97h5v1h-5z M265 101h5v1h-5z M261 97h5v1h-5z M261 101h5v1h-5z M274 97h5v1h-5z M274 101h5v1h-5z M270 97h5v1h-5z M270 101h5v1h-5z M283 97h5v1h-5z M283 101h5v1h-5z M279 97h5v1h-5z M279 101h5v1h-5z M292 97h5v1h-5z M292 101h5v1h-5z M288 97h5v1h-5z M288 101h5v1h-5z M301 97h5v1h-5z M301 101h5v1h-5z M297 97h5v1h-5z M297 101h5v1h-5z M310 97h5v1h-5z M310 101h5v1h-5z M306 97h5v1h-5z M306 101h5v1h-5z M319 97h5v1h-5z M319 101h5v1h-5z M315 97h5v1h-5z M315 101h5v1h-5z M328 97h5v1h-5z M328 101h5v1h-5z M324 97h5v1h-5z M324 101h5v1h-5z M337 97h5v1h-5z M337 101h5v1h-5z M333 97h5v1h-5z M333 101h5v1h-5z M346 97h5v1h-5z M346 101h5v1h-5z M342 97h5v1h-5z M342 101h5v1h-5z M355 97h5v1h-5z M355 101h5v1h-5z M351 97h5v1h-5z M351 101h5v1h-5z M364 97h5v1h-5z M364 101h5v1h-5z M360 97h5v1h-5z M360 101h5v1h-5z M373 97h5v1h-5z M373 101h5v1h-5z M369 97h5v1h-5z M369 101h5v1h-5z M382 97h5v1h-5z M382 101h5v1h-5z M378 97h5v1h-5z M378 101h5v1h-5z M391 97h5v1h-5z M391 101h5v1h-5z M387 97h5v1h-5z M387 101h5v1h-5z M499 97h5v1h-5z M499 101h5v1h-5z M495 97h5v1h-5z M495 101h5v1h-5z M508 97h5v1h-5z M508 101h5v1h-5z M504 97h5v1h-5z M504 101h5v1h-5z M517 97h5v1h-5z M517 101h5v1h-5z M513 97h5v1h-5z M513 101h5v1h-5z M526 97h5v1h-5z M526 101h5v1h-5z M522 97h5v1h-5z M522 101h5v1h-5z M535 97h5v1h-5z M535 101h5v1h-5z M531 97h5v1h-5z M531 101h5v1h-5z M544 97h5v1h-5z M544 101h5v1h-5z M540 97h5v1h-5z M540 101h5v1h-5z M553 97h5v1h-5z M553 101h5v1h-5z M549 97h5v1h-5z M549 101h5v1h-5z M562 97h5v1h-5z M562 101h5v1h-5z M558 97h5v1h-5z M558 101h5v1h-5z M571 97h5v1h-5z M571 101h5v1h-5z M567 97h5v1h-5z M567 101h5v1h-5z M580 97h5v1h-5z M580 101h5v1h-5z M576 97h5v1h-5z M576 101h5v1h-5z M589 97h5v1h-5z M589 101h5v1h-5z M585 97h5v1h-5z M585 101h5v1h-5z M598 97h5v1h-5z M598 101h5v1h-5z M594 97h5v1h-5z M594 101h5v1h-5z M607 97h5v1h-5z M607 101h5v1h-5z M603 97h5v1h-5z M603 101h5v1h-5z M616 97h5v1h-5z M616 101h5v1h-5z M612 97h5v1h-5z M612 101h5v1h-5z M625 97h5v1h-5z M625 101h5v1h-5z M621 97h5v1h-5z M621 101h5v1h-5z M634 97h5v1h-5z M634 101h5v1h-5z M630 97h5v1h-5z M630 101h5v1h-5z M643 97h5v1h-5z M643 101h5v1h-5z M639 97h5v1h-5z M639 101h5v1h-5z M652 97h5v1h-5z M652 101h5v1h-5z M648 97h5v1h-5z M648 101h5v1h-5z M661 97h5v1h-5z M661 101h5v1h-5z M657 97h5v1h-5z M657 101h5v1h-5z M670 97h5v1h-5z M670 101h5v1h-5z M666 97h5v1h-5z M666 101h5v1h-5z M679 97h5v1h-5z M679 101h5v1h-5z M675 97h5v1h-5z M675 101h5v1h-5z M688 97h5v1h-5z M688 101h5v1h-5z M684 97h5v1h-5z M684 101h5v1h-5z M697 97h5v1h-5z M697 101h5v1h-5z M693 97h5v1h-5z M693 101h5v1h-5z M706 97h5v1h-5z M706 101h5v1h-5z M702 97h5v1h-5z M702 101h5v1h-5z M715 97h5v1h-5z M715 101h5v1h-5z M711 97h5v1h-5z M711 101h5v1h-5z M724 97h5v1h-5z M724 101h5v1h-5z M720 97h5v1h-5z M720 101h5v1h-5z M733 97h5v1h-5z M733 101h5v1h-5z M729 97h5v1h-5z M729 101h5v1h-5z M742 97h5v1h-5z M742 101h5v1h-5z M738 97h5v1h-5z M738 101h5v1h-5z M778 97h5v1h-5z M778 101h5v1h-5z M774 97h5v1h-5z M774 101h5v1h-5z M783 97h7v1h-7z M783 101h3v1h-3z M785 101h1v7h-1z M789 97h1v11h-1z M110 117h1v9h-1z M114 117h1v9h-1z M110 108h1v10h-1z M114 108h1v10h-1z M785 117h1v9h-1z M789 117h1v9h-1z M785 108h1v10h-1z M789 108h1v10h-1z M110 135h1v9h-1z M114 135h1v9h-1z M110 126h1v10h-1z M114 126h1v10h-1z M785 135h1v9h-1z M789 135h1v9h-1z M785 126h1v10h-1z M789 126h1v10h-1z M110 153h1v9h-1z M114 153h1v9h-1z M110 144h1v10h-1z M114 144h1v10h-1z M785 153h1v9h-1z M789 153h1v9h-1z M785 144h1v10h-1z M789 144h1v10h-1z M110 171h1v9h-1z M114 171h1v9h-1z M110 162h1v10h-1z M114 162h1v10h-1z M785 171h1v9h-1z M789 171h1v9h-1z M785 162h1v10h-1z M789 162h1v10h-1z M110 189h1v9h-1z M114 189h1v9h-1z M110 180h1v10h-1z M114 180h1v10h-1z M785 189h1v9h-1z M789 189h1v9h-1z M785 180h1v10h-1z M789 180h1v10h-1z M110 207h1v9h-1z M114 207h1v9h-1z M110 198h1v10h-1z M114 198h1v10h-1z M785 207h1v9h-1z M789 207h1v9h-1z M785 198h1v10h-1z M789 198h1v10h-1z M110 225h1v9h-1z M114 225h1v9h-1z M110 216h1v10h-1z M114 216h1v10h-1z M785 225h1v9h-1z M789 225h1v9h-1z M785 216h1v10h-1z M789 216h1v10h-1z M110 243h1v9h-1z M114 243h1v9h-1z M110 234h1v10h-1z M114 234h1v10h-1z M785 243h1v9h-1z M789 243h1v9h-1z M785 234h1v10h-1z M789 234h1v10h-1z M110 261h1v9h-1z M114 261h1v9h-1z M110 252h1v10h-1z M114 252h1v10h-1z M785 261h1v9h-1z M789 261h1v9h-1z M785 252h1v10h-1z M789 252h1v10h-1z M110 279h1v9h-1z M114 279h1v9h-1z M110 270h1v10h-1z M114 270h1v10h-1z M785 279h1v9h-1z M789 279h1v9h-1z M785 270h1v10h-1z M789 270h1v10h-1z M110 297h1v9h-1z M114 297h1v9h-1z M110 288h1v10h-1z M114 288h1v10h-1z M785 297h1v9h-1z M789 297h1v9h-1z M785 288h1v10h-1z M789 288h1v10h-1z M110 315h1v9h-1z M114 315h1v9h-1z M110 306h1v10h-1z M114 306h1v10h-1z M785 315h1v9h-1z M789 315h1v9h-1z M785 306h1v10h-1z M789 306h1v10h-1z M110 333h1v9h-1z M114 333h1v9h-1z M110 324h1v10h-1z M114 324h1v10h-1z M785 333h1v9h-1z M789 333h1v9h-1z M785 324h1v10h-1z M789 324h1v10h-1z M110 351h1v9h-1z M114 351h1v9h-1z M110 342h1v10h-1z M114 342h1v10h-1z M785 351h1v9h-1z M789 351h1v9h-1z M785 342h1v10h-1z M789 342h1v10h-1z M110 369h1v9h-1z M114 369h1v9h-1z M110 360h1v10h-1z M114 360h1v10h-1z M785 369h1v9h-1z M789 369h1v9h-1z M785 360h1v10h-1z M789 360h1v10h-1z M110 387h1v9h-1z M114 387h1v9h-1z M110 378h1v10h-1z M114 378h1v10h-1z M785 387h1v9h-1z M789 387h1v9h-1z M785 378h1v10h-1z M789 378h1v10h-1z M110 405h1v9h-1z M114 405h1v9h-1z M110 396h1v10h-1z M114 396h1v10h-1z M785 405h1v9h-1z M789 405h1v9h-1z M785 396h1v10h-1z M789 396h1v10h-1z M110 423h1v9h-1z M114 423h1v9h-1z M110 414h1v10h-1z M114 414h1v10h-1z M785 423h1v9h-1z M789 423h1v9h-1z M785 414h1v10h-1z M789 414h1v10h-1z M114 439h3v1h-3z M110 443h7v1h-7z M110 432h1v12h-1z M114 432h1v8h-1z M121 439h5v1h-5z M121 443h5v1h-5z M117 439h5v1h-5z M117 443h5v1h-5z M130 439h5v1h-5z M130 443h5v1h-5z M126 439h5v1h-5z M126 443h5v1h-5z M139 439h5v1h-5z M139 443h5v1h-5z M135 439h5v1h-5z M135 443h5v1h-5z M148 439h5v1h-5z M148 443h5v1h-5z M144 439h5v1h-5z M144 443h5v1h-5z M157 439h5v1h-5z M157 443h5v1h-5z M153 439h5v1h-5z M153 443h5v1h-5z M166 439h5v1h-5z M166 443h5v1h-5z M162 439h5v1h-5z M162 443h5v1h-5z M175 439h5v1h-5z M175 443h5v1h-5z M171 439h5v1h-5z M171 443h5v1h-5z M184 439h5v1h-5z M184 443h5v1h-5z M180 439h5v1h-5z M180 443h5v1h-5z M193 439h5v1h-5z M193 443h5v1h-5z M189 439h5v1h-5z M189 443h5v1h-5z M202 439h5v1h-5z M202 443h5v1h-5z M198 439h5v1h-5z M198 443h5v1h-5z M211 439h5v1h-5z M211 443h5v1h-5z M207 439h5v1h-5z M207 443h5v1h-5z M220 439h5v1h-5z M220 443h5v1h-5z M216 439h5v1h-5z M216 443h5v1h-5z M229 439h5v1h-5z M229 443h5v1h-5z M225 439h5v1h-5z M225 443h5v1h-5z M238 439h5v1h-5z M238 443h5v1h-5z M234 439h5v1h-5z M234 443h5v1h-5z M247 439h5v1h-5z M247 443h5v1h-5z M243 439h5v1h-5z M243 443h5v1h-5z M256 439h5v1h-5z M256 443h5v1h-5z M252 439h5v1h-5z M252 443h5v1h-5z M265 439h5v1h-5z M265 443h5v1h-5z M261 439h5v1h-5z M261 443h5v1h-5z M274 439h5v1h-5z M274 443h5v1h-5z M270 439h5v1h-5z M270 443h5v1h-5z M283 439h5v1h-5z M283 443h5v1h-5z M279 439h5v1h-5z M279 443h5v1h-5z M292 439h5v1h-5z M292 443h5v1h-5z M288 439h5v1h-5z M288 443h5v1h-5z M301 439h5v1h-5z M301 443h5v1h-5z M297 439h5v1h-5z M297 443h5v1h-5z M310 439h5v1h-5z M310 443h5v1h-5z M306 439h5v1h-5z M306 443h5v1h-5z M319 439h5v1h-5z M319 443h5v1h-5z M315 439h5v1h-5z M315 443h5v1h-5z M328 439h5v1h-5z M328 443h5v1h-5z M324 439h5v1h-5z M324 443h5v1h-5z M337 439h5v1h-5z M337 443h5v1h-5z M333 439h5v1h-5z M333 443h5v1h-5z M346 439h5v1h-5z M346 443h5v1h-5z M342 439h5v1h-5z M342 443h5v1h-5z M355 439h5v1h-5z M355 443h5v1h-5z M351 439h5v1h-5z M351 443h5v1h-5z M364 439h5v1h-5z M364 443h5v1h-5z M360 439h5v1h-5z M360 443h5v1h-5z M373 439h5v1h-5z M373 443h5v1h-5z M369 439h5v1h-5z M369 443h5v1h-5z M382 439h5v1h-5z M382 443h5v1h-5z M378 439h5v1h-5z M378 443h5v1h-5z M391 439h5v1h-5z M391 443h5v1h-5z M387 439h5v1h-5z M387 443h5v1h-5z M400 439h5v1h-5z M400 443h5v1h-5z M396 439h5v1h-5z M396 443h5v1h-5z M409 439h5v1h-5z M409 443h5v1h-5z M405 439h5v1h-5z M405 443h5v1h-5z M418 439h5v1h-5z M418 443h5v1h-5z M414 439h5v1h-5z M414 443h5v1h-5z M427 439h5v1h-5z M427 443h5v1h-5z M423 439h5v1h-5z M423 443h5v1h-5z M436 439h5v1h-5z M436 443h5v1h-5z M432 439h5v1h-5z M432 443h5v1h-5z M445 439h5v1h-5z M445 443h5v1h-5z M441 439h5v1h-5z M441 443h5v1h-5z M454 439h5v1h-5z M454 443h5v1h-5z M450 439h5v1h-5z M450 443h5v1h-5z M463 439h5v1h-5z M463 443h5v1h-5z M459 439h5v1h-5z M459 443h5v1h-5z M472 439h5v1h-5z M472 443h5v1h-5z M468 439h5v1h-5z M468 443h5v1h-5z M481 439h5v1h-5z M481 443h5v1h-5z M477 439h5v1h-5z M477 443h5v1h-5z M490 439h5v1h-5z M490 443h5v1h-5z M486 439h5v1h-5z M486 443h5v1h-5z M499 439h5v1h-5z M499 443h5v1h-5z M495 439h5v1h-5z M495 443h5v1h-5z M508 439h5v1h-5z M508 443h5v1h-5z M504 439h5v1h-5z M504 443h5v1h-5z M517 439h5v1h-5z M517 443h5v1h-5z M513 439h5v1h-5z M513 443h5v1h-5z M526 439h5v1h-5z M526 443h5v1h-5z M522 439h5v1h-5z M522 443h5v1h-5z M535 439h5v1h-5z M535 443h5v1h-5z M531 439h5v1h-5z M531 443h5v1h-5z M544 439h5v1h-5z M544 443h5v1h-5z M540 439h5v1h-5z M540 443h5v1h-5z M553 439h5v1h-5z M553 443h5v1h-5z M549 439h5v1h-5z M549 443h5v1h-5z M562 439h5v1h-5z M562 443h5v1h-5z M558 439h5v1h-5z M558 443h5v1h-5z M571 439h5v1h-5z M571 443h5v1h-5z M567 439h5v1h-5z M567 443h5v1h-5z M580 439h5v1h-5z M580 443h5v1h-5z M576 439h5v1h-5z M576 443h5v1h-5z M589 439h5v1h-5z M589 443h5v1h-5z M585 439h5v1h-5z M585 443h5v1h-5z M598 439h5v1h-5z M598 443h5v1h-5z M594 439h5v1h-5z M594 443h5v1h-5z M607 439h5v1h-5z M607 443h5v1h-5z M603 439h5v1h-5z M603 443h5v1h-5z M616 439h5v1h-5z M616 443h5v1h-5z M612 439h5v1h-5z M612 443h5v1h-5z M625 439h5v1h-5z M625 443h5v1h-5z M621 439h5v1h-5z M621 443h5v1h-5z M634 439h5v1h-5z M634 443h5v1h-5z M630 439h5v1h-5z M630 443h5v1h-5z M643 439h5v1h-5z M643 443h5v1h-5z M639 439h5v1h-5z M639 443h5v1h-5z M652 439h5v1h-5z M652 443h5v1h-5z M648 439h5v1h-5z M648 443h5v1h-5z M661 439h5v1h-5z M661 443h5v1h-5z M657 439h5v1h-5z M657 443h5v1h-5z M670 439h5v1h-5z M670 443h5v1h-5z M666 439h5v1h-5z M666 443h5v1h-5z M679 439h5v1h-5z M679 443h5v1h-5z M675 439h5v1h-5z M675 443h5v1h-5z M688 439h5v1h-5z M688 443h5v1h-5z M684 439h5v1h-5z M684 443h5v1h-5z M697 439h5v1h-5z M697 443h5v1h-5z M693 439h5v1h-5z M693 443h5v1h-5z M706 439h5v1h-5z M706 443h5v1h-5z M702 439h5v1h-5z M702 443h5v1h-5z M715 439h5v1h-5z M715 443h5v1h-5z M711 439h5v1h-5z M711 443h5v1h-5z M724 439h5v1h-5z M724 443h5v1h-5z M720 439h5v1h-5z M720 443h5v1h-5z M733 439h5v1h-5z M733 443h5v1h-5z M729 439h5v1h-5z M729 443h5v1h-5z M742 439h5v1h-5z M742 443h5v1h-5z M738 439h5v1h-5z M738 443h5v1h-5z M751 439h5v1h-5z M751 443h5v1h-5z M747 439h5v1h-5z M747 443h5v1h-5z M760 439h5v1h-5z M760 443h5v1h-5z M756 439h5v1h-5z M756 443h5v1h-5z M769 439h5v1h-5z M769 443h5v1h-5z M765 439h5v1h-5z M765 443h5v1h-5z"/>
+<text x="18" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">F</text>
+<text x="27" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">ile</text>
+<text x="72" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">E</text>
+<text x="81" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">dit</text>
+<text x="126" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">D</text>
+<text x="135" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">emo</text>
+<text x="180" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">W</text>
+<text x="189" y="14.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">indow</text>
+<text x="252" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">H</text>
+<text x="261" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">elp</text>
+<text x="126" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">[</text>
+<text x="135" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">■</text>
+<text x="144" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">]</text>
+<text x="405" y="104.04" textLength="81" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Tree View</text>
+<text x="747" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">[</text>
+<text x="756" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">↑</text>
+<text x="765" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">]</text>
+<text x="126" y="122.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Tree</text>
+<text x="333" y="122.04" textLength="99" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Directories</text>
+<text x="558" y="122.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Files</text>
+<text x="126" y="140.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Nexer</text>
+<text x="315" y="140.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▲</text>
+<text x="333" y="140.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">MyApp</text>
+<text x="540" y="140.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▲</text>
+<text x="558" y="140.04" textLength="207" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">App.xaml             1k</text>
+<text x="765" y="140.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▲</text>
+<text x="153" y="158.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Core</text>
+<text x="351" y="158.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">[</text>
+<text x="360" y="158.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">+</text>
+<text x="369" y="158.04" textLength="54" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">] docs</text>
+<text x="558" y="158.04" textLength="207" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">App.xaml.cs          0k</text>
+<text x="153" y="176.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Input</text>
+<text x="351" y="176.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">[</text>
+<text x="360" y="176.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">+</text>
+<text x="369" y="176.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">] src</text>
+<text x="558" y="176.04" textLength="207" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">MainWindow.xaml      3k</text>
+<text x="153" y="194.04" textLength="81" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Rendering</text>
+<text x="351" y="194.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">[</text>
+<text x="360" y="194.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">+</text>
+<text x="369" y="194.04" textLength="63" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">] tests</text>
+<text x="558" y="194.04" textLength="207" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">MyApp.csproj         0k</text>
+<text x="144" y="212.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">[</text>
+<text x="153" y="212.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">-</text>
+<text x="162" y="212.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">] Ui</text>
+<text x="558" y="212.04" textLength="207" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Program.cs           1k</text>
+<text x="171" y="230.04" textLength="72" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Controls</text>
+<text x="558" y="230.04" textLength="207" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">README.md            4k</text>
+<text x="171" y="248.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Menus</text>
+<text x="171" y="266.04" textLength="54" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Markup</text>
+<text x="144" y="284.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">[</text>
+<text x="153" y="284.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">-</text>
+<text x="162" y="284.04" textLength="54" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">] Xaml</text>
+<text x="171" y="302.04" textLength="72" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Compiler</text>
+<text x="171" y="320.04" textLength="54" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Loader</text>
+<text x="315" y="320.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▼</text>
+<text x="540" y="320.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▼</text>
+<text x="765" y="320.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▼</text>
+<text x="126" y="338.04" textLength="18" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">◀■</text>
+<text x="306" y="338.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▶</text>
+<text x="333" y="338.04" textLength="18" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">◀■</text>
+<text x="531" y="338.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▶</text>
+<text x="558" y="338.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">◀</text>
+<text x="756" y="338.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▶</text>
+<text x="126" y="356.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">List</text>
+<text x="126" y="374.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Apple</text>
+<text x="315" y="374.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▲</text>
+<text x="333" y="374.04" textLength="144" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Directory: MyApp</text>
+<text x="126" y="392.04" textLength="54" lengthAdjust="spacingAndGlyphs" fill="#a8a8a8" xml:space="preserve">Banana</text>
+<text x="315" y="392.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">■</text>
+<text x="126" y="410.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">◀</text>
+<text x="306" y="410.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#0000a8" xml:space="preserve">▶</text>
+<text x="9" y="536.04" textLength="18" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">F1</text>
+<text x="36" y="536.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Help</text>
+<text x="90" y="536.04" textLength="18" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">F3</text>
+<text x="117" y="536.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Open</text>
+<text x="171" y="536.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">F10</text>
+<text x="207" y="536.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Exit</text>
+<text x="270" y="536.04" textLength="198" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Treeview demonstration</text>
+</svg>

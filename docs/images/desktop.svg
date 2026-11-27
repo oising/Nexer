@@ -1,0 +1,242 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="'Cascadia Mono', Consolas, 'DejaVu Sans Mono', Menlo, monospace" font-size="15">
+<title>Nexer demo: desktop, menu bar and the main demo window with the File menu open</title>
+<rect width="100%" height="100%" fill="#000000"/>
+<g shape-rendering="crispEdges">
+<rect x="0" y="0" width="9" height="18" fill="#a8a8a8"/>
+<rect x="9" y="0" width="54" height="18" fill="#00a800"/>
+<rect x="63" y="0" width="837" height="18" fill="#a8a8a8"/>
+<rect x="0" y="18" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="36" width="18" height="18" fill="#a8a8a8"/>
+<rect x="18" y="36" width="171" height="18" fill="#00a800"/>
+<rect x="189" y="36" width="18" height="18" fill="#a8a8a8"/>
+<rect x="225" y="36" width="675" height="18" fill="#a8a8a8"/>
+<rect x="0" y="54" width="207" height="18" fill="#a8a8a8"/>
+<rect x="225" y="54" width="513" height="18" fill="#0000a8"/>
+<rect x="738" y="54" width="162" height="18" fill="#a8a8a8"/>
+<rect x="0" y="72" width="207" height="18" fill="#a8a8a8"/>
+<rect x="225" y="72" width="513" height="18" fill="#0000a8"/>
+<rect x="756" y="72" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="90" width="207" height="18" fill="#a8a8a8"/>
+<rect x="225" y="90" width="279" height="18" fill="#0000a8"/>
+<rect x="504" y="90" width="126" height="18" fill="#00a800"/>
+<rect x="630" y="90" width="108" height="18" fill="#0000a8"/>
+<rect x="756" y="90" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="108" width="18" height="18" fill="#a8a8a8"/>
+<rect x="225" y="108" width="513" height="18" fill="#0000a8"/>
+<rect x="756" y="108" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="126" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="126" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="126" width="63" height="18" fill="#00a800"/>
+<rect x="567" y="126" width="171" height="18" fill="#0000a8"/>
+<rect x="756" y="126" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="144" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="144" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="144" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="162" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="162" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="162" width="72" height="18" fill="#00a800"/>
+<rect x="576" y="162" width="162" height="18" fill="#0000a8"/>
+<rect x="756" y="162" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="180" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="180" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="180" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="198" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="198" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="198" width="108" height="18" fill="#00a800"/>
+<rect x="612" y="198" width="126" height="18" fill="#0000a8"/>
+<rect x="756" y="198" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="216" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="216" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="216" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="234" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="234" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="234" width="72" height="18" fill="#00a800"/>
+<rect x="576" y="234" width="162" height="18" fill="#0000a8"/>
+<rect x="756" y="234" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="252" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="252" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="252" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="270" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="270" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="270" width="90" height="18" fill="#00a800"/>
+<rect x="594" y="270" width="144" height="18" fill="#0000a8"/>
+<rect x="756" y="270" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="288" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="288" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="288" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="306" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="306" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="306" width="72" height="18" fill="#00a800"/>
+<rect x="576" y="306" width="162" height="18" fill="#0000a8"/>
+<rect x="756" y="306" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="324" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="324" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="324" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="342" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="342" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="342" width="63" height="18" fill="#00a800"/>
+<rect x="567" y="342" width="171" height="18" fill="#0000a8"/>
+<rect x="756" y="342" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="360" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="360" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="360" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="378" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="378" width="342" height="18" fill="#0000a8"/>
+<rect x="504" y="378" width="54" height="18" fill="#00a800"/>
+<rect x="558" y="378" width="180" height="18" fill="#0000a8"/>
+<rect x="756" y="378" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="396" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="396" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="396" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="414" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="414" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="414" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="432" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="432" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="432" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="450" width="162" height="18" fill="#a8a8a8"/>
+<rect x="162" y="450" width="576" height="18" fill="#0000a8"/>
+<rect x="756" y="450" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="468" width="180" height="18" fill="#a8a8a8"/>
+<rect x="756" y="468" width="144" height="18" fill="#a8a8a8"/>
+<rect x="0" y="486" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="504" width="900" height="18" fill="#a8a8a8"/>
+<rect x="0" y="522" width="900" height="18" fill="#a8a8a8"/>
+</g>
+<g shape-rendering="crispEdges">
+<rect x="207" y="18" width="693" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="207" y="36" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="225" y="36" width="675" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="54" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="72" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="72" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="90" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="90" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="108" width="18" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="18" y="108" width="144" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="738" y="108" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="108" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="126" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="126" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="126" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="144" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="144" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="144" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="162" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="162" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="162" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="180" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="180" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="180" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="198" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="198" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="198" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="216" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="216" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="216" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="234" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="234" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="234" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="252" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="252" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="252" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="270" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="270" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="270" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="288" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="288" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="288" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="306" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="306" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="306" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="324" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="324" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="324" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="342" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="342" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="342" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="360" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="360" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="360" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="378" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="378" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="378" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="396" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="396" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="396" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="414" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="414" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="414" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="432" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="432" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="432" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="450" width="162" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="738" y="450" width="18" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="450" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="468" width="180" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="180" y="468" width="576" height="18" fill="#545454" fill-opacity="0.25"/>
+<rect x="756" y="468" width="144" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="486" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+<rect x="0" y="504" width="900" height="18" fill="#0000a8" fill-opacity="0.25"/>
+</g>
+<path fill="#000000" shape-rendering="crispEdges" d="M13 27h5v1h-5z M13 27h1v9h-1z M22 27h5v1h-5z M18 27h5v1h-5z M31 27h5v1h-5z M27 27h5v1h-5z M40 27h5v1h-5z M36 27h5v1h-5z M49 27h5v1h-5z M45 27h5v1h-5z M58 27h5v1h-5z M54 27h5v1h-5z M67 27h5v1h-5z M63 27h5v1h-5z M76 27h5v1h-5z M72 27h5v1h-5z M85 27h5v1h-5z M81 27h5v1h-5z M94 27h5v1h-5z M90 27h5v1h-5z M103 27h5v1h-5z M99 27h5v1h-5z M112 27h5v1h-5z M108 27h5v1h-5z M121 27h5v1h-5z M117 27h5v1h-5z M130 27h5v1h-5z M126 27h5v1h-5z M139 27h5v1h-5z M135 27h5v1h-5z M148 27h5v1h-5z M144 27h5v1h-5z M157 27h5v1h-5z M153 27h5v1h-5z M166 27h5v1h-5z M162 27h5v1h-5z M175 27h5v1h-5z M171 27h5v1h-5z M184 27h5v1h-5z M180 27h5v1h-5z M189 27h5v1h-5z M193 27h1v9h-1z M13 45h1v9h-1z M13 36h1v10h-1z M193 45h1v9h-1z M193 36h1v10h-1z M13 63h5v1h-5z M13 63h1v9h-1z M13 54h1v10h-1z M22 63h5v1h-5z M18 63h5v1h-5z M31 63h5v1h-5z M27 63h5v1h-5z M40 63h5v1h-5z M36 63h5v1h-5z M49 63h5v1h-5z M45 63h5v1h-5z M58 63h5v1h-5z M54 63h5v1h-5z M67 63h5v1h-5z M63 63h5v1h-5z M76 63h5v1h-5z M72 63h5v1h-5z M85 63h5v1h-5z M81 63h5v1h-5z M94 63h5v1h-5z M90 63h5v1h-5z M103 63h5v1h-5z M99 63h5v1h-5z M112 63h5v1h-5z M108 63h5v1h-5z M121 63h5v1h-5z M117 63h5v1h-5z M130 63h5v1h-5z M126 63h5v1h-5z M139 63h5v1h-5z M135 63h5v1h-5z M148 63h5v1h-5z M144 63h5v1h-5z M157 63h5v1h-5z M153 63h5v1h-5z M166 63h5v1h-5z M162 63h5v1h-5z M175 63h5v1h-5z M171 63h5v1h-5z M184 63h5v1h-5z M180 63h5v1h-5z M189 63h5v1h-5z M193 63h1v9h-1z M193 54h1v10h-1z M13 81h1v9h-1z M13 72h1v10h-1z M193 81h1v9h-1z M193 72h1v10h-1z M13 99h5v1h-5z M13 90h1v10h-1z M22 99h5v1h-5z M18 99h5v1h-5z M31 99h5v1h-5z M27 99h5v1h-5z M40 99h5v1h-5z M36 99h5v1h-5z M49 99h5v1h-5z M45 99h5v1h-5z M58 99h5v1h-5z M54 99h5v1h-5z M67 99h5v1h-5z M63 99h5v1h-5z M76 99h5v1h-5z M72 99h5v1h-5z M85 99h5v1h-5z M81 99h5v1h-5z M94 99h5v1h-5z M90 99h5v1h-5z M103 99h5v1h-5z M99 99h5v1h-5z M112 99h5v1h-5z M108 99h5v1h-5z M121 99h5v1h-5z M117 99h5v1h-5z M130 99h5v1h-5z M126 99h5v1h-5z M139 99h5v1h-5z M135 99h5v1h-5z M148 99h5v1h-5z M144 99h5v1h-5z M157 99h5v1h-5z M153 99h5v1h-5z M166 99h5v1h-5z M162 99h5v1h-5z M175 99h5v1h-5z M171 99h5v1h-5z M184 99h5v1h-5z M180 99h5v1h-5z M189 99h5v1h-5z M193 90h1v10h-1z M630 99h9v9h-9z M513 108h9v9h-9z M522 108h9v9h-9z M531 108h9v9h-9z M540 108h9v9h-9z M549 108h9v9h-9z M558 108h9v9h-9z M567 108h9v9h-9z M576 108h9v9h-9z M585 108h9v9h-9z M594 108h9v9h-9z M603 108h9v9h-9z M612 108h9v9h-9z M621 108h9v9h-9z M630 108h9v9h-9z M567 135h9v9h-9z M513 144h9v9h-9z M522 144h9v9h-9z M531 144h9v9h-9z M540 144h9v9h-9z M549 144h9v9h-9z M558 144h9v9h-9z M567 144h9v9h-9z M576 171h9v9h-9z M513 180h9v9h-9z M522 180h9v9h-9z M531 180h9v9h-9z M540 180h9v9h-9z M549 180h9v9h-9z M558 180h9v9h-9z M567 180h9v9h-9z M576 180h9v9h-9z M612 207h9v9h-9z M513 216h9v9h-9z M522 216h9v9h-9z M531 216h9v9h-9z M540 216h9v9h-9z M549 216h9v9h-9z M558 216h9v9h-9z M567 216h9v9h-9z M576 216h9v9h-9z M585 216h9v9h-9z M594 216h9v9h-9z M603 216h9v9h-9z M612 216h9v9h-9z M576 243h9v9h-9z M513 252h9v9h-9z M522 252h9v9h-9z M531 252h9v9h-9z M540 252h9v9h-9z M549 252h9v9h-9z M558 252h9v9h-9z M567 252h9v9h-9z M576 252h9v9h-9z M594 279h9v9h-9z M513 288h9v9h-9z M522 288h9v9h-9z M531 288h9v9h-9z M540 288h9v9h-9z M549 288h9v9h-9z M558 288h9v9h-9z M567 288h9v9h-9z M576 288h9v9h-9z M585 288h9v9h-9z M594 288h9v9h-9z M576 315h9v9h-9z M513 324h9v9h-9z M522 324h9v9h-9z M531 324h9v9h-9z M540 324h9v9h-9z M549 324h9v9h-9z M558 324h9v9h-9z M567 324h9v9h-9z M576 324h9v9h-9z M567 351h9v9h-9z M513 360h9v9h-9z M522 360h9v9h-9z M531 360h9v9h-9z M540 360h9v9h-9z M549 360h9v9h-9z M558 360h9v9h-9z M567 360h9v9h-9z M558 387h9v9h-9z M513 396h9v9h-9z M522 396h9v9h-9z M531 396h9v9h-9z M540 396h9v9h-9z M549 396h9v9h-9z M558 396h9v9h-9z"/>
+<path fill="#545454" shape-rendering="crispEdges" d="M211 61h5v1h-5z M211 65h5v1h-5z M207 61h5v1h-5z M207 65h5v1h-5z M220 61h5v1h-5z M220 65h5v1h-5z M216 61h5v1h-5z M216 65h5v1h-5z M164 117h1v9h-1z M168 117h1v9h-1z M164 108h1v10h-1z M168 108h1v10h-1z"/>
+<path fill="#54fc54" shape-rendering="crispEdges" d="M724 457h5v1h-5z M724 461h5v1h-5z M720 457h5v1h-5z M720 461h5v1h-5z M729 457h3v1h-3z M729 461h7v1h-7z M731 450h1v8h-1z M735 450h1v12h-1z"/>
+<path fill="#54fcfc" shape-rendering="crispEdges" d=""/>
+<path fill="#a80000" shape-rendering="crispEdges" d=""/>
+<path fill="#a8a8a8" shape-rendering="crispEdges" d="M625 351h5v1h-5z M625 351h1v9h-1z M625 342h1v10h-1z M634 351h5v1h-5z M630 351h5v1h-5z M643 351h5v1h-5z M639 351h5v1h-5z M652 351h5v1h-5z M648 351h5v1h-5z M661 351h5v1h-5z M657 351h5v1h-5z M670 351h5v1h-5z M666 351h5v1h-5z M679 351h5v1h-5z M675 351h5v1h-5z M688 351h5v1h-5z M684 351h5v1h-5z M697 351h5v1h-5z M693 351h5v1h-5z M706 351h5v1h-5z M702 351h5v1h-5z M715 351h5v1h-5z M711 351h5v1h-5z M720 351h5v1h-5z M724 351h1v9h-1z M724 342h1v10h-1z M625 385h5v1h-5z M625 389h5v1h-5z M625 385h1v11h-1z M625 378h1v12h-1z M634 385h5v1h-5z M634 389h5v1h-5z M630 385h5v1h-5z M630 389h5v1h-5z M643 385h5v1h-5z M643 389h5v1h-5z M639 385h5v1h-5z M639 389h5v1h-5z M652 385h5v1h-5z M652 389h5v1h-5z M648 385h5v1h-5z M648 389h5v1h-5z M661 385h5v1h-5z M661 389h5v1h-5z M657 385h5v1h-5z M657 389h5v1h-5z M670 385h5v1h-5z M670 389h5v1h-5z M666 385h5v1h-5z M666 389h5v1h-5z M679 385h5v1h-5z M679 389h5v1h-5z M675 385h5v1h-5z M675 389h5v1h-5z M688 385h5v1h-5z M688 389h5v1h-5z M684 385h5v1h-5z M684 389h5v1h-5z M697 385h5v1h-5z M697 389h5v1h-5z M693 385h5v1h-5z M693 389h5v1h-5z M706 385h5v1h-5z M706 389h5v1h-5z M702 385h5v1h-5z M702 389h5v1h-5z M715 385h5v1h-5z M715 389h5v1h-5z M711 385h5v1h-5z M711 389h5v1h-5z M720 385h5v1h-5z M720 389h5v1h-5z M724 385h1v11h-1z M724 378h1v12h-1z"/>
+<path fill="#fcfc54" shape-rendering="crispEdges" d=""/>
+<path fill="#fcfcfc" shape-rendering="crispEdges" d="M229 61h5v1h-5z M229 65h5v1h-5z M225 61h5v1h-5z M225 65h5v1h-5z M238 61h5v1h-5z M238 65h5v1h-5z M234 61h5v1h-5z M234 65h5v1h-5z M247 61h5v1h-5z M247 65h5v1h-5z M243 61h5v1h-5z M243 65h5v1h-5z M256 61h5v1h-5z M256 65h5v1h-5z M252 61h5v1h-5z M252 65h5v1h-5z M265 61h5v1h-5z M265 65h5v1h-5z M261 61h5v1h-5z M261 65h5v1h-5z M274 61h5v1h-5z M274 65h5v1h-5z M270 61h5v1h-5z M270 65h5v1h-5z M283 61h5v1h-5z M283 65h5v1h-5z M279 61h5v1h-5z M279 65h5v1h-5z M292 61h5v1h-5z M292 65h5v1h-5z M288 61h5v1h-5z M288 65h5v1h-5z M301 61h5v1h-5z M301 65h5v1h-5z M297 61h5v1h-5z M297 65h5v1h-5z M310 61h5v1h-5z M310 65h5v1h-5z M306 61h5v1h-5z M306 65h5v1h-5z M319 61h5v1h-5z M319 65h5v1h-5z M315 61h5v1h-5z M315 65h5v1h-5z M328 61h5v1h-5z M328 65h5v1h-5z M324 61h5v1h-5z M324 65h5v1h-5z M337 61h5v1h-5z M337 65h5v1h-5z M333 61h5v1h-5z M333 65h5v1h-5z M346 61h5v1h-5z M346 65h5v1h-5z M342 61h5v1h-5z M342 65h5v1h-5z M355 61h5v1h-5z M355 65h5v1h-5z M351 61h5v1h-5z M351 65h5v1h-5z M364 61h5v1h-5z M364 65h5v1h-5z M360 61h5v1h-5z M360 65h5v1h-5z M373 61h5v1h-5z M373 65h5v1h-5z M369 61h5v1h-5z M369 65h5v1h-5z M382 61h5v1h-5z M382 65h5v1h-5z M378 61h5v1h-5z M378 65h5v1h-5z M508 61h5v1h-5z M508 65h5v1h-5z M504 61h5v1h-5z M504 65h5v1h-5z M517 61h5v1h-5z M517 65h5v1h-5z M513 61h5v1h-5z M513 65h5v1h-5z M526 61h5v1h-5z M526 65h5v1h-5z M522 61h5v1h-5z M522 65h5v1h-5z M535 61h5v1h-5z M535 65h5v1h-5z M531 61h5v1h-5z M531 65h5v1h-5z M544 61h5v1h-5z M544 65h5v1h-5z M540 61h5v1h-5z M540 65h5v1h-5z M553 61h5v1h-5z M553 65h5v1h-5z M549 61h5v1h-5z M549 65h5v1h-5z M562 61h5v1h-5z M562 65h5v1h-5z M558 61h5v1h-5z M558 65h5v1h-5z M571 61h5v1h-5z M571 65h5v1h-5z M567 61h5v1h-5z M567 65h5v1h-5z M580 61h5v1h-5z M580 65h5v1h-5z M576 61h5v1h-5z M576 65h5v1h-5z M589 61h5v1h-5z M589 65h5v1h-5z M585 61h5v1h-5z M585 65h5v1h-5z M598 61h5v1h-5z M598 65h5v1h-5z M594 61h5v1h-5z M594 65h5v1h-5z M607 61h5v1h-5z M607 65h5v1h-5z M603 61h5v1h-5z M603 65h5v1h-5z M616 61h5v1h-5z M616 65h5v1h-5z M612 61h5v1h-5z M612 65h5v1h-5z M625 61h5v1h-5z M625 65h5v1h-5z M621 61h5v1h-5z M621 65h5v1h-5z M634 61h5v1h-5z M634 65h5v1h-5z M630 61h5v1h-5z M630 65h5v1h-5z M643 61h5v1h-5z M643 65h5v1h-5z M639 61h5v1h-5z M639 65h5v1h-5z M652 61h5v1h-5z M652 65h5v1h-5z M648 61h5v1h-5z M648 65h5v1h-5z M661 61h5v1h-5z M661 65h5v1h-5z M657 61h5v1h-5z M657 65h5v1h-5z M670 61h5v1h-5z M670 65h5v1h-5z M666 61h5v1h-5z M666 65h5v1h-5z M679 61h5v1h-5z M679 65h5v1h-5z M675 61h5v1h-5z M675 65h5v1h-5z M688 61h5v1h-5z M688 65h5v1h-5z M684 61h5v1h-5z M684 65h5v1h-5z M724 61h5v1h-5z M724 65h5v1h-5z M720 61h5v1h-5z M720 65h5v1h-5z M729 61h7v1h-7z M729 65h3v1h-3z M731 65h1v7h-1z M735 61h1v11h-1z M731 81h1v9h-1z M735 81h1v9h-1z M731 72h1v10h-1z M735 72h1v10h-1z M731 99h1v9h-1z M735 99h1v9h-1z M731 90h1v10h-1z M735 90h1v10h-1z M731 117h1v9h-1z M735 117h1v9h-1z M731 108h1v10h-1z M735 108h1v10h-1z M164 135h1v9h-1z M168 135h1v9h-1z M164 126h1v10h-1z M168 126h1v10h-1z M731 135h1v9h-1z M735 135h1v9h-1z M731 126h1v10h-1z M735 126h1v10h-1z M164 153h1v9h-1z M168 153h1v9h-1z M164 144h1v10h-1z M168 144h1v10h-1z M731 153h1v9h-1z M735 153h1v9h-1z M731 144h1v10h-1z M735 144h1v10h-1z M164 171h1v9h-1z M168 171h1v9h-1z M164 162h1v10h-1z M168 162h1v10h-1z M731 171h1v9h-1z M735 171h1v9h-1z M731 162h1v10h-1z M735 162h1v10h-1z M164 189h1v9h-1z M168 189h1v9h-1z M164 180h1v10h-1z M168 180h1v10h-1z M731 189h1v9h-1z M735 189h1v9h-1z M731 180h1v10h-1z M735 180h1v10h-1z M164 207h1v9h-1z M168 207h1v9h-1z M164 198h1v10h-1z M168 198h1v10h-1z M731 207h1v9h-1z M735 207h1v9h-1z M731 198h1v10h-1z M735 198h1v10h-1z M164 225h1v9h-1z M168 225h1v9h-1z M164 216h1v10h-1z M168 216h1v10h-1z M731 225h1v9h-1z M735 225h1v9h-1z M731 216h1v10h-1z M735 216h1v10h-1z M164 243h1v9h-1z M168 243h1v9h-1z M164 234h1v10h-1z M168 234h1v10h-1z M731 243h1v9h-1z M735 243h1v9h-1z M731 234h1v10h-1z M735 234h1v10h-1z M164 261h1v9h-1z M168 261h1v9h-1z M164 252h1v10h-1z M168 252h1v10h-1z M731 261h1v9h-1z M735 261h1v9h-1z M731 252h1v10h-1z M735 252h1v10h-1z M164 279h1v9h-1z M168 279h1v9h-1z M164 270h1v10h-1z M168 270h1v10h-1z M731 279h1v9h-1z M735 279h1v9h-1z M731 270h1v10h-1z M735 270h1v10h-1z M164 297h1v9h-1z M168 297h1v9h-1z M164 288h1v10h-1z M168 288h1v10h-1z M731 297h1v9h-1z M735 297h1v9h-1z M731 288h1v10h-1z M735 288h1v10h-1z M164 315h1v9h-1z M168 315h1v9h-1z M164 306h1v10h-1z M168 306h1v10h-1z M731 315h1v9h-1z M735 315h1v9h-1z M731 306h1v10h-1z M735 306h1v10h-1z M164 333h1v9h-1z M168 333h1v9h-1z M164 324h1v10h-1z M168 324h1v10h-1z M731 333h1v9h-1z M735 333h1v9h-1z M731 324h1v10h-1z M735 324h1v10h-1z M164 351h1v9h-1z M168 351h1v9h-1z M164 342h1v10h-1z M168 342h1v10h-1z M731 351h1v9h-1z M735 351h1v9h-1z M731 342h1v10h-1z M735 342h1v10h-1z M164 369h1v9h-1z M168 369h1v9h-1z M164 360h1v10h-1z M168 360h1v10h-1z M731 369h1v9h-1z M735 369h1v9h-1z M731 360h1v10h-1z M735 360h1v10h-1z M164 387h1v9h-1z M168 387h1v9h-1z M164 378h1v10h-1z M168 378h1v10h-1z M731 387h1v9h-1z M735 387h1v9h-1z M731 378h1v10h-1z M735 378h1v10h-1z M164 405h1v9h-1z M168 405h1v9h-1z M164 396h1v10h-1z M168 396h1v10h-1z M731 405h1v9h-1z M735 405h1v9h-1z M731 396h1v10h-1z M735 396h1v10h-1z M164 423h1v9h-1z M168 423h1v9h-1z M164 414h1v10h-1z M168 414h1v10h-1z M731 423h1v9h-1z M735 423h1v9h-1z M731 414h1v10h-1z M735 414h1v10h-1z M164 441h1v9h-1z M168 441h1v9h-1z M164 432h1v10h-1z M168 432h1v10h-1z M731 441h1v9h-1z M735 441h1v9h-1z M731 432h1v10h-1z M735 432h1v10h-1z M168 457h3v1h-3z M164 461h7v1h-7z M164 450h1v12h-1z M168 450h1v8h-1z M175 457h5v1h-5z M175 461h5v1h-5z M171 457h5v1h-5z M171 461h5v1h-5z M184 457h5v1h-5z M184 461h5v1h-5z M180 457h5v1h-5z M180 461h5v1h-5z M193 457h5v1h-5z M193 461h5v1h-5z M189 457h5v1h-5z M189 461h5v1h-5z M202 457h5v1h-5z M202 461h5v1h-5z M198 457h5v1h-5z M198 461h5v1h-5z M211 457h5v1h-5z M211 461h5v1h-5z M207 457h5v1h-5z M207 461h5v1h-5z M220 457h5v1h-5z M220 461h5v1h-5z M216 457h5v1h-5z M216 461h5v1h-5z M229 457h5v1h-5z M229 461h5v1h-5z M225 457h5v1h-5z M225 461h5v1h-5z M238 457h5v1h-5z M238 461h5v1h-5z M234 457h5v1h-5z M234 461h5v1h-5z M247 457h5v1h-5z M247 461h5v1h-5z M243 457h5v1h-5z M243 461h5v1h-5z M256 457h5v1h-5z M256 461h5v1h-5z M252 457h5v1h-5z M252 461h5v1h-5z M265 457h5v1h-5z M265 461h5v1h-5z M261 457h5v1h-5z M261 461h5v1h-5z M274 457h5v1h-5z M274 461h5v1h-5z M270 457h5v1h-5z M270 461h5v1h-5z M283 457h5v1h-5z M283 461h5v1h-5z M279 457h5v1h-5z M279 461h5v1h-5z M292 457h5v1h-5z M292 461h5v1h-5z M288 457h5v1h-5z M288 461h5v1h-5z M301 457h5v1h-5z M301 461h5v1h-5z M297 457h5v1h-5z M297 461h5v1h-5z M310 457h5v1h-5z M310 461h5v1h-5z M306 457h5v1h-5z M306 461h5v1h-5z M319 457h5v1h-5z M319 461h5v1h-5z M315 457h5v1h-5z M315 461h5v1h-5z M328 457h5v1h-5z M328 461h5v1h-5z M324 457h5v1h-5z M324 461h5v1h-5z M337 457h5v1h-5z M337 461h5v1h-5z M333 457h5v1h-5z M333 461h5v1h-5z M346 457h5v1h-5z M346 461h5v1h-5z M342 457h5v1h-5z M342 461h5v1h-5z M355 457h5v1h-5z M355 461h5v1h-5z M351 457h5v1h-5z M351 461h5v1h-5z M364 457h5v1h-5z M364 461h5v1h-5z M360 457h5v1h-5z M360 461h5v1h-5z M373 457h5v1h-5z M373 461h5v1h-5z M369 457h5v1h-5z M369 461h5v1h-5z M382 457h5v1h-5z M382 461h5v1h-5z M378 457h5v1h-5z M378 461h5v1h-5z M391 457h5v1h-5z M391 461h5v1h-5z M387 457h5v1h-5z M387 461h5v1h-5z M400 457h5v1h-5z M400 461h5v1h-5z M396 457h5v1h-5z M396 461h5v1h-5z M409 457h5v1h-5z M409 461h5v1h-5z M405 457h5v1h-5z M405 461h5v1h-5z M418 457h5v1h-5z M418 461h5v1h-5z M414 457h5v1h-5z M414 461h5v1h-5z M427 457h5v1h-5z M427 461h5v1h-5z M423 457h5v1h-5z M423 461h5v1h-5z M436 457h5v1h-5z M436 461h5v1h-5z M432 457h5v1h-5z M432 461h5v1h-5z M445 457h5v1h-5z M445 461h5v1h-5z M441 457h5v1h-5z M441 461h5v1h-5z M454 457h5v1h-5z M454 461h5v1h-5z M450 457h5v1h-5z M450 461h5v1h-5z M463 457h5v1h-5z M463 461h5v1h-5z M459 457h5v1h-5z M459 461h5v1h-5z M472 457h5v1h-5z M472 461h5v1h-5z M468 457h5v1h-5z M468 461h5v1h-5z M481 457h5v1h-5z M481 461h5v1h-5z M477 457h5v1h-5z M477 461h5v1h-5z M490 457h5v1h-5z M490 461h5v1h-5z M486 457h5v1h-5z M486 461h5v1h-5z M499 457h5v1h-5z M499 461h5v1h-5z M495 457h5v1h-5z M495 461h5v1h-5z M508 457h5v1h-5z M508 461h5v1h-5z M504 457h5v1h-5z M504 461h5v1h-5z M517 457h5v1h-5z M517 461h5v1h-5z M513 457h5v1h-5z M513 461h5v1h-5z M526 457h5v1h-5z M526 461h5v1h-5z M522 457h5v1h-5z M522 461h5v1h-5z M535 457h5v1h-5z M535 461h5v1h-5z M531 457h5v1h-5z M531 461h5v1h-5z M544 457h5v1h-5z M544 461h5v1h-5z M540 457h5v1h-5z M540 461h5v1h-5z M553 457h5v1h-5z M553 461h5v1h-5z M549 457h5v1h-5z M549 461h5v1h-5z M562 457h5v1h-5z M562 461h5v1h-5z M558 457h5v1h-5z M558 461h5v1h-5z M571 457h5v1h-5z M571 461h5v1h-5z M567 457h5v1h-5z M567 461h5v1h-5z M580 457h5v1h-5z M580 461h5v1h-5z M576 457h5v1h-5z M576 461h5v1h-5z M589 457h5v1h-5z M589 461h5v1h-5z M585 457h5v1h-5z M585 461h5v1h-5z M598 457h5v1h-5z M598 461h5v1h-5z M594 457h5v1h-5z M594 461h5v1h-5z M607 457h5v1h-5z M607 461h5v1h-5z M603 457h5v1h-5z M603 461h5v1h-5z M616 457h5v1h-5z M616 461h5v1h-5z M612 457h5v1h-5z M612 461h5v1h-5z M625 457h5v1h-5z M625 461h5v1h-5z M621 457h5v1h-5z M621 461h5v1h-5z M634 457h5v1h-5z M634 461h5v1h-5z M630 457h5v1h-5z M630 461h5v1h-5z M643 457h5v1h-5z M643 461h5v1h-5z M639 457h5v1h-5z M639 461h5v1h-5z M652 457h5v1h-5z M652 461h5v1h-5z M648 457h5v1h-5z M648 461h5v1h-5z M661 457h5v1h-5z M661 461h5v1h-5z M657 457h5v1h-5z M657 461h5v1h-5z M670 457h5v1h-5z M670 461h5v1h-5z M666 457h5v1h-5z M666 461h5v1h-5z M679 457h5v1h-5z M679 461h5v1h-5z M675 457h5v1h-5z M675 461h5v1h-5z M688 457h5v1h-5z M688 461h5v1h-5z M684 457h5v1h-5z M684 461h5v1h-5z M697 457h5v1h-5z M697 461h5v1h-5z M693 457h5v1h-5z M693 461h5v1h-5z M706 457h5v1h-5z M706 461h5v1h-5z M702 457h5v1h-5z M702 461h5v1h-5z M715 457h5v1h-5z M715 461h5v1h-5z M711 457h5v1h-5z M711 461h5v1h-5z"/>
+<text x="18" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">F</text>
+<text x="27" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">ile</text>
+<text x="72" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">E</text>
+<text x="81" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">dit</text>
+<text x="126" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">D</text>
+<text x="135" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">emo</text>
+<text x="180" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">W</text>
+<text x="189" y="14.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">indow</text>
+<text x="252" y="14.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">H</text>
+<text x="261" y="14.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">elp</text>
+<text x="45" y="50.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">O</text>
+<text x="54" y="50.04" textLength="126" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">pen...  Ctrl+O</text>
+<text x="396" y="68.04" textLength="99" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Demo Window</text>
+<text x="693" y="68.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">[</text>
+<text x="702" y="68.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#54fc54" font-weight="bold" xml:space="preserve">↑</text>
+<text x="711" y="68.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">]</text>
+<text x="45" y="86.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">E</text>
+<text x="54" y="86.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#a80000" xml:space="preserve">x</text>
+<text x="63" y="86.04" textLength="117" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">it      Alt+X</text>
+<text x="207" y="104.04" textLength="18" lengthAdjust="spacingAndGlyphs" fill="#545454" font-weight="bold" xml:space="preserve">sa</text>
+<text x="225" y="104.04" textLength="72" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">ge Boxes</text>
+<text x="513" y="104.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">M</text>
+<text x="522" y="104.04" textLength="99" lengthAdjust="spacingAndGlyphs" fill="#54fcfc" font-weight="bold" xml:space="preserve">essageBoxes</text>
+<text x="180" y="140.04" textLength="144" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Open me as modal</text>
+<text x="513" y="140.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">M</text>
+<text x="522" y="140.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">o</text>
+<text x="531" y="140.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">dal</text>
+<text x="180" y="176.04" textLength="270" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Text fields, spinner, progress</text>
+<text x="513" y="176.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Field</text>
+<text x="558" y="176.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">s</text>
+<text x="180" y="212.04" textLength="324" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Radio buttons◎, checkbox√, combobox↓</text>
+<text x="513" y="212.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">C</text>
+<text x="522" y="212.04" textLength="81" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">heckBoxes</text>
+<text x="180" y="248.04" textLength="90" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Text areas</text>
+<text x="513" y="248.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">3</text>
+<text x="531" y="248.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Text</text>
+<text x="180" y="284.04" textLength="270" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Tree views, lists, directories</text>
+<text x="513" y="284.04" textLength="36" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Tree</text>
+<text x="549" y="284.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">V</text>
+<text x="558" y="284.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">iew</text>
+<text x="180" y="320.04" textLength="153" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Scrollable window</text>
+<text x="513" y="320.04" textLength="18" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Sc</text>
+<text x="531" y="320.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">r</text>
+<text x="540" y="320.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">oll</text>
+<text x="180" y="356.04" textLength="99" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Split panes</text>
+<text x="513" y="356.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">S</text>
+<text x="522" y="356.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">p</text>
+<text x="531" y="356.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">lit</text>
+<text x="621" y="374.04" textLength="45" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">Timer</text>
+<text x="180" y="392.04" textLength="117" lengthAdjust="spacingAndGlyphs" fill="#fcfcfc" font-weight="bold" xml:space="preserve">File open box</text>
+<text x="513" y="392.04" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#000000" xml:space="preserve">Ope</text>
+<text x="540" y="392.04" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#fcfc54" font-weight="bold" xml:space="preserve">n</text>
+</svg>

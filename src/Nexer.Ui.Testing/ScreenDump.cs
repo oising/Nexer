@@ -93,6 +93,23 @@ public static class ScreenDump
         Text(new ScreenSnapshot(surface), x, y, width, height, trimEnd);
 
     /// <summary>
+    /// Renders a rectangular region as a self-contained SVG image with the frame's colours and attributes, for
+    /// documentation screenshots and visual review (for example <c>File.WriteAllText("main.svg", ScreenDump.Svg(driver.Frame))</c>).
+    /// Output is deterministic, so regenerated images diff cleanly.
+    /// </summary>
+    public static string Svg(ScreenSnapshot screen, SvgOptions? options = null, int x = 0, int y = 0, int width = -1, int height = -1)
+    {
+        ArgumentNullException.ThrowIfNull(screen);
+        ArgumentOutOfRangeException.ThrowIfNegative(x);
+        ArgumentOutOfRangeException.ThrowIfNegative(y);
+        return ScreenSvg.Render(screen, options ?? new SvgOptions(), x, y, width, height);
+    }
+
+    /// <summary>Renders a surface as SVG (see <see cref="Svg(ScreenSnapshot,SvgOptions?,int,int,int,int)"/>).</summary>
+    public static string Svg(IReadOnlyCellSurface surface, SvgOptions? options = null, int x = 0, int y = 0, int width = -1, int height = -1) =>
+        Svg(new ScreenSnapshot(surface), options, x, y, width, height);
+
+    /// <summary>
     /// An attribute dump of a region: each distinct style gets a letter (a, b, c... in order of first appearance)
     /// and the legend follows the grid.
     /// </summary>
