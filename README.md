@@ -52,6 +52,9 @@ await using var host = await ConsoleTerminalHost.StartAsync(new ConsoleTerminalH
 await app.RunAsync(host);
 ```
 
+To build from source, clone with submodules (`git clone --recurse-submodules`, or run
+`git submodule update --init --recursive` in an existing clone) since XamlX is vendored in `external/XamlX`.
+
 To see everything in action, run the demo in Windows Terminal or any other VT terminal:
 `dotnet run --project samples\Nexer.Demo`. F10 or Alt+letter opens the menus, F6 switches windows and Alt+X exits.
 
