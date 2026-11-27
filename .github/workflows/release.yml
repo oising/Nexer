@@ -21,6 +21,9 @@ jobs:
     name: Pack & publish to nuget.org
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write # OIDC token for nuget.org trusted publishing (policy "nexer-release", workflow release.yml)
     steps:
       - uses: actions/checkout@v7
         with:
@@ -61,10 +64,17 @@ jobs:
           path: artifacts/pkg/*
           if-no-files-found: error
 
+      # Exchanges the GitHub OIDC token for a short-lived (1 hour) nuget.org API key; keep it just before the push.
+      - name: NuGet login
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: oisin
+
       - name: Publish
         # Symbol packages (.snupkg) next to each .nupkg are pushed automatically.
         run: >-
           dotnet nuget push "artifacts/pkg/*.nupkg"
-          --api-key "${{ secrets.NUGET_API_KEY }}"
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
